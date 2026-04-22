@@ -22,9 +22,7 @@ def chrono(func):
         return resultat
     return wrapper
 
-# ==========================================
-# 1. FONCTIONS UTILITAIRES (FEATURES)
-# ==========================================
+# FONCTIONS UTILITAIRES
 
 def analyze_oscillation(signal, dt, snr_threshold=15.0, min_amp_physique=0.005):
     """
@@ -74,7 +72,8 @@ def analyze_oscillation(signal, dt, snr_threshold=15.0, min_amp_physique=0.005):
 
     #  Le pic sort-il vraiment du bruit de fond spectral ?
     is_above_noise = pic_max > (snr_threshold * np.median(yf_pos))
-    #print(f'pic_max : {pic_max}, median yf_pos : {snr_threshold * np.mean(yf_pos)}')
+    #print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
+    #print(f'pic_max : {pic_max:.5f}, median yf_pos : {snr_threshold * np.mean(yf_pos):.5f}')
     
     # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = pic_max > min_amp_physique
@@ -111,7 +110,7 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     - window_size : Taille de la fenêtre d'apprentissage du bruit.
     - z_threshold : Nombre d'écarts-types pour déclencher l'alarme (5 est standard).
     """
-    # Calcul de la moyenne et de l'écart-type glissants sur TOUT le fichier
+    # Calcul de la moyenne et de l'écart-type glissants
     rolling_mean = Ucav_series.rolling(window=window_size).mean()
     rolling_std = Ucav_series.rolling(window=window_size).std()
     
@@ -121,10 +120,12 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     # Calcul du Z-Score global
     z_scores = abs((Ucav_series - rolling_mean) / rolling_std)
     
-    # On demande directement la position numérique de l'index 0.0
+    
     if 0.0 in Ucav_series.index:
+        # On demande directement la position numérique de l'index 0.0
         pos_t_zero = Ucav_series.index.get_loc(0.0)
     else:
+        # On prend la position central du signal
         pos_t_zero = int((Ucav_series.size / 2) - 1)
     
     # Définir les bornes (les -9900 et +100 points autour de ce 0)
@@ -134,7 +135,7 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     # Isoler uniquement la zone qui nous intéresse
     z_scores_cible = z_scores.iloc[start_pos:end_pos]
     
-    # Trouver le premier point qui dépasse le seuil DANS LA ZONE CIBLE
+    # Trouver le premier point qui dépasse le seuil dans la zone cible
     anomalies = z_scores_cible[z_scores_cible > z_threshold]
     
     if not anomalies.empty:
@@ -174,38 +175,50 @@ def get_slope(t_array, y_array):
     
     return pente
 
-@chrono
-def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points=50):
+def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points=1000):
     """
     Classifie le défaut en appliquant l'arbre de décision.
     - t0_idx : l'index dans les tableaux correspondant au moment du défaut (trip).
     - window_points : le nombre de points à analyser JUSTE AVANT t0.
     """
     # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
-    # A voir si c'est nécessaire    
-    #print(f'length time : {time.shape}')
-    start_idx = max(0, t0_idx - window_points)
-    end_idx = t0_idx + 10
+    # A voir si c'est nécessaire
+    # t0_idx : index ou le signal Ucav comment à décrocher
+    # zero_idx : index de 0.0 dans time, si pas de 0.0 dans time, index central   
     zero_arg = np.argwhere(time == 0)
     if zero_arg.size == 0:
         zero_idx = int((time.size / 2) - 1)
     else:
         zero_idx = zero_arg[0][0] #Indice ou time = 0, t0_idx est le moment ou Ucav commence à chuter
-    print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}')
-    print(f'index de 0 : {zero_idx}')
-    print(f'start : {start_idx}, end : {end_idx}')
-    
-    t_win     = time[start_idx:end_idx]
-    Uci_win   = Uci.iloc[start_idx:end_idx]
-    Ucr_win   = Ucr.iloc[start_idx:end_idx]
-    Ucav_win  = Ucav.iloc[start_idx:end_idx]
-    modIQ_win = modIQ.iloc[start_idx:end_idx]
+    print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
+    #print(f'start : {start_idx}, end : {end_idx}')
+
+    SEUILS_AMPLITUDE = {
+        "Ucav": 0.005,
+        "Uci":  0.05,
+        "modIQ": 1
+    }
 
     dt_microseconds = np.mean(np.diff(time))
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz
-    osc_Uci, f_Uci = analyze_oscillation(Uci.iloc[t0_idx:zero_idx], dt_seconds)
-    osc_modIQ, f_modIQ = analyze_oscillation(modIQ.iloc[t0_idx:zero_idx], dt_seconds)
-    osc_Ucav, f_Ucav = analyze_oscillation(Ucav.iloc[t0_idx:zero_idx], dt_seconds)
+
+    osc_Uci, f_Uci = analyze_oscillation(
+        Uci.iloc[t0_idx:zero_idx], 
+        dt_seconds, 
+        min_amp_physique=SEUILS_AMPLITUDE["Uci"]
+    )
+    
+    osc_modIQ, f_modIQ = analyze_oscillation(
+        modIQ.iloc[t0_idx:zero_idx], 
+        dt_seconds, 
+        min_amp_physique=SEUILS_AMPLITUDE["modIQ"]
+    )
+    
+    osc_Ucav, f_Ucav = analyze_oscillation(
+        Ucav.iloc[t0_idx:zero_idx], 
+        dt_seconds,  
+        min_amp_physique=SEUILS_AMPLITUDE["Ucav"]
+    )
     
     # Si les trois oscillent (on prend la fréquence de la cavité Ucav comme référence)
     if osc_Uci and osc_modIQ and osc_Ucav:
@@ -214,47 +227,87 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
             return "Loop instability" # A l'air de marcher
         else:
             return "Taconis"
+    
+    # Calcul du "Niveau de repos" (Baseline)
+    # On prend une fenêtre "saine" bien avant t0 (ex: entre t0-500 et t0-100)
+    # np.median est parfait ici pour ignorer le bruit
+    idx_base_start = max(0, t0_idx - 500)
+    idx_base_end = max(1, t0_idx - 100)
+    base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
+    base_Uci   = np.median(Uci.iloc[idx_base_start:idx_base_end])
+    base_Ucr   = np.median(Ucr.iloc[idx_base_start:idx_base_end])
+    #print(f'median modIQ : {base_modIQ}, median Uci : {base_Uci}, median Ucr : {base_Ucr}')
+    
+    # Définition de la "Zone de Recherche de Pic" (Autour de t0)
+    # On autorise le code à chercher un peu avant ET un peu après t0
+    # On limite la fin à zero_idx pour ne pas analyser la chute libre finale
+    #zone_start = max(0, t0_idx - 50)
+    #zone_end   = min(zero_idx, t0_idx + 50) 
+    zone_start = t0_idx - 50
+    zone_end   = zero_idx + 50
+    
+    # Extraction des comportements extrêmes dans cette zone
+    max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
+    max_Ucr_zone = Ucr.iloc[zone_start:zone_end].max()
+    
+    # Pour Uci, comme on cherche à savoir s'il a chuté ou monté, 
+    # on regarde sa valeur moyenne juste au moment de l'événement
+    eval_end = min(zero_idx, t0_idx + 20)
+    if zero_idx < t0_idx:
+        Uci_event = np.mean(Uci.iloc[t0_idx:t0_idx+20])
+    else :
+        Uci_event = np.mean(Uci.iloc[t0_idx:eval_end])
+    #print(f'Uci event : {Uci_event}, eval end : {eval_end}')
+    
+    # Calcul des variations réelles (L'événement par rapport au repos)
+    delta_modIQ = max_modIQ_zone - base_modIQ
+    delta_Uci   = Uci_event - base_Uci
+    delta_Ucr   = max_Ucr_zone - base_Ucr
+    #print(f'Variations (Deltas) -> modIQ: {delta_modIQ:.4f} | Uci: {delta_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
+
+    # Calcul des variations en POURCENTAGE
+    # Sécurité anti-division par (presque) zéro : 
+    EPSILON = 0.01 
+    
+    base_modIQ_safe = max(abs(base_modIQ), EPSILON)
+    base_Uci_safe   = max(abs(base_Uci), EPSILON)
+    base_Ucr_safe   = max(abs(base_Ucr), EPSILON)
+    
+    pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
+    pct_Uci   = (delta_Uci / base_Uci_safe) * 100.0
+    pct_Ucr   = (delta_Ucr / base_Ucr_safe) * 100.0
+    
+    print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci: {delta_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
+    print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci: {pct_Uci:.1f}% | Ucr: {pct_Ucr:.1f}% ')
+    
+    SEUIL_BRUIT_PCT = 5.0
+    SEUIL_GROS_PIC_PCT = 100.00
+    
+    # Si modIQ monte plus que le bruit ambiant
+    if pct_modIQ > SEUIL_BRUIT_PCT:
         
+        # CAS 1 : Power Chain Gain (ÉNORME pic > 100% ET Uci baisse d'au moins 5%)
+        if pct_modIQ > SEUIL_GROS_PIC_PCT and pct_Uci < -SEUIL_BRUIT_PCT:
+            return "Power chain gain"
+            
+        # CAS 2 : Beam Loss (Montée de modIQ entre 5% et 100% ET montée de Uci > 5%)
+        elif SEUIL_BRUIT_PCT < pct_modIQ <= SEUIL_GROS_PIC_PCT and pct_Uci > SEUIL_BRUIT_PCT:
+            return "Beam loss"
+
+    start_idx = max(0, t0_idx - window_points)
+    end_idx = t0_idx
+
+    t_win     = time[start_idx:end_idx]
+    Uci_win   = Uci.iloc[start_idx:end_idx]
+    Ucr_win   = Ucr.iloc[start_idx:end_idx]
+    Ucav_win  = Ucav.iloc[start_idx:end_idx]
+    modIQ_win = modIQ.iloc[start_idx:end_idx]
+
     # Analyse des tendances (Pentes)
-    #print(f'max modIQ : {modIQ.max()}, pos max modIQ : {modIQ.max()}')
     trend_modIQ = get_trend(t_win, modIQ_win)
     trend_Uci   = get_trend(t_win, Uci_win)
     trend_Ucr   = get_trend(t_win, Ucr_win)
-    '''
-    #trend_modIQ = get_trend(time, modIQ)
-    #trend_Uci   = get_trend(time, Uci)
-    #trend_Ucr   = get_trend(time, Ucr)
-    print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}')
-
-    # Arbre de décision pour modIQ croissant
-    if trend_modIQ == 1:
-        if trend_Uci == -1:
-            return "Power chain gain"
-        elif trend_Uci == 1:
-            return "Beam loss"
-    '''
-    # Calcul des vraies pentes
-    pente_modIQ = get_slope(t_win, modIQ_win)
-    pente_Uci   = get_slope(t_win, Uci_win)
-    pente_Ucr   = get_slope(t_win, Ucr_win)
-    
-    print(f'Pentes brutes -> modIQ: {pente_modIQ:.4f} | Uci: {pente_Uci:.4f} | Ucr: {pente_Ucr:.4f}')
-
-    SEUIL_BRUIT = 0.01        # En dessous de ça (ex: 0.1), on considère que c'est plat
-    SEUIL_FORTE_MONTEE = 15.0 # Au-dessus de ça, c'est une montée brutale
-    
-    # Si modIQ est croissant (et que ce n'est pas juste du bruit)
-    if pente_modIQ > SEUIL_BRUIT:
-        print(f'pente modIQ : {pente_modIQ}, pente Uci : {pente_Uci}')
-        print(f'pente uci < -seuil bruit {pente_Uci < -SEUIL_BRUIT}')
-        
-        # CAS 1 : Grosse montée de modIQ ET baisse de Uci
-        if pente_modIQ > SEUIL_FORTE_MONTEE and pente_Uci < -SEUIL_BRUIT:
-            return "Power chain gain"
-            
-        # CAS 2 : Légère montée de modIQ ET légère montée de Uci
-        elif SEUIL_BRUIT < pente_modIQ <= SEUIL_FORTE_MONTEE and pente_Uci > SEUIL_BRUIT:
-            return "Beam loss"
+    print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}') 
 
     # Arbre de décision pour Uci croissant
     if trend_Uci == 1:
@@ -262,6 +315,10 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
             return "Quench"
         elif trend_Ucr == 1:
             return "Quench aside"
+
+    if pct_Ucr > SEUIL_GROS_PIC_PCT:
+        # Cas particulier pour le moment non répertorié ou Ucr croit seul après t0 tandis que Ucav, Uci et modIQ baisse.
+        return "Ucr croissant seul"
             
     # Si aucune condition n'est remplie
     return "Other"
@@ -333,29 +390,38 @@ def classify(file_name):
 
 if __name__ == "__main__":
     '''
-    #file = '../LLRF/2020/CMA/CMA03/2020 12 06 CMA03_0001' #Power chain gain
-    file = '../LLRF/2020/CMA/CMA01/2020 10 22 CMA01_0003'
+    file = '../../LLRF/2020/CMB/CMB06B/2020 11 30 CMB06-CAV2_0009 13h18 50ms' # Détecte bien quench
+    print(file)
+    label = classify(file)
+    print(label)
+    file = '../../LLRF/2020/CMB/CMB06A/2020 11 30 CMB06-CAV1_0002 quench sur cav à coté' # Détecte bien quench aside
     print(file)
     label = classify(file)
     print(label)
     '''
 
+    #name_file_export = "resultat/2020_CMA_CMA01_liste_Rég signal RF hors tolérance.txt"
     #name_file_export = "resultat/2020_CMA_CMA03_liste_Rég signal RF hors tolérance.txt"
-    #name_file_export = "resultat/2024_CMA_CMA08_liste_Rég signal RF hors tolérance.txt"
-    name_file_export = "resultat/2020_CMA_CMA01_liste_Rég signal RF hors tolérance.txt"
+    name_file_export = "resultat/2024_CMA_CMA08_liste_Rég signal RF hors tolérance.txt"
+    #name_file_export ='resultat/2024_REG_REG01_liste_Rég signal RF hors tolérance.txt'
     default_file = {}
 
-    #path_name = "../LLRF/2020/CMA/CMA03"
-    #path_name = "../LLRF/2024/CMA/CMA08"
-    path_name = "../LLRF/2020/CMA/CMA01"
+    #path_name = "../../LLRF/2020/CMA/CMA01"
+    #path_name = "../../LLRF/2020/CMA/CMA03"
+    path_name = "../../LLRF/2024/CMA/CMA08"
+    #path_name = "../../LLRF/2024/REG/REG1"
     path_file = Path(path_name)
     print(path_file)
     post_mortem_files = sorted([chemin for chemin in path_file.iterdir() if chemin.is_file()])
     for file in post_mortem_files:
-        label = classify(file)
-        if "Rég signal RF hors tolérance" in label:
-            default_file[file] = label
-        print(f'Nom de fichier : {file}, Défaut : {label}')
+        try:
+            label = classify(file)
+            if "Rég signal RF hors tolérance" in label:
+                default_file[file] = label
+            print(f'Nom de fichier : {file}, Défaut : {label}')
+        except Exception as e:
+            print(f' Fichier ignoré ({file}) - Fichier incomplet ou erreur : {e}')
+            continue
 
     with open(name_file_export, "w", encoding="utf-8") as f:
         f.write(f'{path_name}\n')
