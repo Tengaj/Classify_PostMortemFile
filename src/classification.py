@@ -241,9 +241,8 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     # Définition de la "Zone de Recherche de Pic" (Autour de t0)
     # On autorise le code à chercher un peu avant ET un peu après t0
     # On limite la fin à zero_idx pour ne pas analyser la chute libre finale
-    #zone_start = max(0, t0_idx - 50)
+    zone_start = max(0, min(t0_idx, zero_idx) - 50)
     #zone_end   = min(zero_idx, t0_idx + 50) 
-    zone_start = t0_idx - 50
     zone_end   = zero_idx + 50
     
     # Extraction des comportements extrêmes dans cette zone
@@ -324,7 +323,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     return "Other"
 
 @chrono
-def classify(file_name):
+def classify_file(file_name):
 
     t_start_read = perf_counter()
 
@@ -384,21 +383,75 @@ def classify(file_name):
             if t0_idx is None:
                 # Si on ne trouve pas de t0, ça sert à rien de lancer la classification
                 return default[0] + ", Pas de chute de Ucav"
-            return default[0] + ", "+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx)
+            return default[0] + ","+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx)
         case _:
             return "Other"
+
+def classify_folder(folder_name):
+    """
+    Classifie tous les fichiers d'un dossiers. 
+    Enregistre le défaut et le label de chaque fichier dans un .csv
+    """
+
+    # Récupération de tous les fichiers du dossier
+    path_folder = Path(folder_name)
+    post_mortem_files = sorted([path for path in path_folder.iterdir() if path.is_file()])
+    file_default = {}
+    for file in post_mortem_files:
+        try:
+            label = classify_file(file)
+            file_default[file] = label
+            print(f'Nom du fichier : {file}, Défaut : {label}')
+        except Exception as e:
+            print(f'Fcihier ignoré ({file}) - Fichier imcomplet ou erreur : {e}')
+            continue
+
+    # Ecriture des résultats
+    path_parts = path_folder.parts
+    folder_name_clean = ""
+    for parts in path_parts:
+        if parts not in ('..', '.'):
+            if parts == path_parts[len(path_parts)-1]:
+                folder_name_clean += parts
+            else:
+                folder_name_clean += parts + "_"
+
+    file_name_export = "resultat/" + folder_name_clean + ".csv"
+    with open(file_name_export, "w", encoding="utf-8") as f:
+        f.write("Fichier,Defaut,Label\n")
+        for file in file_default.keys():
+            file_name = file.parts[len(file.parts)-1]
+            f.write(f'{file_name},{file_default[file]}\n')
+
+def classify_cav_folder(cav_folder_name):
+    """
+    Classifie tous les fichiers des sous dossiers dun type de cavité.
+    """
+    path_folder = Path(cav_folder_name)
+    cav_number_folder = sorted([path for path in path_folder.iterdir() if path.is_dir()])
+    for folder in cav_number_folder:
+        classify_folder(folder)
+
+def classify_year_folder(year_folder_name):
+    """
+    Classifie tous les fichiers des sous dossiers d'une année.
+    """
+    path_folder = Path(year_folder_name)
+    cav_folder = sorted([path for path in path_folder.iterdir() if path.is_dir()])
+    for folder in cav_folder:
+        classify_cav_folder(folder)
+
 
 if __name__ == "__main__":
     '''
     file = '../../LLRF/2020/CMB/CMB06B/2020 11 30 CMB06-CAV2_0009 13h18 50ms' # Détecte bien quench
     print(file)
-    label = classify(file)
+    label = classify_file(file)
     print(label)
     file = '../../LLRF/2020/CMB/CMB06A/2020 11 30 CMB06-CAV1_0002 quench sur cav à coté' # Détecte bien quench aside
     print(file)
-    label = classify(file)
+    label = classify_file(file)
     print(label)
-    '''
 
     #name_file_export = "resultat/2020_CMA_CMA01_liste_Rég signal RF hors tolérance.txt"
     #name_file_export = "resultat/2020_CMA_CMA03_liste_Rég signal RF hors tolérance.txt"
@@ -415,7 +468,7 @@ if __name__ == "__main__":
     post_mortem_files = sorted([chemin for chemin in path_file.iterdir() if chemin.is_file()])
     for file in post_mortem_files:
         try:
-            label = classify(file)
+            label = classify_file(file)
             if "Rég signal RF hors tolérance" in label:
                 default_file[file] = label
             print(f'Nom de fichier : {file}, Défaut : {label}')
@@ -427,7 +480,10 @@ if __name__ == "__main__":
         f.write(f'{path_name}\n')
         for key in default_file.keys():
             f.write(f'{key} : {default_file[key]}\n')
-
+    '''
+    classify_folder("../../LLRF/2024/CMA/CMA08")
+    #classify_cav_folder("../../LLRF/2024/CMA")
+    #classify_year_folder("../../LLRF/2024/")
 
 #Seuil pick-up,
 #Coupure externe rapide,    
