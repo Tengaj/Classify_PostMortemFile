@@ -81,7 +81,7 @@ def analyze_oscillation(signal, dt, snr_threshold=15.0, min_amp_physique=0.005):
     # Il faut que ce soit une belle oscillation ET qu'elle soit assez grosse
     is_oscillating = is_above_noise and is_physically_significant
     
-    #print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f}")
+    print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
     #print(f'is_oscillating : {is_oscillating}')
     
     return is_oscillating, freq_dom
@@ -181,6 +181,9 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     - t0_idx : l'index dans les tableaux correspondant au moment du défaut (trip).
     - window_points : le nombre de points à analyser JUSTE AVANT t0.
     """
+    if np.max(np.abs(Uci)) < 0.001:
+        print(f"Fichier ignoré/classé : Signal Uci inexistant (Max = {np.max(np.abs(Uci)):.4f})")
+        return "Uci nulle" 
     # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
     # A voir si c'est nécessaire
     # t0_idx : index ou le signal Ucav comment à décrocher
@@ -194,16 +197,16 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     #print(f'start : {start_idx}, end : {end_idx}')
 
     SEUILS_AMPLITUDE = {
-        "Ucav": 0.005,
-        "Uci":  0.05,
-        "modIQ": 1
+        "Uci":  0.01,
+        "modIQ": 1,
+        "Ucav": 0.002
     }
 
     dt_microseconds = np.mean(np.diff(time))
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz
 
     osc_Uci, f_Uci = analyze_oscillation(
-        Uci.iloc[t0_idx:zero_idx], 
+        Uci.iloc[t0_idx:zero_idx+20], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["Uci"]
     )
@@ -248,19 +251,24 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     # Extraction des comportements extrêmes dans cette zone
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
     max_Ucr_zone = Ucr.iloc[zone_start:zone_end].max()
+    max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
+    min_Uci_zone = Uci.iloc[zone_start:zone_end].min()
     
     # Pour Uci, comme on cherche à savoir s'il a chuté ou monté, 
     # on regarde sa valeur moyenne juste au moment de l'événement
+    '''
     eval_end = min(zero_idx, t0_idx + 20)
-    if zero_idx < t0_idx:
+    if zero_idx <= t0_idx:
         Uci_event = np.mean(Uci.iloc[t0_idx:t0_idx+20])
     else :
         Uci_event = np.mean(Uci.iloc[t0_idx:eval_end])
     #print(f'Uci event : {Uci_event}, eval end : {eval_end}')
+    '''
     
     # Calcul des variations réelles (L'événement par rapport au repos)
     delta_modIQ = max_modIQ_zone - base_modIQ
-    delta_Uci   = Uci_event - base_Uci
+    delta_pos_Uci   = max_Uci_zone - base_Uci
+    delta_neg_Uci   = min_Uci_zone - base_Uci
     delta_Ucr   = max_Ucr_zone - base_Ucr
     #print(f'Variations (Deltas) -> modIQ: {delta_modIQ:.4f} | Uci: {delta_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
 
@@ -269,18 +277,26 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     EPSILON = 0.01 
     
     base_modIQ_safe = max(abs(base_modIQ), EPSILON)
-    base_Uci_safe   = max(abs(base_Uci), EPSILON)
-    base_Ucr_safe   = max(abs(base_Ucr), EPSILON)
+    base_Uci_pos_safe = max(abs(delta_pos_Uci), EPSILON)
+    base_Uci_neg_safe = max(abs(delta_neg_Uci), EPSILON)
+    base_Ucr_safe = max(abs(base_Ucr), EPSILON)
     
     pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
-    pct_Uci   = (delta_Uci / base_Uci_safe) * 100.0
+    pct_pos_Uci   = (delta_pos_Uci / base_Uci_pos_safe) * 100.0
+    pct_neg_Uci   = (delta_neg_Uci / base_Uci_neg_safe) * 100.0
     pct_Ucr   = (delta_Ucr / base_Ucr_safe) * 100.0
     
-    print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci: {delta_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
-    print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci: {pct_Uci:.1f}% | Ucr: {pct_Ucr:.1f}% ')
+    print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
+    print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
+    print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}| Ucr: {pct_Ucr:.1f}% ')
     
     SEUIL_BRUIT_PCT = 5.0
-    SEUIL_GROS_PIC_PCT = 100.00
+    SEUIL_GROS_PIC_PCT = 150.00
+    
+    if pct_pos_Uci > SEUIL_BRUIT_PCT:
+        pct_Uci = pct_pos_Uci
+    else:
+        pct_Uci = pct_neg_Uci
     
     # Si modIQ monte plus que le bruit ambiant
     if pct_modIQ > SEUIL_BRUIT_PCT:
@@ -382,7 +398,7 @@ def classify_file(file_name):
             t0_idx, _ = detect_t0_zscore(Ucav)
             if t0_idx is None:
                 # Si on ne trouve pas de t0, ça sert à rien de lancer la classification
-                return default[0] + ", Pas de chute de Ucav"
+                return default[0] + ",Pas de chute de Ucav"
             return default[0] + ","+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx)
         case _:
             return "Other"
@@ -400,10 +416,13 @@ def classify_folder(folder_name):
     for file in post_mortem_files:
         try:
             label = classify_file(file)
-            file_default[file] = label
+            #Pour le moment je ne regard que le défaut : Rég signal RF hors tolérance
+            if "Rég signal RF hors tolérance" in label:
+                file_default[file] = label
+            #file_default[file] = label
             print(f'Nom du fichier : {file}, Défaut : {label}')
         except Exception as e:
-            print(f'Fcihier ignoré ({file}) - Fichier imcomplet ou erreur : {e}')
+            print(f'Fichier ignoré ({file}) - Fichier imcomplet ou erreur : {e}')
             continue
 
     # Ecriture des résultats
@@ -452,36 +471,13 @@ if __name__ == "__main__":
     print(file)
     label = classify_file(file)
     print(label)
-
-    #name_file_export = "resultat/2020_CMA_CMA01_liste_Rég signal RF hors tolérance.txt"
-    #name_file_export = "resultat/2020_CMA_CMA03_liste_Rég signal RF hors tolérance.txt"
-    name_file_export = "resultat/2024_CMA_CMA08_liste_Rég signal RF hors tolérance.txt"
-    #name_file_export ='resultat/2024_REG_REG01_liste_Rég signal RF hors tolérance.txt'
-    default_file = {}
-
-    #path_name = "../../LLRF/2020/CMA/CMA01"
-    #path_name = "../../LLRF/2020/CMA/CMA03"
-    path_name = "../../LLRF/2024/CMA/CMA08"
-    #path_name = "../../LLRF/2024/REG/REG1"
-    path_file = Path(path_name)
-    print(path_file)
-    post_mortem_files = sorted([chemin for chemin in path_file.iterdir() if chemin.is_file()])
-    for file in post_mortem_files:
-        try:
-            label = classify_file(file)
-            if "Rég signal RF hors tolérance" in label:
-                default_file[file] = label
-            print(f'Nom de fichier : {file}, Défaut : {label}')
-        except Exception as e:
-            print(f' Fichier ignoré ({file}) - Fichier incomplet ou erreur : {e}')
-            continue
-
-    with open(name_file_export, "w", encoding="utf-8") as f:
-        f.write(f'{path_name}\n')
-        for key in default_file.keys():
-            f.write(f'{key} : {default_file[key]}\n')
     '''
-    classify_folder("../../LLRF/2024/CMA/CMA08")
+    
+    file = '../../LLRF/2024/CMA/CMA03/2024 11 08 CMA03_0004' # beam loss je pense
+    label = classify_file(file)
+    print(f'Nom du fichier : {file} | Label :{label}')
+    
+    #classify_folder("../../LLRF/2024/CMA/CMA03")
     #classify_cav_folder("../../LLRF/2024/CMA")
     #classify_year_folder("../../LLRF/2024/")
 
