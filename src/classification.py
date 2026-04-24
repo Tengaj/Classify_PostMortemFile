@@ -24,7 +24,7 @@ def chrono(func):
 
 # FONCTIONS UTILITAIRES
 
-def analyze_oscillation(signal, dt, snr_threshold=15.0, min_amp_physique=0.005):
+def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
     - snr_threshold : Rapport signal/bruit dans le spectre (relatif).
@@ -72,8 +72,8 @@ def analyze_oscillation(signal, dt, snr_threshold=15.0, min_amp_physique=0.005):
 
     #  Le pic sort-il vraiment du bruit de fond spectral ?
     is_above_noise = pic_max > (snr_threshold * np.median(yf_pos))
-    #print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
-    #print(f'pic_max : {pic_max:.5f}, median yf_pos : {snr_threshold * np.mean(yf_pos):.5f}')
+    print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
+    print(f'pic_max : {pic_max:.5f}, median yf_pos : {snr_threshold * np.mean(yf_pos):.5f}')
     
     # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = pic_max > min_amp_physique
@@ -111,15 +111,25 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     - z_threshold : Nombre d'écarts-types pour déclencher l'alarme (5 est standard).
     """
     # Calcul de la moyenne et de l'écart-type glissants
-    rolling_mean = Ucav_series.rolling(window=window_size).mean()
-    rolling_std = Ucav_series.rolling(window=window_size).std()
-    
+    rolling_mean = Ucav_series.rolling(window=window_size, min_periods=1).mean()
+    rolling_std = Ucav_series.rolling(window=window_size, min_periods=1).std()
+
     # Éviter la division par zéro si le signal est parfaitement plat
     rolling_std = rolling_std.replace(0, 1e-6)
-    
+
+    '''
+    temps_cible = -54319.0
+    ligne_exacte = Ucav_series.index.get_indexer([temps_cible], method='nearest')[0]
+    vrai_temps = Ucav_series.index[ligne_exacte]
+    val_brute = Ucav_series.iloc[ligne_exacte]
+    val_mean  = rolling_mean.iloc[ligne_exacte]
+    val_std   = rolling_std.iloc[ligne_exacte]
+    print(f"Temps cherché: {temps_cible} | Trouvé: {vrai_temps}")
+    print(f"Val : {val_brute:.4f} | Mean : {val_mean:.4f} | std : {val_std:.4f}")
+    '''
+
     # Calcul du Z-Score global
     z_scores = abs((Ucav_series - rolling_mean) / rolling_std)
-    
     
     if 0.0 in Ucav_series.index:
         # On demande directement la position numérique de l'index 0.0
@@ -137,7 +147,7 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     
     # Trouver le premier point qui dépasse le seuil dans la zone cible
     anomalies = z_scores_cible[z_scores_cible > z_threshold]
-    
+
     if not anomalies.empty:
         # On prend le premier temps où l'anomalie est détectée
         t0_time = anomalies.index[0]
@@ -184,8 +194,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     if np.max(np.abs(Uci)) < 0.001:
         print(f"Fichier ignoré/classé : Signal Uci inexistant (Max = {np.max(np.abs(Uci)):.4f})")
         return "Uci nulle" 
-    # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
-    # A voir si c'est nécessaire
+
     # t0_idx : index ou le signal Ucav comment à décrocher
     # zero_idx : index de 0.0 dans time, si pas de 0.0 dans time, index central   
     zero_arg = np.argwhere(time == 0)
@@ -197,28 +206,28 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     #print(f'start : {start_idx}, end : {end_idx}')
 
     SEUILS_AMPLITUDE = {
-        "Uci":  0.01,
-        "modIQ": 1,
-        "Ucav": 0.002
+        "Uci":  0.001,
+        "modIQ": 0.1,
+        "Ucav": 0.0001
     }
 
     dt_microseconds = np.mean(np.diff(time))
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz
 
     osc_Uci, f_Uci = analyze_oscillation(
-        Uci.iloc[t0_idx:zero_idx+20], 
+        Uci.iloc[t0_idx:zero_idx+30], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["Uci"]
     )
     
     osc_modIQ, f_modIQ = analyze_oscillation(
-        modIQ.iloc[t0_idx:zero_idx], 
+        modIQ.iloc[t0_idx:zero_idx+30], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["modIQ"]
     )
     
     osc_Ucav, f_Ucav = analyze_oscillation(
-        Ucav.iloc[t0_idx:zero_idx], 
+        Ucav.iloc[t0_idx:zero_idx+30], 
         dt_seconds,  
         min_amp_physique=SEUILS_AMPLITUDE["Ucav"]
     )
@@ -233,7 +242,6 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     
     # Calcul du "Niveau de repos" (Baseline)
     # On prend une fenêtre "saine" bien avant t0 (ex: entre t0-500 et t0-100)
-    # np.median est parfait ici pour ignorer le bruit
     idx_base_start = max(0, t0_idx - 500)
     idx_base_end = max(1, t0_idx - 100)
     base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
@@ -241,12 +249,12 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     base_Ucr   = np.median(Ucr.iloc[idx_base_start:idx_base_end])
     #print(f'median modIQ : {base_modIQ}, median Uci : {base_Uci}, median Ucr : {base_Ucr}')
     
-    # Définition de la "Zone de Recherche de Pic" (Autour de t0)
+    # Définition de la Zone de Recherche de Pic (Autour de t0)
     # On autorise le code à chercher un peu avant ET un peu après t0
     # On limite la fin à zero_idx pour ne pas analyser la chute libre finale
-    zone_start = max(0, min(t0_idx, zero_idx) - 50)
+    zone_start = max(0, min(t0_idx, zero_idx))
     #zone_end   = min(zero_idx, t0_idx + 50) 
-    zone_end   = zero_idx + 50
+    zone_end   = zero_idx + 20
     
     # Extraction des comportements extrêmes dans cette zone
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
@@ -274,16 +282,15 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
 
     # Calcul des variations en POURCENTAGE
     # Sécurité anti-division par (presque) zéro : 
-    EPSILON = 0.01 
+    EPSILON = 0.01
     
     base_modIQ_safe = max(abs(base_modIQ), EPSILON)
-    base_Uci_pos_safe = max(abs(delta_pos_Uci), EPSILON)
-    base_Uci_neg_safe = max(abs(delta_neg_Uci), EPSILON)
+    base_Uci_safe = max(abs(base_Uci), EPSILON)
     base_Ucr_safe = max(abs(base_Ucr), EPSILON)
     
     pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
-    pct_pos_Uci   = (delta_pos_Uci / base_Uci_pos_safe) * 100.0
-    pct_neg_Uci   = (delta_neg_Uci / base_Uci_neg_safe) * 100.0
+    pct_pos_Uci   = (delta_pos_Uci / base_Uci_safe) * 100.0
+    pct_neg_Uci   = (delta_neg_Uci / base_Uci_safe) * 100.0
     pct_Ucr   = (delta_Ucr / base_Ucr_safe) * 100.0
     
     print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
@@ -306,9 +313,11 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
             return "Power chain gain"
             
         # CAS 2 : Beam Loss (Montée de modIQ entre 5% et 100% ET montée de Uci > 5%)
-        elif SEUIL_BRUIT_PCT < pct_modIQ <= SEUIL_GROS_PIC_PCT and pct_Uci > SEUIL_BRUIT_PCT:
+        elif SEUIL_BRUIT_PCT < pct_modIQ and pct_Uci > SEUIL_BRUIT_PCT:
             return "Beam loss"
 
+    # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
+    # A voir si c'est nécessaire
     start_idx = max(0, t0_idx - window_points)
     end_idx = t0_idx
 
@@ -472,8 +481,8 @@ if __name__ == "__main__":
     label = classify_file(file)
     print(label)
     '''
-    
-    file = '../../LLRF/2024/CMA/CMA03/2024 11 08 CMA03_0004' # beam loss je pense
+
+    file = '../../LLRF/2024/CMA/CMA03/2024 11 08 CMA03_0006' #power chain gain
     label = classify_file(file)
     print(f'Nom du fichier : {file} | Label :{label}')
     
