@@ -196,12 +196,15 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
         return "Uci nulle" 
 
     # t0_idx : index ou le signal Ucav comment à décrocher
-    # zero_idx : index de 0.0 dans time, si pas de 0.0 dans time, index central   
+    # zero_idx : index de 0.0 dans time, si pas de 0.0 dans time, index central
+    '''   
     zero_arg = np.argwhere(time == 0)
     if zero_arg.size == 0:
         zero_idx = int((time.size / 2) - 1)
     else:
         zero_idx = zero_arg[0][0] #Indice ou time = 0, t0_idx est le moment ou Ucav commence à chuter
+    '''
+    zero_idx = np.argmin(np.abs(time))
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
     #print(f'start : {start_idx}, end : {end_idx}')
 
@@ -215,19 +218,19 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz
 
     osc_Uci, f_Uci = analyze_oscillation(
-        Uci.iloc[t0_idx:zero_idx+30], 
+        Uci.iloc[t0_idx:zero_idx+40], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["Uci"]
     )
     
     osc_modIQ, f_modIQ = analyze_oscillation(
-        modIQ.iloc[t0_idx:zero_idx+30], 
+        modIQ.iloc[t0_idx:zero_idx+40], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["modIQ"]
     )
     
     osc_Ucav, f_Ucav = analyze_oscillation(
-        Ucav.iloc[t0_idx:zero_idx+30], 
+        Ucav.iloc[t0_idx:zero_idx+40], 
         dt_seconds,  
         min_amp_physique=SEUILS_AMPLITUDE["Ucav"]
     )
@@ -298,7 +301,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}| Ucr: {pct_Ucr:.1f}% ')
     
     SEUIL_BRUIT_PCT = 5.0
-    SEUIL_GROS_PIC_PCT = 150.00
+    SEUIL_GROS_PIC_PCT = 100.00
     
     if pct_pos_Uci > SEUIL_BRUIT_PCT:
         pct_Uci = pct_pos_Uci
@@ -380,6 +383,11 @@ def classify_file(file_name):
     else:
         default = [""]
 
+    Ucav = df_signals.get("Ucav")
+    zero_idx = np.argmin(np.abs(time))
+    if np.mean(Ucav.iloc[0:zero_idx]) < 0.1:
+        return "Tension trop basse" 
+
     match default[0]:
         case "Seuil pick-up":
             return "1"
@@ -393,16 +401,13 @@ def classify_file(file_name):
             return "4"
         case "Claquage ou quench cavité":
             Ucr = df_signals.get("A Ucr") 
-            Ucav = df_signals.get("Ucav") 
             return "5"
         case "Deép seuil de sécurité RF":
             return "6"
             Ucr = df_signals.get("A Ucr") 
-            Ucav = df_signals.get("Ucav") 
         case "Rég signal RF hors tolérance":
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
-            Ucav = df_signals.get("Ucav") 
             modIQ = df_signals.get("IQ")
             t0_idx, _ = detect_t0_zscore(Ucav)
             if t0_idx is None:
@@ -423,6 +428,9 @@ def classify_folder(folder_name):
     post_mortem_files = sorted([path for path in path_folder.iterdir() if path.is_file()])
     file_default = {}
     for file in post_mortem_files:
+        if file.stat().st_size == 0:
+            print(f'Fichier ignoré : {file} (0 octet sur le disque)')
+            continue
         try:
             label = classify_file(file)
             #Pour le moment je ne regard que le défaut : Rég signal RF hors tolérance
@@ -481,12 +489,12 @@ if __name__ == "__main__":
     label = classify_file(file)
     print(label)
     '''
-
-    file = '../../LLRF/2024/CMA/CMA03/2024 11 08 CMA03_0006' #power chain gain
+    '''
+    file = '../../LLRF/2024/CMA/CMA04/2024 11 29 CMA04_0002' #loop instability
     label = classify_file(file)
     print(f'Nom du fichier : {file} | Label :{label}')
-    
-    #classify_folder("../../LLRF/2024/CMA/CMA03")
+    '''
+    classify_folder("../../LLRF/2024/CMA/CMA06")
     #classify_cav_folder("../../LLRF/2024/CMA")
     #classify_year_folder("../../LLRF/2024/")
 
