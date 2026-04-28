@@ -71,9 +71,9 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     pic_max = yf_pos[idx_max]
 
     #  Le pic sort-il vraiment du bruit de fond spectral ?
-    is_above_noise = pic_max > (snr_threshold * np.median(yf_pos))
-    print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
-    print(f'pic_max : {pic_max:.5f}, median yf_pos : {snr_threshold * np.mean(yf_pos):.5f}')
+    is_above_noise = pic_max > (snr_threshold * np.mean(yf_pos))
+    #print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
+    #print(f'pic_max : {pic_max:.5f}, median yf_pos : {(snr_threshold * np.mean(yf_pos)):.5f}')
     
     # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = pic_max > min_amp_physique
@@ -82,8 +82,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     is_oscillating = is_above_noise and is_physically_significant
     
     print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
-    #print(f'is_oscillating : {is_oscillating}')
-    
+
     return is_oscillating, freq_dom
 
 def get_trend(time, signal, tolerance=1e-5):
@@ -103,6 +102,7 @@ def get_trend(time, signal, tolerance=1e-5):
     else:
         return 0
 
+'''
 def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     """
     Détecte t0, le moment ou le signal Ucav sort de son amplitude moyenne avec un Z-score glissant.
@@ -116,9 +116,8 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
 
     # Éviter la division par zéro si le signal est parfaitement plat
     rolling_std = rolling_std.replace(0, 1e-6)
-
-    '''
-    temps_cible = -54319.0
+    """
+    temps_cible = -78646.2621731353
     ligne_exacte = Ucav_series.index.get_indexer([temps_cible], method='nearest')[0]
     vrai_temps = Ucav_series.index[ligne_exacte]
     val_brute = Ucav_series.iloc[ligne_exacte]
@@ -126,21 +125,17 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
     val_std   = rolling_std.iloc[ligne_exacte]
     print(f"Temps cherché: {temps_cible} | Trouvé: {vrai_temps}")
     print(f"Val : {val_brute:.4f} | Mean : {val_mean:.4f} | std : {val_std:.4f}")
-    '''
+    """
 
     # Calcul du Z-Score global
     z_scores = abs((Ucav_series - rolling_mean) / rolling_std)
     
-    if 0.0 in Ucav_series.index:
-        # On demande directement la position numérique de l'index 0.0
-        pos_t_zero = Ucav_series.index.get_loc(0.0)
-    else:
-        # On prend la position central du signal
-        pos_t_zero = int((Ucav_series.size / 2) - 1)
+    # Récupération de l'index de la valeur de temps la plus proche de 0.0
+    zero_idx = np.argmin(np.abs(Ucav_series.index))
     
-    # Définir les bornes (les -9900 et +100 points autour de ce 0)
-    start_pos = max(0, pos_t_zero - 9900)
-    end_pos = min(len(z_scores), pos_t_zero + 100 + 1)
+    # Définir les bornes (les -900 et +100 points autour de ce 0)
+    start_pos = max(0, zero_idx - 900)
+    end_pos = min(len(z_scores), zero_idx + 100 + 1)
     
     # Isoler uniquement la zone qui nous intéresse
     z_scores_cible = z_scores.iloc[start_pos:end_pos]
@@ -155,6 +150,60 @@ def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0):
         return t0_idx, t0_time
         
     return None, None
+'''
+
+def detect_t0_zscore(Ucav_series, window_size=10000, z_threshold=5.0, calm_window=200):
+    """
+    Détecte t0, en ignorant les transitoires pour se concentrer sur la dernière anomalie menant au trip.
+    """
+    # Calcul du Z-score
+    rolling_mean = Ucav_series.rolling(window=window_size, min_periods=1).mean()
+    rolling_std = Ucav_series.rolling(window=window_size, min_periods=1).std()
+    
+    rolling_std = rolling_std.replace(0, 1e-6)
+    
+    z_scores = abs((Ucav_series - rolling_mean) / rolling_std)
+    
+    # Définition des bornes
+    zero_idx = np.argmin(np.abs(Ucav_series.index))
+    #pos_t_zero = Ucav_series.index.get_loc(Ucav_series.index[zero_idx])
+    
+    start_pos = max(0, zero_idx - 9900)
+    end_pos = min(len(z_scores), zero_idx + 100 + 1)
+    z_scores_cible = z_scores.iloc[start_pos:end_pos]
+    
+    
+    # On cherche toutes les anomalies
+    anomalies = z_scores_cible[z_scores_cible > z_threshold]
+    
+    if anomalies.empty:
+        return None, None
+        
+    # On repère les moments où la machine va bien (Z-score sous le seuil)
+    is_healthy = (z_scores_cible <= z_threshold).astype(int)
+    
+    # C. Un "Vrai Calme" c'est quand le signal est sain sur au moins 200 points consécutifs.
+    # La fonction rolling().min() vaudra 1 UNIQUEMENT si les 200 points précédents étaient à 1 (sains)
+    true_calm = is_healthy.rolling(window=calm_window).min() == 1
+    last_calm_times = true_calm[true_calm == True]
+    
+    if not last_calm_times.empty:
+        # On a trouvé au moins une vraie période de paix. 
+        # On prend la fin de cette TOUTE DERNIÈRE période de paix.
+        end_of_last_calm = last_calm_times.index[-1]
+        
+        # Le vrai t0 est la première anomalie qui arrive APRÈS cette ultime paix
+        anomalies_finales = anomalies[anomalies.index > end_of_last_calm]
+        
+        if not anomalies_finales.empty:
+            t0_time = anomalies_finales.index[0]
+            t0_idx = Ucav_series.index.get_loc(t0_time)
+            return t0_idx, t0_time
+
+    # Fallback de sécurité (Si la machine n'a jamais été calme dès le début du fichier)
+    t0_time = anomalies.index[0]
+    t0_idx = Ucav_series.index.get_loc(t0_time)
+    return t0_idx, t0_time
 
 def get_slope(t_array, y_array):
     """
@@ -204,13 +253,14 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     else:
         zero_idx = zero_arg[0][0] #Indice ou time = 0, t0_idx est le moment ou Ucav commence à chuter
     '''
+    # Récupération de l'index de la valeur de temps la plus proche de 0.0
     zero_idx = np.argmin(np.abs(time))
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
     #print(f'start : {start_idx}, end : {end_idx}')
 
     SEUILS_AMPLITUDE = {
         "Uci":  0.001,
-        "modIQ": 0.1,
+        "modIQ": 0.5,
         "Ucav": 0.0001
     }
 
@@ -242,6 +292,30 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
             return "Loop instability" # A l'air de marcher
         else:
             return "Taconis"
+
+    # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
+    # A voir si c'est nécessaire
+    start_idx = max(0, t0_idx - window_points)
+    end_idx = t0_idx
+
+    t_win     = time[start_idx:end_idx]
+    Uci_win   = Uci.iloc[start_idx:end_idx]
+    Ucr_win   = Ucr.iloc[start_idx:end_idx]
+    Ucav_win  = Ucav.iloc[start_idx:end_idx]
+    modIQ_win = modIQ.iloc[start_idx:end_idx]
+
+    # Analyse des tendances (Pentes)
+    trend_modIQ = get_trend(t_win, modIQ_win)
+    trend_Uci   = get_trend(t_win, Uci_win)
+    trend_Ucr   = get_trend(t_win, Ucr_win)
+    print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}') 
+
+    # Arbre de décision pour Uci croissant
+    if trend_Uci == 1:
+        if trend_Ucr == -1:
+            return "Quench"
+        elif trend_Ucr == 1:
+            return "Quench aside"
     
     # Calcul du "Niveau de repos" (Baseline)
     # On prend une fenêtre "saine" bien avant t0 (ex: entre t0-500 et t0-100)
@@ -300,7 +374,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
     print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
     print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}| Ucr: {pct_Ucr:.1f}% ')
     
-    SEUIL_BRUIT_PCT = 5.0
+    SEUIL_BRUIT_PCT = 10.0
     SEUIL_GROS_PIC_PCT = 100.00
     
     if pct_pos_Uci > SEUIL_BRUIT_PCT:
@@ -318,34 +392,6 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_idx, window_points
         # CAS 2 : Beam Loss (Montée de modIQ entre 5% et 100% ET montée de Uci > 5%)
         elif SEUIL_BRUIT_PCT < pct_modIQ and pct_Uci > SEUIL_BRUIT_PCT:
             return "Beam loss"
-
-    # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
-    # A voir si c'est nécessaire
-    start_idx = max(0, t0_idx - window_points)
-    end_idx = t0_idx
-
-    t_win     = time[start_idx:end_idx]
-    Uci_win   = Uci.iloc[start_idx:end_idx]
-    Ucr_win   = Ucr.iloc[start_idx:end_idx]
-    Ucav_win  = Ucav.iloc[start_idx:end_idx]
-    modIQ_win = modIQ.iloc[start_idx:end_idx]
-
-    # Analyse des tendances (Pentes)
-    trend_modIQ = get_trend(t_win, modIQ_win)
-    trend_Uci   = get_trend(t_win, Uci_win)
-    trend_Ucr   = get_trend(t_win, Ucr_win)
-    print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}') 
-
-    # Arbre de décision pour Uci croissant
-    if trend_Uci == 1:
-        if trend_Ucr == -1:
-            return "Quench"
-        elif trend_Ucr == 1:
-            return "Quench aside"
-
-    if pct_Ucr > SEUIL_GROS_PIC_PCT:
-        # Cas particulier pour le moment non répertorié ou Ucr croit seul après t0 tandis que Ucav, Uci et modIQ baisse.
-        return "Ucr croissant seul"
             
     # Si aucune condition n'est remplie
     return "Other"
@@ -421,8 +467,9 @@ def classify_folder(folder_name):
     """
     Classifie tous les fichiers d'un dossiers. 
     Enregistre le défaut et le label de chaque fichier dans un .csv
+    ATTENTION : Le path ne doit pas être absolue !!!
+    Il doit être du type :  ../LLRF/year/cav_type/cav_number (exemple : ../../LLRF/2024/CMA/CMA09/)
     """
-
     # Récupération de tous les fichiers du dossier
     path_folder = Path(folder_name)
     post_mortem_files = sorted([path for path in path_folder.iterdir() if path.is_file()])
@@ -445,14 +492,15 @@ def classify_folder(folder_name):
     # Ecriture des résultats
     path_parts = path_folder.parts
     folder_name_clean = ""
-    for parts in path_parts:
-        if parts not in ('..', '.'):
-            if parts == path_parts[len(path_parts)-1]:
-                folder_name_clean += parts
+    year = path_parts[-3]
+    for part in path_parts:
+        if part not in ('..', '.'):
+            if part == path_parts[len(path_parts)-1]:
+                folder_name_clean += part
             else:
-                folder_name_clean += parts + "_"
+                folder_name_clean += part + "_"
 
-    file_name_export = "resultat/" + folder_name_clean + ".csv"
+    file_name_export = "../resultat/" + year + "/" + folder_name_clean + ".csv"
     with open(file_name_export, "w", encoding="utf-8") as f:
         f.write("Fichier,Defaut,Label\n")
         for file in file_default.keys():
@@ -490,11 +538,11 @@ if __name__ == "__main__":
     print(label)
     '''
     '''
-    file = '../../LLRF/2024/CMA/CMA04/2024 11 29 CMA04_0002' #loop instability
+    file = '../../LLRF/2024/CMA/CMA10/2024 11 08 CMA10_0001' # Power chain gain
     label = classify_file(file)
     print(f'Nom du fichier : {file} | Label :{label}')
     '''
-    classify_folder("../../LLRF/2024/CMA/CMA06")
+    classify_folder("../../LLRF/2024/CMA/CMA12")
     #classify_cav_folder("../../LLRF/2024/CMA")
     #classify_year_folder("../../LLRF/2024/")
 
