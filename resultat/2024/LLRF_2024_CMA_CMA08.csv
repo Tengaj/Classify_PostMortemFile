@@ -1,7 +1,13 @@
-Fichier,Defaut,Label
+Fichier,Defaut,Label,Détails
 2024 09 19 CMA08_0001_D Signal RF hors tolérance,Rég signal RF hors tolérance,Loop instability
 2024 09 23 CMA08_0001_D Signal RF hors tolérance,Rég signal RF hors tolérance,Loop instability
-2024 09 27 CMA08_0002 kn coup sur defaut ampli et regul_D Signal RF hors tolérance,Rég signal RF hors tolérance,Other
+2024 09 25 CMA08_0001_D Signal RF hors tolérance,Rég signal RF hors tolérance,,Tension inférieur à 0.1
+2024 09 25 CMA08_0002_D Signal RF hors tolérance,Rég signal RF hors tolérance,,Tension inférieur à 0.1
+2024 09 25 CMA08_0003_D Signal RF hors tolérance,Rég signal RF hors tolérance,,Tension inférieur à 0.1
+2024 09 25 CMA08_0004_D Signal RF hors tolérance,Rég signal RF hors tolérance,,Tension inférieur à 0.1
+2024 09 25 CMA08_0005_D Signal RF hors tolérance,Rég signal RF hors tolérance,,Tension inférieur à 0.1
+2024 09 27 CMA08_0001_D Signal RF hors tolérance,Rég signal RF hors tolérance,,Tension inférieur à 0.1
+2024 09 27 CMA08_0002 kn coup sur defaut ampli et regul_D Signal RF hors tolérance,Rég signal RF hors tolérance,Other,Problème t0
 2024 09 27 CMA08_0003 kf FFO coup sur defaut regul_D Trig,Rég signal RF hors tolérance,Other
 2024 10 11 CMA08_0001_D Signal RF hors tolérance,Rég signal RF hors tolérance,Loop instability
 2024 10 11 CMA08_0003_D Signal RF hors tolérance,Rég signal RF hors tolérance,Loop instability

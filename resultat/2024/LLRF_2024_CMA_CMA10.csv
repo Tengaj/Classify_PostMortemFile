@@ -1,11 +1,13 @@
-Fichier,Defaut,Label
+Fichier,Defaut,Label,Détails
 2024 09 19 CMA10_0001,Rég signal RF hors tolérance,Loop instability
 2024 10 02 CMA10_0003,Rég signal RF hors tolérance,Loop instability
 2024 10 11 CMA10_0001,Rég signal RF hors tolérance,Loop instability
 2024 10 11 CMA10_0004,Rég signal RF hors tolérance,Loop instability
 2024 10 24 CMA10_0002,Rég signal RF hors tolérance,Loop instability
 2024 10 24 CMA10_0005,Rég signal RF hors tolérance,Loop instability
+2024 10 24 CMA10_0006,Rég signal RF hors tolérance,,Tension inférieur à 0.1
 2024 10 24 CMA10_0007,Rég signal RF hors tolérance,Loop instability
+2024 10 24 CMA10_0008,Rég signal RF hors tolérance,,Tension inférieur à 0.1
 2024 11 04 CMA10_0004,Rég signal RF hors tolérance,Quench
 2024 11 08 CMA10_0001,Rég signal RF hors tolérance,Power chain gain
 2024 11 08 CMA10_0002,Rég signal RF hors tolérance,Power chain gain
