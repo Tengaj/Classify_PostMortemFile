@@ -73,8 +73,8 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
 
     #  Le pic sort-il vraiment du bruit de fond spectral ?
     is_above_noise = pic_max > (snr_threshold * np.mean(yf_pos))
-    print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
-    print(f'pic_max : {pic_max:.5f}, median yf_pos : {(snr_threshold * np.mean(yf_pos)):.5f}')
+    #print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
+    #print(f'pic_max : {pic_max:.5f}, median yf_pos : {(snr_threshold * np.mean(yf_pos)):.5f}')
     
     # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = pic_max > min_amp_physique
@@ -82,7 +82,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     # Il faut que ce soit une belle oscillation ET qu'elle soit assez grosse
     is_oscillating = is_above_noise and is_physically_significant
     
-    print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
+    #print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
 
     return is_oscillating, freq_dom
 
@@ -203,7 +203,7 @@ def get_slope(t_array, y_array):
     
     return pente
 
-def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, window_points=1000):
+def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, window_points=800):
     """
     Classifie le défaut en appliquant l'arbre de décision.
     - t0_idx : l'index dans les tableaux correspondant au moment du défaut (trip).
@@ -226,7 +226,6 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, window_points=1000):
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
 
     # On isole la fenêtre d'analyse "proche de t0" (avant la coupure)
-    # A voir si c'est nécessaire
     start_idx = max(0, t0_idx - window_points)
     end_idx = t0_idx
 
@@ -236,18 +235,45 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, window_points=1000):
     Ucav_win  = Ucav.iloc[start_idx:end_idx]
     modIQ_win = modIQ.iloc[start_idx:end_idx]
 
+    # Couper la fenêtre Ucav_win en deux et regarder la trend des deux, si la première descend, (et que la deuxième monte) -> Quench 
+    # Récupérer la position mimimum de Ucr dans la fenêtre pour l'utiliser comme séparateur.
+
+    window_size = end_idx - start_idx
+    mid_window = start_idx + np.argmin(Ucr.iloc[start_idx:end_idx]) 
+    if mid_window == start_idx:
+        mid_window = mid_window = end_idx - int(window_points * 0.5)
+    print(f'Window start : {start_idx}, Window mid : {mid_window}, Window end : {end_idx}')
+    print(f'Window start value : {time[start_idx]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
+    t_win_left = time[start_idx:mid_window]
+    t_win_right = time[mid_window:end_idx]
+    Ucr_win_left = Ucr.iloc[start_idx:mid_window]
+    Ucr_win_right = Ucr.iloc[mid_window:end_idx]
+
     # Analyse des tendances (Pentes)
     trend_modIQ = get_trend(t_win, modIQ_win)
     trend_Uci   = get_trend(t_win, Uci_win)
     trend_Ucr   = get_trend(t_win, Ucr_win)
-    print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}') 
+    trend_Ucr_left = get_trend(t_win_left,Ucr_win_left)
+    trend_Ucr_right = get_trend(t_win_right,Ucr_win_right)
+    print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ') 
 
     # Arbre de décision pour Uci croissant
+    '''
     if trend_Uci == 1:
         if trend_Ucr == -1:
             return "Quench"
         elif trend_Ucr == 1:
             return "Quench aside"
+    '''
+    if trend_Uci == 1:
+        if (trend_Ucr_left == -1 and trend_Ucr_right == 1) or trend_Ucr == -1:
+            return "Quench"
+        elif trend_Ucr == 1:
+            return "Quench aside" 
+        '''
+        elif trend_Ucr_left == 1 and trend_Ucr_right == 1:
+            return "Quench aside"
+        '''
 
     SEUILS_AMPLITUDE = {
         "Uci":  0.001,
@@ -374,7 +400,7 @@ def classify_file(file_name):
     parameters, time, df_signals, df_defaults, _, header = Read_Signals(
         file_content, 
         compute_defauts=True, 
-        compute_etats=False, 
+        compute_etats=True, 
         plot_signaux=False, 
         show_header=False
     )
@@ -411,7 +437,7 @@ def classify_file(file_name):
             return "3"
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
-            vact = parameters.get("VACT")
+            #vact = parameters.get("VACT")
             return "4"
         case "Claquage ou quench cavité":
             Ucr = df_signals.get("A Ucr") 
@@ -505,12 +531,13 @@ if __name__ == "__main__":
     print(label)
     '''
     '''
-    file = '../../LLRF/2024/CMA/CMA08/2024 09 27 CMA08_0002 kn coup sur defaut ampli et regul_D Signal RF hors tolérance' # Beam loss
+    file = '../../LLRF/2024/CMB/CMB02A/2024 09 27 CMB02-CAV1_0004_D Signal RF hors tolérance' # Quench aside
     label = classify_file(file)
     print(f'Nom du fichier : {file} | Label :{label}')
     '''
     #classify_folder("../../LLRF/2024/CMA/CMA01")
-    classify_cav_folder("../../LLRF/2024/CMA")
+    #classify_folder("../../LLRF/2024/CMB/CMB02B")
+    classify_cav_folder("../../LLRF/2024/CMB")
     #classify_year_folder("../../LLRF/2024/")
 
 #Seuil pick-up,
