@@ -1,7 +1,7 @@
-# Date: 09/04/2025
+# Date: 22/04/2026
 # Nom: PyPostMortem
 # Description: lecture des fichiers postmortem
-# Version: 1.0
+# Version: 2.1
  
 class LengthError(Exception):
     pass
@@ -13,13 +13,7 @@ class ChunkError(Exception):
     pass
 
 def Read_Header(filename,show_header=False):
-    import struct
-    import pandas as pd
-    import numpy as np
     import re
-    import math
-    import cmath
-    import matplotlib.pyplot as plt
 
     def extraire_cle_valeur_unite(chaine):
         # Séparer la clé et l'ensemble (valeur + unité) en fonction du caractère "="
@@ -45,28 +39,28 @@ def Read_Header(filename,show_header=False):
         # Créer un dictionnaire à partir des résultats
         Header = {}
         with open(filename,'rb') as file:
-            line=""
+            while True:
+                line = file.readline()
+                if not line:
+                    break
 
-            try:
-                while str(line)!=r"END":
-                    line=file.readline()
-                    line = line.decode('utf-8').strip()
-                    if show_header:
-                        print(line)
+                line = line.decode('utf-8').strip()
+                # if show_header:
+                #     print(line)
 
-                    if str(line)!="END":
-                        Header_list.append(line)
-                
-                for array in Header_list:
-                    cle, valeur, unite = extraire_cle_valeur_unite(array)
-                    if cle:
-                        # Ajouter au dictionnaire avec la clé et un sous-dictionnaire pour "Valeur" et "Unité"
-                        Header[cle] = {
-                            "Valeur": valeur,
-                            "Unité": unite
-                        }
-            except:
-                pass
+                if line == "END":
+                    break
+
+                Header_list.append(line)
+
+            for array in Header_list:
+                cle, valeur, unite = extraire_cle_valeur_unite(array)
+                if cle:
+                    # Ajouter au dictionnaire avec la clé et un sous-dictionnaire pour "Valeur" et "Unité"
+                    Header[cle] = {
+                        "Valeur": valeur,
+                        "Unité": unite
+                    }
             del Header_list
 
         return Header
@@ -79,17 +73,12 @@ def Read_Header(filename,show_header=False):
     # Attention : POSTROW est en fait le nombre de ligne AVANT t=0 et non après, ce n'est pas égal au postrow de l'interface post-mortem (ihm) (un calcul est effectué : postrow_fichier = nrow - postrow_ihm)
 
 
-def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_signaux=False,show_header=False):
-    import struct
+def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_signaux=False,show_header=False,etats_columns=None):
     import pandas as pd
     import numpy as np
     import re
     import math
-    import cmath
-    import matplotlib.pyplot as plt
-    import struct
     import io
-    import base64
 
     def extraire_cle_valeur_unite(chaine):
         if "=" in chaine:
@@ -108,15 +97,24 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
     def read_head(file_content):
         Header_list=[]
         file = io.BytesIO(file_content)
-        line=""
-        while str(line)!=r"END":
-            line=file.readline()
-            line = line.decode('utf-8').strip()
-            if show_header:
-                print(line)
+        end_found = False
+        while True:
+            line = file.readline()
+            if not line:
+                break
 
-            if str(line)!="END":
-                Header_list.append(line)
+            line = line.decode('utf-8').strip()
+            # if show_header:
+            #     print(line)
+
+            if line == "END":
+                end_found = True
+                break
+
+            Header_list.append(line)
+
+        if not end_found:
+            raise HeaderACQError("Header END introuvable")
         
             # Créer un dictionnaire à partir des résultats
         Header = {}
@@ -133,17 +131,18 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
 
         values= []
         if Header["FORMAT"]["Valeur"]=="BINAIRE":
-            while True:
-                chunk = file.read(32) # Lis le fichier par paquet de 32 octets (=16 valeur int16, 1 valeur int16 est encodée sur 2 octets)
-                chunklen=len(chunk)//2
-                try:
-                    chunk = struct.unpack('>' +'h' * chunklen, chunk)
-                    if not chunk:
-                        break 
-                    else:
-                        values.append(chunk)
-                except:
+            try:
+                raw_data = file.read()
+                if len(raw_data) % 2 != 0:
                     raise ChunkError
+
+                values = np.frombuffer(raw_data, dtype='>i2')
+                if values.size % 16 != 0:
+                    raise ChunkError
+
+                values = values.reshape(-1, 16)
+            except ValueError as exc:
+                raise ChunkError from exc
             
         elif Header["FORMAT"]["Valeur"]=="ASCII":
             while True:
@@ -156,29 +155,32 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
                         break
                     else:
                         values.append(chunk)
-                except:
-                    raise ChunkError
+                except (UnicodeDecodeError, ValueError) as exc:
+                    raise ChunkError from exc
         df = pd.DataFrame(values)
         df.columns = [Header["ACQ"+str(i)]["Valeur"] for i in range(1,17)]
 
         return Header,df
 
-    def read_alarm_mask(mask):
-        mask_value = bin(mask)[2:].zfill(7)[::-1]
-        return mask_value
+    def calculs_defauts_et_etats(time,df,compute_defauts,compute_etats,etats_columns=None):
+        etats = ["Fsamp"                                     ,
+                    "Switch RF ON"                           ,
+                    "Multipac"                               ,
+                    "VIR"                                   ,
+                    "TSR"                                   ,
+                    "Temp RF int"                           ,
+                    "Temp RF ext"                           ,
+                    "Switch rap"                            ,
+                    "Alim"                                  ,
+                    "Tension"                               ,
+                    "Polarisée"                             ,
+                    "Présence RF cav"                       ,
+                    "Seuil pick-up"                        ,
+                    "RF hors spéc"                          ,
+                    "Ucr"                                   ,
+                    "FPGA prêt"                                    ]
 
-    def int16_to_big_endian_array(value, nbofbits):
-        packed_value = struct.pack('>h', value)
-        binary_array = []
-        for byte in packed_value:
-            binary_array.extend([int(bit) for bit in format(byte, '08b')])
-        binary_array = np.flip(binary_array)[:nbofbits]
-        return binary_array
-
-    def calculs_defauts_et_etats(time,df,compute_defauts,compute_etats):
         if compute_defauts:
-            df_defaut= df.iloc[:,0].apply(int16_to_big_endian_array,nbofbits=7)
-            df_defaut = pd.DataFrame(df_defaut.tolist(), columns=[f'defaut_{i}' for i in range(7)])
             defauts = [ "Seuil pick-up"                      ,     
                         "Coupure externe rapide"              ,      
                         "Absence autorisation RF"              ,   
@@ -186,31 +188,23 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
                         "Claquage ou quench cavité"            , 
                         "Dép seuil de sécurité RF"              ,   
                         "Rég signal RF hors tolérance"              ]
-            df_defaut.columns = defauts
+            defauts_values = df.iloc[:,0].astype(np.int16).to_numpy().astype(np.uint16)
+            defauts_bits = ((defauts_values[:, None] >> np.arange(7)) & 1).astype(np.int8)
+            df_defaut = pd.DataFrame(defauts_bits, columns=defauts)
 
         if compute_etats:
-            df_states=pd.DataFrame(df.iloc[:,1])
-            df_states=df_states.astype(np.int16)
-            df_states= df_states.iloc[:,0].apply(int16_to_big_endian_array,nbofbits=16)
-            df_states = pd.DataFrame(df_states.tolist(), columns=[f'etat_{i}' for i in range(16)])
-            etats = ["Fsamp"                                     ,   
-                        "Switch RF ON"                           ,    
-                        "Multipac"                               ,     
-                        "VIR"                                   ,       
-                        "TSR"                                   ,       
-                        "Temp RF int"                           ,       
-                        "Temp RF ext"                           ,       
-                        "Switch rap"                            ,       
-                        "Alim"                                  ,       
-                        "Tension"                               ,      
-                        "Polarisée"                             ,       
-                        "Présence RF cav"                       ,       
-                        "Seuil pick-up"                        ,        
-                        "RF hors spéc"                          ,       
-                        "Ucr"                                   ,       
-                        "FPGA prêt"                                    ]
+            etats_to_compute = etats
+            if etats_columns:
+                etats_to_compute = [etat for etat in etats_columns if etat in etats]
+                if len(etats_to_compute) == 0:
+                    etats_to_compute = etats
 
-            df_states.columns = etats
+            states_values = df.iloc[:,1].astype(np.int16).to_numpy().astype(np.uint16)
+            states_bits = ((states_values[:, None] >> np.arange(16)) & 1).astype(np.int8)
+            df_states = pd.DataFrame({
+                etat: states_bits[:, etats.index(etat)]
+                for etat in etats_to_compute
+            })
 
         df_signaux = df.iloc[:,2:]
 
@@ -262,7 +256,6 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
     typeCavite = Header["CAVITE"]["Valeur"]
     LOOP = Header["LOOP"]["Valeur"]
     MASK = Header["MASK"]["Valeur"]
-    VACT = Header["VACT"]["Valeur"]
 
     parameters={
         "NDEC":NDEC,
@@ -281,7 +274,6 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
         "CAVITE":typeCavite,
         "LOOP":LOOP,
         "MASK":MASK,
-        "VACT":VACT
     }
 
     # Attention : POSTROW fait référence au nombre de ligne AVANT t=0 et non après, ce n'est pas égal au postrow de l'interface post-mortem (ihm) (un calcul est effectué : postrow_fichier = nrow - postrow_ihm)
@@ -343,16 +335,6 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
             coefUci=100
         return coefUcr,coefUcav,coefUci
 
-    calculs = ["Ucav",
-            "Uci",
-            "PhaseCav",
-            "PhaseUci",
-            "DPCI",
-            "IQ",
-            "MODA",
-            "MODP",
-            "RF ON"]
-
     if typeCavite == "RFQ_ESCLAVE":
         typeCavite = Header["DBNAME"]["Valeur"].split("-")[1].split(":")[0]
 
@@ -365,20 +347,16 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
         else:
             coefUci  = coefUci + 12
             
-    df, df_defaut, df_states = calculs_defauts_et_etats(time,df,compute_defauts,compute_etats)
+    df, df_defaut, df_states = calculs_defauts_et_etats(time,df,compute_defauts,compute_etats,etats_columns)
 
-    df_signaux = df.copy()
+    df_signaux = df
     del df
-    col_names=[]
-    for col in df_signaux.columns:
-        col_names.append(col + " binary")
-    
-    df_signaux.columns = col_names
+    df_signaux.columns = [f"{col} binary" for col in df_signaux.columns]
 
     if "A Ucr binary" in df_signaux.columns:
         ADO1 = float(Header["ADO1"]["Valeur"])
         ADA1 = float(Header["ADA1"]["Valeur"])
-        print(df_signaux._is_copy)
+        # print(df_signaux._is_copy)
         df_signaux.loc[:,"A Ucr"] = 10**(((ADO1+(df_signaux["A Ucr binary"]*2.5/4095)/ADA1)+coefUcr)/10)
 
     if "A Uamp binary" in df_signaux.columns:
@@ -397,53 +375,57 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
 
     if "vide binary" in df_signaux.columns:
         #v1      =
-        df_signaux.loc[:,"vide"]= 1.332*10**(((df_signaux["vide binary"]*10)/4095)/0.6-12)
+        df_signaux.loc[:,"vide"]= 1.332*10**(((df_signaux["vide binary"]*10.0)/4095)/0.6-12)
 
     if "courant pickup binary" in df_signaux.columns:
         df_signaux.loc[:,"courant pickup"]= df_signaux["courant pickup binary"]*0.0245168-37.5008
 
     if "T SP2RF interne binary" in df_signaux.columns:
-        df_signaux.loc[:,"T SP2RF interne"]= (df_signaux["T SP2RF interne binary"]*256)/(4095-128)
+        df_signaux.loc[:,"T SP2RF interne"]= (df_signaux["T SP2RF interne binary"]*256.0)/(4095-128)
 
     if "T SP2RF externe binary" in df_signaux.columns:
-        df_signaux.loc[:,"T SP2RF externe"]= (df_signaux["T SP2RF externe binary"]*256)/(4095-128)
+        df_signaux.loc[:,"T SP2RF externe"]= (df_signaux["T SP2RF externe binary"]*256.0)/(4095-128)
 
-    if "I Ucav binary" and "Q Ucav binary" in df_signaux.columns:
-        df_signaux.loc[:,"Ucav"]= np.sqrt(df_signaux["I Ucav binary"]*df_signaux["I Ucav binary"]+df_signaux["Q Ucav binary"]*df_signaux["Q Ucav binary"]) *coefUcav/32767
+    if "I Ucav binary" in df_signaux.columns and "Q Ucav binary" in df_signaux.columns:
+        df_signaux.loc[:,"Ucav"]= np.hypot(df_signaux["I Ucav binary"],df_signaux["Q Ucav binary"]) *coefUcav/32767
 
-    if "I Uci binary" and "Q Uci binary"  in df_signaux.columns:
-        df_signaux.loc[:,"Uci"]= coefUci*(df_signaux["I Uci binary"]*df_signaux["I Uci binary"]+df_signaux["Q Uci binary"]*df_signaux["Q Uci binary"] )/32767/32767
+    if "I Uci binary" in df_signaux.columns and "Q Uci binary"  in df_signaux.columns:
+            df_signaux.loc[:,"Uci"] = coefUci * ((df_signaux["I Uci binary"] / 32767.0)**2 + (df_signaux["Q Uci binary"] / 32767.0)**2)
+            
 
-    if "Q Ucav binary" and "I Ucav binary" in df_signaux.columns:
+    if "Q Ucav binary" in df_signaux.columns and "I Ucav binary" in df_signaux.columns:
         # df_signaux["PhaseCav"]=  df_signaux.apply(lambda row: math.atan2(row['Q Ucav'],row['I Ucav']), axis=1)
         # # Si tu veux convertir l'angle de radians à degrés
         # df_signaux['PhaseCav'] = df_signaux['PhaseCav'].apply(math.degrees)
         df_signaux.loc[:,'PhaseCav'] = (np.degrees(np.arctan2(df_signaux['Q Ucav binary'], df_signaux['I Ucav binary'])) - float(Header["UCAR"]["Valeur"]) + 180) % 360 - 180
 
-    if "Q Uci binary" and "I Uci binary" in df_signaux.columns:
+    if "Q Uci binary" in df_signaux.columns and "I Uci binary" in df_signaux.columns:
         # df_signaux["PhaseUci"]= math.atan2(df_signaux["I Uci"], df_signaux["Q Uci"])*180/np.pi
         # df_signaux["PhaseUci"]=  df_signaux.apply(lambda row: math.atan2(row['Q Uci'],row['I Uci']), axis=1)
         # # Si on veux convertir l'angle de radians à degrés
         # df_signaux['PhaseUci'] = df_signaux['PhaseUci'].apply(math.degrees)
+
         df_signaux.loc[:,'PhaseUci'] = (np.degrees(np.arctan2(df_signaux['Q Uci binary'], df_signaux['I Uci binary'])) - float(Header["UCIR"]["Valeur"]) + 180) % 360 - 180
 
     # df_signaux["I Uci"]=df_signaux["I Uci"]/10.0
 
-    if "PhaseCav" and "PhaseUci" in df_signaux.columns:
+    if "PhaseCav" in df_signaux.columns and "PhaseUci" in df_signaux.columns:
         df_signaux.loc[:,"DPCI"]= (df_signaux["PhaseCav"] - df_signaux["PhaseUci"] - ((float(Header["DPOF"]["Valeur"])+180)%360 -180) + 180) % 360 -180
 
-    if "I modulateur binary" and "Q modulateur binary" in df_signaux.columns:
-        df_signaux.loc[:,"IQ"]= np.sqrt(df_signaux["I modulateur binary"]*df_signaux["I modulateur binary"]+df_signaux["Q modulateur binary"]*df_signaux["Q modulateur binary"]) /32767*300
+    if "I modulateur binary" in df_signaux.columns and "Q modulateur binary" in df_signaux.columns:
+        df_signaux.loc[:,"IQ"]= np.hypot(df_signaux["I modulateur binary"],df_signaux["Q modulateur binary"]) /32767*300
 
     # if "IQ" in df_signaux.columns:
     #     df_signaux["MODA"]= 20*np.log10(df_signaux["IQ"])-57.75
 
     # if "Q modulateur binary" and "I modulateur binary" and "IQ binary" in df_signaux.columns:
-    if "Q modulateur binary" and "I modulateur binary" in df_signaux.columns:
+    if "Q modulateur binary" in df_signaux.columns and "I modulateur binary" in df_signaux.columns:
 
         #df_signaux["MODP"]= np.sin(df_signaux["Q modulateur binary"]) * (180/np.pi) *(df_signaux["I modulateur binary"]/df_signaux["IQ"]).apply(cmath.acos)
         # df_signaux["MODP"]= np.arctan(df_signaux["Q modulateur"]/(df_signaux["I modulateur"]+1e-9))
         # df_signaux["MODP2"]= np.angle([df_signaux["I modulateur binary"]+ df_signaux["Q modulateur binary"]*1j])
         df_signaux.loc[:,"MODP"]= np.degrees(np.arctan2(df_signaux["Q modulateur binary"],(df_signaux["I modulateur binary"])))
 
+    df_defaut = df_defaut.astype(bool)
+    df_states = df_states.astype(bool)
     return parameters,time, df_signaux, df_defaut, df_states,Header
