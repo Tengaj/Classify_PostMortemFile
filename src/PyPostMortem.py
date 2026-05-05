@@ -256,6 +256,7 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
     typeCavite = Header["CAVITE"]["Valeur"]
     LOOP = Header["LOOP"]["Valeur"]
     MASK = Header["MASK"]["Valeur"]
+    UCAT = Header["UCAT"]["Valeur"]
 
     parameters={
         "NDEC":NDEC,
@@ -274,6 +275,7 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
         "CAVITE":typeCavite,
         "LOOP":LOOP,
         "MASK":MASK,
+        "UCAT":UCAT,
     }
 
     # Attention : POSTROW fait référence au nombre de ligne AVANT t=0 et non après, ce n'est pas égal au postrow de l'interface post-mortem (ihm) (un calcul est effectué : postrow_fichier = nrow - postrow_ihm)

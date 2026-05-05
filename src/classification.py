@@ -372,6 +372,95 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     # Si aucune condition n'est remplie
     return "Other"
 
+def classify_RF_protections(time, Ucav, Ucat):
+    """
+    Classifie la cause de la protection RF en comparant la tension cavité (Ucav) 
+    à la tension de cathode (Ucat) autour de t=0.
+    """
+    # index du temps t=0 (le moment de la coupure)
+    zero_idx = np.argmin(np.abs(time))
+    
+    # Définir la zone autour de 0
+    start_idx = max(0, zero_idx - 20)
+    end_idx   = min(len(time), zero_idx + 20)
+    
+    Ucat_fraction = float(Ucat) / 100.0
+
+    # Calculer le ratio sur la fenêtre
+    ratio = Ucav.iloc[start_idx:end_idx] / Ucat_fraction
+     
+    max_ratio = ratio.max()
+    
+    print(f"Index de t=0 : {zero_idx} | Ratio maximum mesuré : {max_ratio:.2f}")
+    
+    if max_ratio > 8.5:
+        return "Ucav max"
+    else:
+        return "Pr max"
+
+def classify_void(pickup, threshold_pickup=50):
+    zero_idx = np.argmin(np.abs(pickup.index))
+    # Définir la zone autour de 0
+    start_idx = max(0, zero_idx - 30)
+    end_idx   = min(len(pickup), zero_idx + 30)
+    pickup_win = pickup.iloc[start_idx:end_idx]
+    max_pickup = pickup_win.max()
+    mean_pickup = pickup.mean()
+    #print(f'moyenne pickup : {mean_pickup}')
+    if mean_pickup > threshold_pickup:
+        return "Ipu"
+    else:
+        return "Leak/outgassing"
+
+def classify_quench(Ucav):
+    """
+    Classifie un défaut de type Quench en mesurant le temps de chute 
+    de la tension cavité (Ucav) de 100% à 50%.
+    - Moins de 2 µs : Breakdown
+    - Plus de 2 ms : Fausse alerte
+    - Entre les deux : Quench
+    """
+    # Trouver le début de la chute
+    t0_idx, t0_time = detect_t0_zscore(Ucav)
+    t0_idx = t0_idx - 1
+    t0_time = Ucav.index[t0_idx]
+
+    U_max = Ucav.iloc[t0_idx]
+    
+    # Définir la cible des 50%
+    U_target = U_max * 0.5
+    
+    # Isoler la partie du signal qui se passe APRES le début de la chute
+    Ucav_fall = Ucav.iloc[t0_idx:]
+    
+    # Chercher tous les points qui sont passés sous la barre des 50%
+    below_50 = Ucav_fall[Ucav_fall < U_target]
+    
+    if below_50.empty:
+        print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
+        return ",Incomplet (Pas de chute à 50%)"
+        
+    # Le temps "t_50" est le tout premier point de cette liste
+    t_50 = below_50.index[0]
+    
+    # Calcul du Delta T
+    delta_t = t_50 - t0_time
+    
+    print(f"U_max: {U_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
+
+    dt_microseconds = np.mean(np.diff(Ucav.index))
+    THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
+    THRESHOLD_FALSE_ALARM = 2000.0  # 2 ms (2000 µs)
+
+    falltime = f",Temps de chute : {delta_t:.2f} us"
+
+    if delta_t <= THRESHOLD_BREAKDOWN:
+        return "Breakdown" + falltime
+    elif delta_t > THRESHOLD_FALSE_ALARM:
+        return "Fausse alerte" + falltime
+    else:
+        return "Quench" + falltime
+
 @chrono
 def classify_file(file_name):
     """
@@ -406,7 +495,7 @@ def classify_file(file_name):
     zero_idx = np.argmin(np.abs(time))
     ucav_threshold = 0.1
     if np.mean(Ucav.iloc[0:zero_idx]) < ucav_threshold:
-        return f'{default[0]},,Tension inférieur à {ucav_threshold}' 
+        return f'{default[0]},,Tension inférieur à {ucav_threshold}'
 
     match default[0]:
         case "Seuil pick-up":
@@ -417,14 +506,12 @@ def classify_file(file_name):
             return "3"
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
-            #vact = parameters.get("VACT")
-            return "4"
+            return default[0]  + "," + classify_void(pickup)
         case "Claquage ou quench cavité":
-            Ucr = df_signals.get("A Ucr") 
-            return "5"
-        case "Deép seuil de sécurité RF":
-            return "6"
-            Ucr = df_signals.get("A Ucr") 
+            return default[0]  + "," + classify_quench(Ucav)
+        case "Dép seuil de sécurité RF":
+            Ucat = parameters.get("UCAT")
+            return default[0]  + "," + classify_RF_protections(time, Ucav, Ucat)
         case "Rég signal RF hors tolérance":
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
@@ -452,7 +539,7 @@ def classify_folder(folder_name):
         try:
             label = classify_file(file)
             #Pour le moment je ne regard que le défaut : Rég signal RF hors tolérance
-            if "Rég signal RF hors tolérance" in label:
+            if "Rég signal RF hors tolérance" in label or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
                 file_default[file] = label
             #file_default[file] = label
             print(f'Nom du fichier : {file}, Défaut : {label}')
@@ -481,7 +568,7 @@ def classify_folder(folder_name):
             f.write(f'{file_name},{file_default[file]}\n')
 
 @chrono
-def classify_folder(cav_folder_name):
+def classify_cav_folder(cav_folder_name):
     """
     Classifie tous les fichiers des sous dossiers dun type de cavité.
     """
