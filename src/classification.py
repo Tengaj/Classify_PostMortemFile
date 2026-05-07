@@ -99,8 +99,6 @@ def get_trend(time, signal, tolerance=1e-6):
     else:
         return 0
 
-
-
 def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     """
     Détecte t0, le moment ou le signal Ucav sort de son amplitude moyenne avec un Z-score,
@@ -109,41 +107,45 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     - z_threshold : Nombre d'écarts-types pour déclencher l'alarme (5 est standard).
     """
     zero_idx = np.argmin(np.abs(Ucav_series.index))
-    # Calcul du Z-score
-    #rolling_mean = Ucav_series.rolling(window=5000, min_periods=1).mean()
-    #rolling_std = Ucav_series.rolling(window=5000, min_periods=1).std()
-    Ucav_mean = (Ucav_series.iloc[zero_idx - 20000:zero_idx - 15000]).mean()
-    Ucav_std = (Ucav_series.iloc[zero_idx - 20000:zero_idx - 15000]).std()
     
-    #Ucav_std = Ucav_std.replace(0, 1e-6)
+    # Calcul du Z-score
+    Ucav_mean = Ucav_series.rolling(window=5000, min_periods=1).mean()
+
+    # On cherche l'écart type minimum (écart type d'un signal stable)
+    end_safe_zone = max(100, zero_idx - 20000) 
+    safe_zone = Ucav_series.iloc[0:end_safe_zone]
+    search_window = min(5000, len(safe_zone))
+    all_stds = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
+    Ucav_std_brut = all_stds.min()
+    Ucav_std = max(Ucav_std_brut, 1e-6) # protection anti division par 0
     
     z_scores = abs((Ucav_series - Ucav_mean) / Ucav_std)
-    '''
-    temps_cible = -78646.2621731353
-    ligne_exacte = Ucav_series.index.get_indexer([temps_cible], method='nearest')[0]
-    vrai_temps = Ucav_series.index[ligne_exacte]
-    val_brute = Ucav_series.iloc[ligne_exacte]
-    val_mean  = Ucav_mean.iloc[ligne_exacte]
-    val_std   = Ucav_std.iloc[ligne_exacte]
-    print(f"Temps cherché: {temps_cible} | Trouvé: {vrai_temps}")
-    print(f"Val : {val_brute:.4f} | Mean : {val_mean:.4f} | std : {val_std:.4f}")
-    '''
     
     # Définition des bornes
-    zero_idx = np.argmin(np.abs(Ucav_series.index))
     z_scores_cible = z_scores.iloc[0:zero_idx + 100]
     
-    # On cherche toutes les anomalies
-    anomalies = z_scores_cible[z_scores_cible > z_threshold]
+    # On définit combien de points anormaux consécutifs on exige 
+    MIN_CONSECUTIVE = 3 
     
+    # Masque binaire : 1 si on dépasse le seuil, 0 sinon
+    is_anomaly_bin = (z_scores_cible > z_threshold).astype(int)
+    
+    # On inverse la série pour regarder se qui vient après
+    # min() vaudra 1 uniquement si le point actuel ET les suivants sont à 1.
+    future_window = is_anomaly_bin.iloc[::-1].rolling(window=MIN_CONSECUTIVE).min().iloc[::-1]
+    
+    # Le premier point d'une vraie chute vaudra exactement 1.
+    valid_anomaly_starts = (future_window == 1)
+    
+    # On extrait uniquement les Z-scores qui démarrent une vraie chute
+    anomalies = z_scores_cible[valid_anomaly_starts]
     if anomalies.empty:
         return None, None
-        
-    # On repère les moments où la machine va bien (Z-score sous le seuil)
+
+    # On repère les moments où le Z-score est sous le seuil
     is_healthy = (z_scores_cible <= z_threshold).astype(int)
     
     # Un "Vrai Calme" c'est quand le signal est sain sur au moins 200 points consécutifs.
-    # La fonction rolling().min() vaudra 1 UNIQUEMENT si les 200 points précédents étaient à 1 (sains)
     true_calm = is_healthy.rolling(window=200).min() == 1
     last_calm_times = true_calm[true_calm == True]
     
@@ -160,7 +162,7 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
             t0_idx = Ucav_series.index.get_loc(t0_time)
             return t0_idx, t0_time
 
-    # Fallback de sécurité (Si la machine n'a jamais été calme dès le début du fichier)
+    # Cas ou le signal n'est jamais calme
     t0_time = anomalies.index[0]
     t0_idx = Ucav_series.index.get_loc(t0_time)
     return t0_idx, t0_time
@@ -416,9 +418,6 @@ def classify_quench(Ucav):
     """
     Classifie un défaut de type Quench en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
-    - Moins de 2 µs : Breakdown
-    - Plus de 2 ms : Fausse alerte
-    - Entre les deux : Quench
     """
     # Trouver le début de la chute
     t0_idx, t0_time = detect_t0_zscore(Ucav)
@@ -457,7 +456,7 @@ def classify_quench(Ucav):
     if delta_t <= THRESHOLD_BREAKDOWN:
         return "Breakdown" + falltime
     elif delta_t > THRESHOLD_FALSE_ALARM:
-        return "Fausse alerte" + falltime
+        return "False alarm" + falltime
     else:
         return "Quench" + falltime
 
@@ -495,15 +494,15 @@ def classify_file(file_name):
     zero_idx = np.argmin(np.abs(time))
     ucav_threshold = 0.1
     if np.mean(Ucav.iloc[0:zero_idx]) < ucav_threshold:
-        return f'{default[0]},,Tension inférieur à {ucav_threshold}'
+        return f'{default[0]},Other,Tension inférieur à {ucav_threshold}'
 
     match default[0]:
         case "Seuil pick-up":
-            return "1"
+            return default[0]
         case "Coupure externe rapide":
-            return "2"
+            return default[0]
         case "Absence autorisation RF":
-            return "3"
+            return default[0]
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
             return default[0]  + "," + classify_void(pickup)
