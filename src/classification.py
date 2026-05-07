@@ -79,7 +79,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     # Il faut que ce soit une belle oscillation ET qu'elle soit assez grosse
     is_oscillating = is_above_noise and is_physically_significant
     
-    #print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
+    print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
 
     return is_oscillating, freq_dom
 
@@ -114,7 +114,7 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     # On cherche l'écart type minimum (écart type d'un signal stable)
     end_safe_zone = max(100, zero_idx - 20000) 
     safe_zone = Ucav_series.iloc[0:end_safe_zone]
-    search_window = min(5000, len(safe_zone))
+    search_window = min(10000, len(safe_zone))
     all_stds = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
     Ucav_std_brut = all_stds.min()
     Ucav_std = max(Ucav_std_brut, 1e-6) # protection anti division par 0
@@ -520,7 +520,7 @@ def classify_file(file_name):
             return "Other"
 
 @chrono
-def classify_folder(folder_name):
+def classify_folder(folder_name, export=False):
     """
     Classifie tous les fichiers d'un dossiers. 
     Enregistre le défaut et le label de chaque fichier dans un .csv
@@ -538,7 +538,7 @@ def classify_folder(folder_name):
         try:
             label = classify_file(file)
             #Pour le moment je ne regard que le défaut : Rég signal RF hors tolérance
-            if "Rég signal RF hors tolérance" in label or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
+            if "Rég signal RF hors tolérance" in label :#or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
                 file_default[file] = label
             #file_default[file] = label
             print(f'Nom du fichier : {file}, Défaut : {label}')
@@ -546,12 +546,15 @@ def classify_folder(folder_name):
             print(f'Fichier ignoré ({file}) - Fichier imcomplet ou erreur : {e}')
             continue
 
+    if export:
+        return file_default
+
     # Ecriture des résultats
 
     # Création du nom du fichier csv
     path_parts = path_folder.parts
-    folder_name_clean = ""
     year = path_parts[-3]
+    folder_name_clean = ""
     for part in path_parts:
         if part not in ('..', '.'):
             if part == path_parts[len(path_parts)-1]:
@@ -567,23 +570,42 @@ def classify_folder(folder_name):
             f.write(f'{file_name},{file_default[file]}\n')
 
 @chrono
-def classify_cav_folder(cav_folder_name):
+def classify_cav_folder(cav_folder_name, export=False):
     """
     Classifie tous les fichiers des sous dossiers dun type de cavité.
     """
+    
     path_folder = Path(cav_folder_name)
     cav_number_folder = sorted([path for path in path_folder.iterdir() if path.is_dir()])
+    file_default = {}
     for folder in cav_number_folder:
-        classify_folder(folder)
+        if export:
+            file_default.update(classify_folder(folder, True))
+        else:
+            classify_folder(folder)
+    if export:
+        return file_default
 
 @chrono
-def classify_year_folder(year_folder_name):
+def classify_year_folder(year_folder_name, export=False):
     """
     Classifie tous les fichiers des sous dossiers d'une année.
     """
     path_folder = Path(year_folder_name)
     cav_folder = sorted([path for path in path_folder.iterdir() if path.is_dir()])
+    file_default = {}
     for folder in cav_folder:
         print(folder)
         if "CMA" in folder.parts or "CMB" in folder.parts:
-            classify_cav_folder(folder)
+            if export:
+                file_default.update(classify_cav_folder(folder, True))
+            else:
+                classify_cav_folder(folder)
+    if export:
+        year = path_folder.parts[-1]
+        file_name_export = "../resultat/LLRF_" + year + ".csv"
+        with open(file_name_export, "w", encoding="utf-8") as f:
+            f.write("Fichier,Defaut,Label,Détails\n")
+            for file in file_default.keys():
+                file_name = file.parts[len(file.parts)-1]
+                f.write(f'{file_name},{file_default[file]}\n')
