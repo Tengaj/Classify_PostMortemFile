@@ -79,7 +79,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     # Il faut que ce soit une belle oscillation ET qu'elle soit assez grosse
     is_oscillating = is_above_noise and is_physically_significant
     
-    print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
+    #print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
 
     return is_oscillating, freq_dom
 
@@ -120,7 +120,19 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     Ucav_std = max(Ucav_std_brut, 1e-6) # protection anti division par 0
     
     z_scores = abs((Ucav_series - Ucav_mean) / Ucav_std)
-    
+
+    '''
+    temps_cible = -69424.4
+    ligne_exacte = Ucav_series.index.get_indexer([temps_cible], method='nearest')[0]
+    vrai_temps = Ucav_series.index[ligne_exacte]                            
+    val_brute = Ucav_series.iloc[ligne_exacte]
+    val_mean  = Ucav_mean.iloc[ligne_exacte]                                                                    
+    #val_std   = Ucav_std.iloc[ligne_exacte]
+    print(f"Temps cherché: {temps_cible} | Trouvé: {vrai_temps}")
+    print(f"Val : {val_brute:.4f} | Mean : {val_mean:.4f} | std : {Ucav_std:.4f}")
+    print(f'z score : {abs((val_brute - val_mean) / Ucav_std)}')
+    '''
+
     # Définition des bornes
     z_scores_cible = z_scores.iloc[0:zero_idx + 100]
     
@@ -142,11 +154,18 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     if anomalies.empty:
         return None, None
 
-    # On repère les moments où le Z-score est sous le seuil
-    is_healthy = (z_scores_cible <= z_threshold).astype(int)
+    Ucav_median = safe_zone.median()
+    # On définit un seuil de "survie" (ex: il faut qu'il reste au moins 50% de la tension)
+    SEUIL_SURVIE = Ucav_median * 0.5 
+    Ucav_cible = Ucav_series.iloc[0:zero_idx + 100]
+    
+    # Un point est sain SEULEMENT SI le Z-score est bon ET que la cavité est allumée
+    is_zscore_ok = (z_scores_cible <= z_threshold)
+    is_amplitude_ok = (np.abs(Ucav_cible) > SEUIL_SURVIE)
+    is_healthy = (is_zscore_ok & is_amplitude_ok).astype(int)
     
     # Un "Vrai Calme" c'est quand le signal est sain sur au moins 200 points consécutifs.
-    true_calm = is_healthy.rolling(window=200).min() == 1
+    true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1
     last_calm_times = true_calm[true_calm == True]
     
     if not last_calm_times.empty:
@@ -162,7 +181,7 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
             t0_idx = Ucav_series.index.get_loc(t0_time)
             return t0_idx, t0_time
 
-    # Cas ou le signal n'est jamais calme
+    # Cas ou le signal n'est jamais calme (ou est mort trop tôt)
     t0_time = anomalies.index[0]
     t0_idx = Ucav_series.index.get_loc(t0_time)
     return t0_idx, t0_time
@@ -198,7 +217,7 @@ def get_slope(t_array, y_array):
 
 def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     """
-    Classifie le défaut "Rég signal RF hors tolérance" en appliquant l'arbre de décision.
+    Classifie le défaut "Rég signal RF hors tolérance". 
     """
 
     # t0_idx : index ou le signal Ucav comment à décrocher
@@ -235,8 +254,8 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
     if mid_window == start_idx_short:
         mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
-    print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}')
-    print(f'Window start value : {time[start_idx_short]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
+    #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}')
+    #print(f'Window start value : {time[start_idx_short]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
 
     t_win_left = time[start_idx_short:mid_window]
     t_win_right = time[mid_window:end_idx]
@@ -250,7 +269,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     trend_Ucr_left = get_trend(t_win_left,Ucr_win_left)
     trend_Ucr_right = get_trend(t_win_right,Ucr_win_right)
     #print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
-    print(f'trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
+    #print(f'trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
 
     # On calcule la vraie perte d'amplitude entre le début et le point le plus bas
     valeur_debut_Ucr = Ucr.iloc[start_idx_short]
@@ -261,7 +280,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     # Seuil en dessous du quel on considère que se n'est pas un quecnh
     THRESHOLD_QUENCH = 0.2 
     
-    # On définit ce qu'est un "un vrai profil en V pour un quench
+    # On définit ce qu'est un vrai profil en V pour un quench
     true_V_profil = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
 
     if trend_Uci == 1:
@@ -275,7 +294,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
 
     SEUILS_AMPLITUDE = {
         "Uci":  0.001,
-        "modIQ": 0.5,
+        "modIQ": 0.3,
         "Ucav": 0.0001
     }
 
@@ -315,7 +334,8 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
     base_Uci   = np.median(Uci.iloc[idx_base_start:idx_base_end])
     base_Ucr   = np.median(Ucr.iloc[idx_base_start:idx_base_end])
-    #print(f'median modIQ : {base_modIQ}, median Uci : {base_Uci}, median Ucr : {base_Ucr}')
+    base_Ucav  = np.median(Ucav.iloc[idx_base_start:idx_base_end])
+    #print(f'median modIQ : {base_modIQ}, median Uci : {base_Uci}, median Ucr : {base_Ucr}, median Ucav : {base_Ucav}')
     
     # Définition de la zone de recherche de pic (Autour de t0)
     # On cherche dans une petite fenêtre avant et après t0
@@ -327,30 +347,35 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     max_Ucr_zone = Ucr.iloc[zone_start:zone_end].max()
     max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
     min_Uci_zone = Uci.iloc[zone_start:zone_end].min()
+    max_Ucav_zone = Ucav.iloc[zone_start:zone_end].max()
+    min_Ucav_zone = Ucav.iloc[zone_start:zone_end].min()
     
     # Calcul des variations réelles (L'événement par rapport au repos)
     delta_modIQ = max_modIQ_zone - base_modIQ
     delta_pos_Uci   = max_Uci_zone - base_Uci
     delta_neg_Uci   = min_Uci_zone - base_Uci
     delta_Ucr   = max_Ucr_zone - base_Ucr
-    #print(f'Variations (Deltas) -> modIQ: {delta_modIQ:.4f} | Uci: {delta_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
-
+    delta_pos_Ucav = max_Ucav_zone - base_Ucav
+    delta_neg_Ucav = min_Ucav_zone - base_Ucav
     
-    # Sécurité anti-division par (presque) zéro : 
+    # Sécurité anti-division par zéro : 
     EPSILON = 0.01
     base_modIQ_safe = max(abs(base_modIQ), EPSILON)
     base_Uci_safe = max(abs(base_Uci), EPSILON)
     base_Ucr_safe = max(abs(base_Ucr), EPSILON)
+    base_Ucav_safe = max(abs(base_Ucav), EPSILON)
 
     # Calcul des variations en POURCENTAGE
     pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
     pct_pos_Uci   = (delta_pos_Uci / base_Uci_safe) * 100.0
     pct_neg_Uci   = (delta_neg_Uci / base_Uci_safe) * 100.0
     pct_Ucr   = (delta_Ucr / base_Ucr_safe) * 100.0
+    pct_pos_Ucav = (delta_pos_Ucav / base_Ucav_safe) * 100.0
+    pct_neg_Ucav = (delta_neg_Ucav / base_Ucav_safe) * 100.0
     
-    print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
-    print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f} | Ucr: {delta_Ucr:.4f}')
-    print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}% | Ucr: {pct_Ucr:.1f}%')
+    #print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
+    #print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f} | Ucr: {delta_Ucr:.4f} | Ucav_pos: {delta_pos_Ucav:.4f} | Ucav_neg: {delta_neg_Ucav:.4f}')
+    #print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}% | Ucr: {pct_Ucr:.1f}% | pct_pos_Ucav: {pct_pos_Ucav:.1f}% | pct_neg_Ucav: {pct_neg_Ucav:.4f}%')
     
     THRESHOLD_NOISE_PCT = 10.0
     THRESHOLD_PEAK_PCT = 90.00
@@ -359,7 +384,10 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         pct_Uci = pct_pos_Uci
     else:
         pct_Uci = pct_neg_Uci
-    
+
+    trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5],Ucav.iloc[t0_idx:t0_idx+5])
+    print(f'trend_Ucav_short : {trend_Ucav_short}') 
+   
     # Si modIQ monte plus que le bruit ambiant
     if pct_modIQ > THRESHOLD_NOISE_PCT:
         
@@ -367,17 +395,19 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
             
-        # Montée significative de modIQ et Uci
-        elif THRESHOLD_NOISE_PCT < pct_modIQ and pct_Uci > THRESHOLD_NOISE_PCT:
+        # Montée significative de modIQ et Uci et Ucav baisse
+        elif THRESHOLD_NOISE_PCT < pct_modIQ and pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == -1:
             return "Beam loss"
+        
+        elif THRESHOLD_NOISE_PCT < pct_modIQ and pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
+            return "Beam loss,Pic Ucav"
             
     # Si aucune condition n'est remplie
     return "Other"
 
 def classify_RF_protections(time, Ucav, Ucat):
     """
-    Classifie la cause de la protection RF en comparant la tension cavité (Ucav) 
-    à la tension de cathode (Ucat) autour de t=0.
+    Classifie le défaut "Dép seuil de sécurité RF" en comparant la valeur de la tension (Ucav) par rapport au seuil maximal (Ucat). 
     """
     # index du temps t=0 (le moment de la coupure)
     zero_idx = np.argmin(np.abs(time))
@@ -401,14 +431,19 @@ def classify_RF_protections(time, Ucav, Ucat):
         return "Pr max"
 
 def classify_void(pickup, threshold_pickup=50):
+    """
+    Classifie le défaut "Seuil de vide" en mesurant la quantité de courant pickup par rapport au seuil. 
+    """
     zero_idx = np.argmin(np.abs(pickup.index))
     # Définir la zone autour de 0
     start_idx = max(0, zero_idx - 30)
     end_idx   = min(len(pickup), zero_idx + 30)
     pickup_win = pickup.iloc[start_idx:end_idx]
+
     max_pickup = pickup_win.max()
     mean_pickup = pickup.mean()
     #print(f'moyenne pickup : {mean_pickup}')
+
     if mean_pickup > threshold_pickup:
         return "Ipu"
     else:
@@ -416,7 +451,7 @@ def classify_void(pickup, threshold_pickup=50):
 
 def classify_quench(Ucav):
     """
-    Classifie un défaut de type Quench en mesurant le temps de chute 
+    Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
     # Trouver le début de la chute
@@ -538,7 +573,7 @@ def classify_folder(folder_name, export=False):
         try:
             label = classify_file(file)
             #Pour le moment je ne regard que le défaut : Rég signal RF hors tolérance
-            if "Rég signal RF hors tolérance" in label :#or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
+            if "Rég signal RF hors tolérance" in label :# or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
                 file_default[file] = label
             #file_default[file] = label
             print(f'Nom du fichier : {file}, Défaut : {label}')
