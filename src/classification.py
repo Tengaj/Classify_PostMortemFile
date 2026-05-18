@@ -23,7 +23,7 @@ def chrono(func):
 
 # FONCTIONS UTILITAIRES
 
-def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
+def analyze_oscillation(signal, dt, snr_threshold=6.0, min_amp_physique=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
     - snr_threshold : Rapport signal/bruit dans le spectre (relatif).
@@ -71,7 +71,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     # Le pic sort-il vraiment du bruit de fond spectral ?
     is_above_noise = pic_max > (snr_threshold * np.mean(yf_pos))
     #print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
-    #print(f'pic_max : {pic_max:.5f}, median yf_pos : {(snr_threshold * np.mean(yf_pos)):.5f}')
+    #print(f'pic_max : {pic_max:.5f}, mean yf_pos : {(snr_threshold * np.mean(yf_pos)):.5f}')
     
     # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = pic_max > min_amp_physique
@@ -79,7 +79,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_amp_physique=0.005):
     # Il faut que ce soit une belle oscillation ET qu'elle soit assez grosse
     is_oscillating = is_above_noise and is_physically_significant
     
-    #print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.median(yf_pos):.4f} | is_oscillating : {is_oscillating}")
+    print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.mean(yf_pos):.4f} | is_oscillating : {is_oscillating}")
 
     return is_oscillating, freq_dom
 
@@ -108,21 +108,40 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     """
     zero_idx = np.argmin(np.abs(Ucav_series.index))
     
-    # Calcul du Z-score
-    Ucav_mean = Ucav_series.rolling(window=5000, min_periods=1).mean()
+    Ucav_mean = Ucav_series.rolling(window=1000, min_periods=1).mean() #500
 
-    # On cherche l'écart type minimum (écart type d'un signal stable)
-    end_safe_zone = max(100, zero_idx - 20000) 
+    # On définit la zone sûre
+    end_safe_zone = max(100, zero_idx - 20000) # - 0
     safe_zone = Ucav_series.iloc[0:end_safe_zone]
     search_window = min(10000, len(safe_zone))
+    # On cherche l'écart type minimum (écart type d'un signal stable)
     all_stds = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
-    Ucav_std_brut = all_stds.min()
-    Ucav_std = max(Ucav_std_brut, 1e-6) # protection anti division par 0
+    Ucav_std = max(all_stds.min(), 1e-6) # protection
+    #Ucav_std = 0.00053
+    #print(f'ucav std : {Ucav_std}')
     
     z_scores = abs((Ucav_series - Ucav_mean) / Ucav_std)
+    
+    z_scores_amp = abs((Ucav_series - Ucav_mean) / Ucav_std)
 
+    Ucav_diff = Ucav_series.diff(periods=20).fillna(0)
+    safe_zone_diff = Ucav_diff.iloc[0:end_safe_zone]
+    all_stds_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
+    all_means_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).mean()
+    
+    best_idx_diff = all_stds_diff.idxmin()
+    diff_std = max(all_stds_diff[best_idx_diff], 1e-6)
+    diff_mean = all_means_diff[best_idx_diff]
+    
+    z_scores_diff = abs((Ucav_diff - diff_mean) / diff_std)
+
+    #print(f'diff std : {diff_std}')
+
+    # Pour chaque point, on retient la pire des deux anomalies.
+    z_scores = pd.DataFrame({'amp': z_scores_amp, 'diff': z_scores_diff}).max(axis=1)
+    
     '''
-    temps_cible = -69424.4
+    temps_cible = -23400
     ligne_exacte = Ucav_series.index.get_indexer([temps_cible], method='nearest')[0]
     vrai_temps = Ucav_series.index[ligne_exacte]                            
     val_brute = Ucav_series.iloc[ligne_exacte]
@@ -132,9 +151,8 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     print(f"Val : {val_brute:.4f} | Mean : {val_mean:.4f} | std : {Ucav_std:.4f}")
     print(f'z score : {abs((val_brute - val_mean) / Ucav_std)}')
     '''
-
     # Définition des bornes
-    z_scores_cible = z_scores.iloc[0:zero_idx + 100]
+    z_scores_cible = z_scores.iloc[0:zero_idx + 40]
     
     # On définit combien de points anormaux consécutifs on exige 
     MIN_CONSECUTIVE = 3 
@@ -152,12 +170,12 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     # On extrait uniquement les Z-scores qui démarrent une vraie chute
     anomalies = z_scores_cible[valid_anomaly_starts]
     if anomalies.empty:
-        return None, None
+        return zero_idx-10000, None
 
     Ucav_median = safe_zone.median()
     # On définit un seuil de "survie" (ex: il faut qu'il reste au moins 50% de la tension)
     SEUIL_SURVIE = Ucav_median * 0.5 
-    Ucav_cible = Ucav_series.iloc[0:zero_idx + 100]
+    Ucav_cible = Ucav_series.iloc[0:zero_idx + 40]
     
     # Un point est sain SEULEMENT SI le Z-score est bon ET que la cavité est allumée
     is_zscore_ok = (z_scores_cible <= z_threshold)
@@ -165,7 +183,7 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     is_healthy = (is_zscore_ok & is_amplitude_ok).astype(int)
     
     # Un "Vrai Calme" c'est quand le signal est sain sur au moins 200 points consécutifs.
-    true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1
+    true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1.0
     last_calm_times = true_calm[true_calm == True]
     
     if not last_calm_times.empty:
@@ -290,42 +308,57 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
             
         # Si la tendance est à la hausse
         elif trend_Ucr == 1:
-            return "Quench aside" 
+            return "Quench aside"
+
+    dt_microseconds = np.mean(np.diff(time))
+    dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
 
     SEUILS_AMPLITUDE = {
         "Uci":  0.001,
-        "modIQ": 0.3,
+        "modIQ": 0.1,
         "Ucav": 0.0001
     }
-
-    dt_microseconds = np.mean(np.diff(time))
-    dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz
+    
+    if t0_idx > zero_idx:
+        start_osci = max(0, zero_idx - 2000)
+        end_osci = zero_idx
+    else:
+        start_osci = t0_idx
+        end_osci = zero_idx + 40
 
     osc_Uci, f_Uci = analyze_oscillation(
-        Uci.iloc[t0_idx:zero_idx+40], 
+        Uci.iloc[start_osci:end_osci], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["Uci"]
     )
     
     osc_modIQ, f_modIQ = analyze_oscillation(
-        modIQ.iloc[t0_idx:zero_idx+40], 
+        modIQ.iloc[start_osci:end_osci], 
         dt_seconds, 
         min_amp_physique=SEUILS_AMPLITUDE["modIQ"]
     )
     
     osc_Ucav, f_Ucav = analyze_oscillation(
-        Ucav.iloc[t0_idx:zero_idx+40], 
+        Ucav.iloc[start_osci:end_osci], 
         dt_seconds,  
         min_amp_physique=SEUILS_AMPLITUDE["Ucav"]
     )
     
     # Si les trois oscillent (on prend la fréquence de la cavité Ucav comme référence)
     if osc_Uci and osc_modIQ and osc_Ucav:
-        freq = f_Ucav 
-        if freq > 100:
-            return "Loop instability"
-        else:
-            return "Taconis"
+        # On regroupe les fréquences trouvées
+        frequencies = [f_Uci, f_modIQ, f_Ucav]
+        f_max = max(frequencies)
+        f_min = max(min(frequencies), 1e-6) # Protection anti-division par zéro
+        
+        # Le ratio entre la fréquence max et min. 
+        #print(f'Ratio : {(f_max / f_min)}')
+        if (f_max / f_min) <= 1.5:
+            freq = f_Ucav 
+            if freq > 100:
+                return "Loop instability"
+            else:
+                return "Taconis"
     
     # Calcul du "Niveau de repos" (Baseline)
     # On prend une fenêtre "saine" bien avant t0 (ex: entre t0-500 et t0-100)
@@ -386,7 +419,6 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         pct_Uci = pct_neg_Uci
 
     trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5],Ucav.iloc[t0_idx:t0_idx+5])
-    print(f'trend_Ucav_short : {trend_Ucav_short}') 
    
     # Si modIQ monte plus que le bruit ambiant
     if pct_modIQ > THRESHOLD_NOISE_PCT:
@@ -434,6 +466,7 @@ def classify_void(pickup, threshold_pickup=50):
     """
     Classifie le défaut "Seuil de vide" en mesurant la quantité de courant pickup par rapport au seuil. 
     """
+    '''
     zero_idx = np.argmin(np.abs(pickup.index))
     # Définir la zone autour de 0
     start_idx = max(0, zero_idx - 30)
@@ -441,6 +474,7 @@ def classify_void(pickup, threshold_pickup=50):
     pickup_win = pickup.iloc[start_idx:end_idx]
 
     max_pickup = pickup_win.max()
+    '''
     mean_pickup = pickup.mean()
     #print(f'moyenne pickup : {mean_pickup}')
 
