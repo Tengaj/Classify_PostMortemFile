@@ -5,7 +5,7 @@ from pathlib import Path
 from functools import wraps
 from scipy.fft import fft, fftfreq
 from scipy.stats import linregress
-from scipy.signal import detrend
+from scipy.signal import detrend, find_peaks
 from PyPostMortem import Read_Signals
 
 def chrono(func):
@@ -23,19 +23,26 @@ def chrono(func):
 
 # FONCTIONS UTILITAIRES
 
-def analyze_oscillation(signal, dt, snr_threshold=6.0, min_amp_physique=0.005):
+def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
     - snr_threshold : Rapport signal/bruit dans le spectre (relatif).
-    - min_amp_physique : Amplitude physique minimale en dessous de laquelle on considère que c'est juste du bruit.
+    - min_physical_amp : Amplitude physique minimale en dessous de laquelle on considère que c'est juste du bruit.
     """
     if len(signal) < 10:    
         return False, 0.0 
 
     n = len(signal)
     
-    # Enlever la pente et la moyenne (Detrend linéaire)
-    sig_detrended = detrend(signal, type='linear')
+    # On veut une fenêtre glissante très large
+    # dt est en secondes. 0.02s = 20 ms.
+    window_size = int(0.02 / dt)
+    # Sécurité : Si le fichier total est plus petit que 20ms, 
+    window_size = min(n, window_size)
+    # Pandas a besoin d'une fenêtre d'au moins 3 points
+    window_size = max(3, window_size)
+    baseline = pd.Series(signal).rolling(window=window_size, center=True, min_periods=1).mean().to_numpy()
+    sig_detrended = signal - baseline
     
     # Fenêtrage (Hanning Window)
     # Adoucit les bords de la fenêtre pour éviter les faux pics de coupure
@@ -45,43 +52,79 @@ def analyze_oscillation(signal, dt, snr_threshold=6.0, min_amp_physique=0.005):
     # Calcul de la FFT
     yf = np.abs(fft(sig_windowed))
     xf = fftfreq(n, d=dt)
-    
     # Normalisation
     yf = 2.0 / n * yf
-
     # La résolution fréquentielle (df) est l'écart entre 2 points de la FFT.
     # On ignore les 5 premiers points qui contiennent toujours la fuite du detrend.
     freq_resolution = 1.0 / (n * dt)
-    freq_min_valid = 5 * freq_resolution
-    
+    min_valid_freq = 0.5 * freq_resolution
     # On ne garde que les fréquences positives
-    mask = xf > freq_min_valid
+    mask = xf > min_valid_freq
 
-    # Si la fenêtre est trop petite et qu'il n'y a plus de fréquences valides
+    # Si la fenêtre est trop petite et qu'il n'y a plus de fréquences valides 
     if not np.any(mask):
         return False, 0.0
 
     xf_pos, yf_pos = xf[mask], yf[mask]
-    
-    # Recherche du pic dominant
-    idx_max = np.argmax(yf_pos)
-    freq_dom = xf_pos[idx_max]
-    pic_max = yf_pos[idx_max]
 
+    # Recherche du pic dominant 
+    peaks_indices, _ = find_peaks(yf_pos)
+    if len(peaks_indices) > 0:
+        # S'il y a des vrais pics trouvés, on sélectionne le plus haut parmi eux
+        best_peak_idx = np.argmax(yf_pos[peaks_indices])
+        max_idx = peaks_indices[best_peak_idx]
+    else:
+        # Sécurité : Si aucun pic n'est trouvé (signal plat ou pente pure), on retombe sur argmax
+        max_idx = np.argmax(yf_pos)
+    dominant_freq = xf_pos[max_idx]
+    peak_amp = yf_pos[max_idx]
+
+    noise_level = snr_threshold * np.median(yf_pos)
+    
     # Le pic sort-il vraiment du bruit de fond spectral ?
-    is_above_noise = pic_max > (snr_threshold * np.mean(yf_pos))
-    #print(f'snr threshold : {snr_threshold}, min amp physique : {min_amp_physique}')
-    #print(f'pic_max : {pic_max:.5f}, mean yf_pos : {(snr_threshold * np.mean(yf_pos)):.5f}')
+    is_above_noise = peak_amp > noise_level
     
     # L'amplitude de l'oscillation est-elle physiquement significative ?
-    is_physically_significant = pic_max > min_amp_physique
-    
-    # Il faut que ce soit une belle oscillation ET qu'elle soit assez grosse
-    is_oscillating = is_above_noise and is_physically_significant
-    
-    print(f"Freq: {freq_dom:.6f} Hz | Amp: {pic_max:.4f} | Bruit spectral: {np.mean(yf_pos):.4f} | is_oscillating : {is_oscillating}")
+    is_physically_significant = peak_amp > min_physical_amp
 
-    return is_oscillating, freq_dom
+    # Zero-Crossing
+    # On calcule la période exacte de l'oscillation (en nombre de points)
+    period_points = int(1.0 / (dominant_freq * dt))
+    
+    # On crée une fenêtre glissante qui fait exactement 3 périodes de large.
+    zcross_window_size = max(5, 3 * period_points)
+    
+    # On recalcule un signal spécifiquement centré pour le Z-crossing
+    zcross_baseline = pd.Series(signal).rolling(window=zcross_window_size, center=True, min_periods=1).mean().to_numpy()
+    sig_zcross = signal - zcross_baseline
+
+    hysteresis_threshold = 0.3 * peak_amp  
+    
+    states = np.zeros_like(sig_zcross)
+    states[sig_zcross > hysteresis_threshold] = 1
+    states[sig_zcross < -hysteresis_threshold] = -1
+    
+    valid_states = states[states != 0]
+    
+    if len(valid_states) > 0:
+        actual_crossings = np.sum(np.abs(np.diff(valid_states)) == 2)
+    else:
+        actual_crossings = 0
+    
+    expected_crossings = 2 * (dominant_freq * (n * dt))
+    
+    is_crossing_valid = (actual_crossings >= 2) and (actual_crossings >= 0.4 * expected_crossings)
+    # Il faut que les 3 conditions soient réunies
+
+    is_oscillating = is_above_noise and is_physically_significant and is_crossing_valid
+
+    # Affichage
+    #print(f'snr threshold : {snr_threshold}, min physical amp : {min_physical_amp}')
+    #print(f'peak_amp : {peak_amp:.5f}, noise_level : {noise_level:.5f}')
+    #print(f'is_above_noise : {is_above_noise} | is_physically_significant : {is_physically_significant} | is_crossing_valid : {is_crossing_valid}')
+    #print(f"Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {actual_crossings}/{int(expected_crossings)} | is_oscillating: {is_oscillating}")
+
+    return is_oscillating, dominant_freq
 
 def get_trend(time, signal, tolerance=1e-6):
     """
@@ -316,7 +359,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     SEUILS_AMPLITUDE = {
         "Uci":  0.001,
         "modIQ": 0.1,
-        "Ucav": 0.0001
+        "Ucav": 0.001
     }
     
     if t0_idx > zero_idx:
@@ -324,41 +367,57 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         end_osci = zero_idx
     else:
         start_osci = t0_idx
-        end_osci = zero_idx + 40
+        end_osci = zero_idx + 10
 
     osc_Uci, f_Uci = analyze_oscillation(
         Uci.iloc[start_osci:end_osci], 
         dt_seconds, 
-        min_amp_physique=SEUILS_AMPLITUDE["Uci"]
+        min_physical_amp=SEUILS_AMPLITUDE["Uci"]
     )
     
     osc_modIQ, f_modIQ = analyze_oscillation(
         modIQ.iloc[start_osci:end_osci], 
         dt_seconds, 
-        min_amp_physique=SEUILS_AMPLITUDE["modIQ"]
+        min_physical_amp=SEUILS_AMPLITUDE["modIQ"]
     )
     
     osc_Ucav, f_Ucav = analyze_oscillation(
         Ucav.iloc[start_osci:end_osci], 
         dt_seconds,  
-        min_amp_physique=SEUILS_AMPLITUDE["Ucav"]
+        min_physical_amp=SEUILS_AMPLITUDE["Ucav"]
     )
     
-    # Si les trois oscillent (on prend la fréquence de la cavité Ucav comme référence)
+    # Si les trois oscillent
     if osc_Uci and osc_modIQ and osc_Ucav:
-        # On regroupe les fréquences trouvées
+        
         frequencies = [f_Uci, f_modIQ, f_Ucav]
         f_max = max(frequencies)
-        f_min = max(min(frequencies), 1e-6) # Protection anti-division par zéro
+        f_min = max(min(frequencies), 1e-6)
         
-        # Le ratio entre la fréquence max et min. 
-        #print(f'Ratio : {(f_max / f_min)}')
-        if (f_max / f_min) <= 1.5:
+        ratio = f_max / f_min
+        closest_integer = round(ratio)
+        
+        is_coherent = False
+        
+        # Fondamentale (les fréquences sont quasi-identiques)
+        if ratio <= 1.5:
+            is_coherent = True
+            
+        # Harmonique (Le ratio est très proche d'un entier, de la 2ème à la 5ème harmonique)
+        elif 2 <= closest_integer <= 5:
+            # tolérance fixe
+            if abs(ratio - closest_integer) <= 0.1:
+                is_coherent = True
+        
+        # Classification finale si la cohérence est validée
+        if is_coherent:
             freq = f_Ucav 
             if freq > 100:
                 return "Loop instability"
             else:
                 return "Taconis"
+        else:
+            return "Oscillation"
     
     # Calcul du "Niveau de repos" (Baseline)
     # On prend une fenêtre "saine" bien avant t0 (ex: entre t0-500 et t0-100)
