@@ -126,21 +126,29 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
 
     return is_oscillating, dominant_freq
 
-def get_trend(time, signal, tolerance=1e-6):
+def get_trend(time, signal, tolerance=1e-5):
     """
     Détermine si le signal est croissant, décroissant ou stable
     en utilisant la pente de la régression linéaire.
     Retourne 1 si le signal est croissant, -1 si il est décroissant et 0 sinon
     La tolérance permet d'ignorer le bruit plat.
     """
-    slope, intercept, r_value, p_value, std_err = linregress(time, signal)
-    #print(f'slope : {slope}')
-    if slope > tolerance:
-        return 1
-    elif slope < -tolerance:
-        return -1
-    else:
+    time_arr = np.asarray(time)
+    signal_arr = np.asarray(signal)
+    # Protection contre les fenêtres trop petites
+    if len(signal_arr) < 2 or len(time_arr) < 2:
+        #print(f"{signal.name} | array too small (len={len(signal)})")
         return 0
+
+    slope, intercept, r_value, p_value, std_err = linregress(time, signal)
+    if slope > tolerance:
+        trend = 1
+    elif slope < -tolerance:
+        trend =  -1
+    else:
+        trend = 0
+    #print(f'{signal.name} | slope : {slope} | trend : {trend}')
+    return trend
 
 def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     """
@@ -293,6 +301,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     # Récupération de l'index de la valeur de temps la plus proche de 0.0
     zero_idx = np.argmin(np.abs(time))
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
+    t0_idx_Ucr = detect_t0_zscore(Uci)
 
     # On isole la fenêtre d'analyse proche de t0 (avant la coupure)
     # Plage d'analyze pour la tendance global des signaux, et pour pour la tendance plus local
@@ -301,6 +310,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
 
     start_idx_large = max(0, t0_idx - WINDOW_POINTS_LARGE)
     start_idx_short = max(0, t0_idx - WINDOW_POINTS_SHORT)
+    start_idx_short = t0_idx_Ucr[0]
     end_idx = t0_idx
 
     t_win     = time[start_idx_short:end_idx]
@@ -310,48 +320,50 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     Uci_win   = Uci.iloc[start_idx_large:end_idx]
     Ucr_win   = Ucr.iloc[start_idx_large:end_idx]
 
-    # Couper la fenêtre Ucav_win en deux et regarder la trend des deux parties
-    # Le milieu et la valeur minimal dans l'intervalle
-    mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
-    if mid_window == start_idx_short:
-        mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
-    #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}')
-    #print(f'Window start value : {time[start_idx_short]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
+    if not start_idx_short >= end_idx:
+        # Couper la fenêtre Ucav_win en deux et regarder la trend des deux parties
+        # Le milieu et la valeur minimal dans l'intervalle
+        start_idx_short = max(0,start_idx_short - 200)
+        mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
+        if mid_window == start_idx_short:
+            mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
+        #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}')
+        #print(f'Window start value : {time[start_idx_short]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
 
-    t_win_left = time[start_idx_short:mid_window]
-    t_win_right = time[mid_window:end_idx]
-    Ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
-    Ucr_win_right = Ucr.iloc[mid_window:end_idx]
+        t_win_left = time[start_idx_short:mid_window]
+        t_win_right = time[mid_window:end_idx]
+        Ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
+        Ucr_win_right = Ucr.iloc[mid_window:end_idx]
 
-    # Analyse des tendances
-    #trend_modIQ = get_trend(t_win, modIQ_win)
-    trend_Uci   = get_trend(t_win_large, Uci_win)
-    trend_Ucr   = get_trend(t_win_large, Ucr_win)
-    trend_Ucr_left = get_trend(t_win_left,Ucr_win_left)
-    trend_Ucr_right = get_trend(t_win_right,Ucr_win_right)
-    #print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
-    #print(f'trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
+        # Analyse des tendances
+        #trend_modIQ = get_trend(t_win, modIQ_win)
+        trend_Uci   = get_trend(t_win_large, Uci_win)
+        trend_Ucr   = get_trend(t_win_large, Ucr_win)
+        trend_Ucr_left = get_trend(t_win_left,Ucr_win_left,tolerance=1e-6)
+        trend_Ucr_right = get_trend(t_win_right,Ucr_win_right,tolerance=1e-6)
+        #print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
+        #print(f'trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
 
-    # On calcule la vraie perte d'amplitude entre le début et le point le plus bas
-    valeur_debut_Ucr = Ucr.iloc[start_idx_short]
-    valeur_min_Ucr = Ucr.iloc[mid_window]
-    fall_depth_Ucr = valeur_debut_Ucr - valeur_min_Ucr
-    #print(f'fall_depth_Ucr : {fall_depth_Ucr}')
-    
-    # Seuil en dessous du quel on considère que se n'est pas un quecnh
-    THRESHOLD_QUENCH = 0.2 
-    
-    # On définit ce qu'est un vrai profil en V pour un quench
-    true_V_profil = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
+        # On calcule la vraie perte d'amplitude entre le début et le point le plus bas
+        valeur_debut_Ucr = Ucr.iloc[start_idx_short]
+        valeur_min_Ucr = Ucr.iloc[mid_window]
+        fall_depth_Ucr = valeur_debut_Ucr - valeur_min_Ucr
+        #print(f'fall_depth_Ucr : {fall_depth_Ucr}')
+        
+        # Seuil en dessous du quel on considère que se n'est pas un quench
+        THRESHOLD_QUENCH = 0.1 
+        
+        # On définit ce qu'est un vrai profil en V pour un quench
+        true_V_profil = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
 
-    if trend_Uci == 1:
-        # Si on a un vrai creux profond, OU une descente globale nette
-        if true_V_profil or trend_Ucr == -1:
-            return "Quench"
-            
-        # Si la tendance est à la hausse
-        elif trend_Ucr == 1:
-            return "Quench aside"
+        if trend_Uci == 1:
+            # Si on a un vrai creux profond, OU une descente globale nette
+            if true_V_profil or trend_Ucr == -1:
+                return "Quench"
+                
+            # Si la tendance est à la hausse
+            elif trend_Ucr == 1:
+                return "Quench aside"
 
     dt_microseconds = np.mean(np.diff(time))
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
@@ -534,13 +546,15 @@ def classify_void(pickup, threshold_pickup=50):
 
     max_pickup = pickup_win.max()
     '''
-    mean_pickup = pickup.mean()
+    zero_idx = np.argmin(np.abs(pickup.index))
+    pickup_win = pickup.iloc[0:zero_idx] #+ 38
+    mean_pickup = pickup_win.mean() #+ 38
     #print(f'moyenne pickup : {mean_pickup}')
 
     if mean_pickup > threshold_pickup:
-        return "Ipu"
+        return f"Ipu,{mean_pickup:.2f}uA"
     else:
-        return "Leak/outgassing"
+        return f"Leak/outgassing,{mean_pickup:.2f}uA"
 
 def classify_quench(Ucav):
     """
@@ -565,7 +579,7 @@ def classify_quench(Ucav):
     
     if below_50.empty:
         print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
-        return ",Incomplet (Pas de chute à 50%)"
+        return "Other,Incomplet (Pas de chute à 50%)"
         
     # Le temps "t_50" est le tout premier point de cette liste
     t_50 = below_50.index[0]
@@ -648,7 +662,7 @@ def classify_file(file_name):
             return "Other"
 
 @chrono
-def classify_folder(folder_name, export=False):
+def classify_folder(folder_name):
     """
     Classifie tous les fichiers d'un dossiers. 
     Enregistre le défaut et le label de chaque fichier dans un .csv
@@ -666,7 +680,9 @@ def classify_folder(folder_name, export=False):
         try:
             label = classify_file(file)
             #Pour le moment je ne regard que le défaut : Rég signal RF hors tolérance
-            if "Rég signal RF hors tolérance" in label :# or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
+            #if "Rég signal RF hors tolérance" in label or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
+            if "Rég signal RF hors tolérance" in label:
+            #if "Seuil de vide" in label:
                 file_default[file] = label
             #file_default[file] = label
             print(f'Nom du fichier : {file}, Défaut : {label}')
@@ -674,8 +690,7 @@ def classify_folder(folder_name, export=False):
             print(f'Fichier ignoré ({file}) - Fichier imcomplet ou erreur : {e}')
             continue
 
-    if export:
-        return file_default
+    return file_default
 
     # Ecriture des résultats
 
@@ -698,7 +713,7 @@ def classify_folder(folder_name, export=False):
             f.write(f'{file_name},{file_default[file]}\n')
 
 @chrono
-def classify_cav_folder(cav_folder_name, export=False):
+def classify_cav_folder(cav_folder_name):
     """
     Classifie tous les fichiers des sous dossiers dun type de cavité.
     """
@@ -707,15 +722,11 @@ def classify_cav_folder(cav_folder_name, export=False):
     cav_number_folder = sorted([path for path in path_folder.iterdir() if path.is_dir()])
     file_default = {}
     for folder in cav_number_folder:
-        if export:
-            file_default.update(classify_folder(folder, True))
-        else:
-            classify_folder(folder)
-    if export:
-        return file_default
+        file_default.update(classify_folder(folder))
+    return file_default
 
 @chrono
-def classify_year_folder(year_folder_name, export=False):
+def classify_year_folder(year_folder_name,export = ''):
     """
     Classifie tous les fichiers des sous dossiers d'une année.
     """
@@ -725,15 +736,11 @@ def classify_year_folder(year_folder_name, export=False):
     for folder in cav_folder:
         print(folder)
         if "CMA" in folder.parts or "CMB" in folder.parts:
-            if export:
-                file_default.update(classify_cav_folder(folder, True))
-            else:
-                classify_cav_folder(folder)
-    if export:
-        year = path_folder.parts[-1]
-        file_name_export = "../resultat/LLRF_" + year + ".csv"
-        with open(file_name_export, "w", encoding="utf-8") as f:
-            f.write("Fichier,Defaut,Label,Détails\n")
-            for file in file_default.keys():
-                file_name = file.parts[len(file.parts)-1]
-                f.write(f'{file_name},{file_default[file]}\n')
+            file_default.update(classify_cav_folder(folder))
+    year = path_folder.parts[-1]
+    file_name_export = "../resultat/LLRF_" + export + year + ".csv"
+    with open(file_name_export, "w", encoding="utf-8") as f:
+        f.write("Fichier,Defaut,Label,Détails\n")
+        for file in file_default.keys():
+            file_name = file.parts[len(file.parts)-1]
+            f.write(f'{file_name},{file_default[file]}\n')
