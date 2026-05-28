@@ -33,17 +33,21 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
         return False, 0.0 
 
     n = len(signal)
+
+    # On sécurise le signal en Numpy array
+    sig_array = np.asarray(signal)
     
-    # On veut une fenêtre glissante très large
-    # dt est en secondes. 0.02s = 20 ms.
-    window_size = int(0.02 / dt)
-    # Sécurité : Si le fichier total est plus petit que 20ms, 
-    window_size = min(n, window_size)
-    # Pandas a besoin d'une fenêtre d'au moins 3 points
-    window_size = max(3, window_size)
-    baseline = pd.Series(signal).rolling(window=window_size, center=True, min_periods=1).mean().to_numpy()
-    sig_detrended = signal - baseline
+    # Fenêtre glissante dynamique (20% de la durée de l'emballement fourni)
+    # Cela permet à la moyenne de grimper la pente sans l'effacer, 
+    # et de s'adapter si ton emballement fait 5ms ou 50ms.
+    dyn_window = max(5, int(n * 0.20))
     
+    # Le rolling mean (moyenne) est meilleur que le median pour lisser une pente
+    baseline = pd.Series(sig_array).rolling(window=dyn_window, center=True, min_periods=1).median().to_numpy()
+    
+    # En soustrayant la baseline, la "montée" disparaît, le signal devient horizontal.
+    sig_detrended = sig_array - baseline
+
     # Fenêtrage (Hanning Window)
     # Adoucit les bords de la fenêtre pour éviter les faux pics de coupure
     window = np.hanning(n)
@@ -113,7 +117,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
     
     expected_crossings = 2 * (dominant_freq * (n * dt))
     
-    is_crossing_valid = (actual_crossings >= 2) and (actual_crossings >= 0.4 * expected_crossings)
+    is_crossing_valid = (actual_crossings >= 2) and (actual_crossings >= 0.45 * expected_crossings)
     # Il faut que les 3 conditions soient réunies
 
     is_oscillating = is_above_noise and is_physically_significant and is_crossing_valid
@@ -122,7 +126,7 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
     #print(f'snr threshold : {snr_threshold}, min physical amp : {min_physical_amp}')
     #print(f'peak_amp : {peak_amp:.5f}, noise_level : {noise_level:.5f}')
     #print(f'is_above_noise : {is_above_noise} | is_physically_significant : {is_physically_significant} | is_crossing_valid : {is_crossing_valid}')
-    #print(f"Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {actual_crossings}/{int(expected_crossings)} | is_oscillating: {is_oscillating}")
+    #print(f"{signal.name} Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {actual_crossings}/{int(expected_crossings)} | is_oscillating: {is_oscillating}")
 
     return is_oscillating, dominant_freq
 
@@ -288,18 +292,27 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
     """
+    # zero_idx : index de 0.0 dans time (ou la valeur la plus proche de 0.0)
+    # Récupération de l'index de la valeur de temps la plus proche de 0.0
+    zero_idx = np.argmin(np.abs(time))
 
+    dt_microseconds = np.mean(np.diff(time))
+    ucav_threshold = 0.1
+    min_duration_us = 200 
+    required_points = max(2, int(min_duration_us / dt_microseconds))
+    ucav_before_t0 = Ucav.iloc[:zero_idx]
+    drop_mask = ucav_before_t0 < ucav_threshold
+    if drop_mask.rolling(window=required_points).sum().max() >= required_points:
+        return f"Other;Tension inférieur à {ucav_threshold} avant t0"
+    
     # t0_idx : index ou le signal Ucav comment à décrocher
     t0_idx, _ = detect_t0_zscore(Ucav)
     if t0_idx is None:
         # Si on ne trouve pas de t0, ça sert à rien de lancer la classification
-        return "Other,Pas de chute de Ucav"
+        return "Other;Pas de chute de Ucav"
     if t0_idx == 0:
-        return "Other,Problème t0"
+        return "Other;Problème t0"
 
-    # zero_idx : index de 0.0 dans time (ou la valeur la plus proche de 0.0)
-    # Récupération de l'index de la valeur de temps la plus proche de 0.0
-    zero_idx = np.argmin(np.abs(time))
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
     t0_idx_Ucr = detect_t0_zscore(Uci)
 
@@ -365,7 +378,6 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
             elif trend_Ucr == 1:
                 return "Quench aside"
 
-    dt_microseconds = np.mean(np.diff(time))
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
 
     SEUILS_AMPLITUDE = {
@@ -407,6 +419,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         f_min = max(min(frequencies), 1e-6)
         
         ratio = f_max / f_min
+        #print(f'Ratio : {ratio}')
         closest_integer = round(ratio)
         
         is_coherent = False
@@ -418,7 +431,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         # Harmonique (Le ratio est très proche d'un entier, de la 2ème à la 5ème harmonique)
         elif 2 <= closest_integer <= 5:
             # tolérance fixe
-            if abs(ratio - closest_integer) <= 0.1:
+            if abs(ratio - closest_integer) <= 0.2:
                 is_coherent = True
         
         # Classification finale si la cohérence est validée
@@ -503,7 +516,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
             return "Beam loss"
         
         elif THRESHOLD_NOISE_PCT < pct_modIQ and pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
-            return "Beam loss,Pic Ucav"
+            return "Beam loss;Pic Ucav"
             
     # Si aucune condition n'est remplie
     return "Other"
@@ -552,9 +565,9 @@ def classify_void(pickup, threshold_pickup=50):
     #print(f'moyenne pickup : {mean_pickup}')
 
     if mean_pickup > threshold_pickup:
-        return f"Ipu,{mean_pickup:.2f}uA"
+        return f"Ipu;{mean_pickup:.2f}uA"
     else:
-        return f"Leak/outgassing,{mean_pickup:.2f}uA"
+        return f"Leak/outgassing;{mean_pickup:.2f}uA"
 
 def classify_quench(Ucav):
     """
@@ -579,7 +592,7 @@ def classify_quench(Ucav):
     
     if below_50.empty:
         print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
-        return "Other,Incomplet (Pas de chute à 50%)"
+        return "Other;Incomplet (Pas de chute à 50%)"
         
     # Le temps "t_50" est le tout premier point de cette liste
     t_50 = below_50.index[0]
@@ -593,7 +606,7 @@ def classify_quench(Ucav):
     THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
     THRESHOLD_FALSE_ALARM = 2000.0  # 2 ms (2000 µs)
 
-    falltime = f",Temps de chute : {delta_t:.2f} us"
+    falltime = f";Temps de chute : {delta_t:.2f} us"
 
     if delta_t <= THRESHOLD_BREAKDOWN:
         return "Breakdown" + falltime
@@ -636,7 +649,7 @@ def classify_file(file_name):
     zero_idx = np.argmin(np.abs(time))
     ucav_threshold = 0.1
     if np.mean(Ucav.iloc[0:zero_idx]) < ucav_threshold:
-        return f'{default[0]},Other,Tension inférieur à {ucav_threshold}'
+        return f'{default[0]};Other;Tension inférieur à {ucav_threshold}'
 
     match default[0]:
         case "Seuil pick-up":
@@ -647,17 +660,17 @@ def classify_file(file_name):
             return default[0]
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
-            return default[0]  + "," + classify_void(pickup)
+            return default[0] + ";" + classify_void(pickup)
         case "Claquage ou quench cavité":
-            return default[0]  + "," + classify_quench(Ucav)
+            return default[0] + ";" + classify_quench(Ucav)
         case "Dép seuil de sécurité RF":
             Ucat = parameters.get("UCAT")
-            return default[0]  + "," + classify_RF_protections(time, Ucav, Ucat)
+            return default[0] + ";" + classify_RF_protections(time, Ucav, Ucat)
         case "Rég signal RF hors tolérance":
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
-            return default[0] + ","+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ)
+            return default[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ)
         case _:
             return "Other"
 
@@ -710,7 +723,7 @@ def classify_folder(folder_name):
         f.write("Fichier,Defaut,Label,Détails\n")
         for file in file_default.keys():
             file_name = file.parts[len(file.parts)-1]
-            f.write(f'{file_name},{file_default[file]}\n')
+            f.write(f'{file_name};{file_default[file]}\n')
 
 @chrono
 def classify_cav_folder(cav_folder_name):
@@ -740,7 +753,7 @@ def classify_year_folder(year_folder_name,export = ''):
     year = path_folder.parts[-1]
     file_name_export = "../resultat/LLRF_" + export + year + ".csv"
     with open(file_name_export, "w", encoding="utf-8") as f:
-        f.write("Fichier,Defaut,Label,Détails\n")
+        f.write("Fichier;Defaut;Label;Détails\n")
         for file in file_default.keys():
             file_name = file.parts[len(file.parts)-1]
-            f.write(f'{file_name},{file_default[file]}\n')
+            f.write(f'{file_name};{file_default[file]}\n')
