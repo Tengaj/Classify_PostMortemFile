@@ -267,10 +267,8 @@ def classify_RF_protections(time, Ucav, Ucat):
 
     # Calculer le ratio sur la fenêtre
     ratio = Ucav.iloc[start_idx:end_idx] / Ucat_fraction
-     
     max_ratio = ratio.max()
-    
-    print(f"Index de t=0 : {zero_idx} | Ratio maximum mesuré : {max_ratio:.2f}")
+    #print(f"Index de t=0 : {zero_idx} | Ratio maximum mesuré : {max_ratio:.2f}")
     
     if max_ratio > 8.5:
         return "Ucav max"
@@ -281,15 +279,6 @@ def classify_void(pickup, threshold_pickup=50):
     """
     Classifie le défaut "Seuil de vide" en mesurant la quantité de courant pickup par rapport au seuil. 
     """
-    '''
-    zero_idx = np.argmin(np.abs(pickup.index))
-    # Définir la zone autour de 0
-    start_idx = max(0, zero_idx - 30)
-    end_idx   = min(len(pickup), zero_idx + 30)
-    pickup_win = pickup.iloc[start_idx:end_idx]
-
-    max_pickup = pickup_win.max()
-    '''
     zero_idx = np.argmin(np.abs(pickup.index))
     pickup_win = pickup.iloc[0:zero_idx] #+ 38
     mean_pickup = pickup_win.mean() #+ 38
@@ -305,46 +294,36 @@ def classify_quench(Ucav):
     Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
-    # Trouver le début de la chute
     t0_idx, t0_time = detect_t0_zscore(Ucav)
     t0_idx = t0_idx - 1
     t0_time = Ucav.index[t0_idx]
 
-    U_max = Ucav.iloc[t0_idx]
+    u_max = Ucav.iloc[t0_idx]
+    u_target = u_max * 0.5
     
-    # Définir la cible des 50%
-    U_target = U_max * 0.5
+    ucav_fall = Ucav.iloc[t0_idx:]
+    below_50_points = ucav_fall[ucav_fall < u_target]
     
-    # Isoler la partie du signal qui se passe APRES le début de la chute
-    Ucav_fall = Ucav.iloc[t0_idx:]
-    
-    # Chercher tous les points qui sont passés sous la barre des 50%
-    below_50 = Ucav_fall[Ucav_fall < U_target]
-    
-    if below_50.empty:
-        print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
+    if below_50_points.empty:
         return "Other;Incomplet (Pas de chute à 50%)"
         
-    # Le temps "t_50" est le tout premier point de cette liste
-    t_50 = below_50.index[0]
-    
-    # Calcul du Delta T
+    t_50 = below_50_points.index[0]
     delta_t = t_50 - t0_time
     
-    print(f"U_max: {U_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
+    print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
 
     dt_microseconds = np.mean(np.diff(Ucav.index))
     THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
     THRESHOLD_FALSE_ALARM = 2000.0  # 2 ms (2000 µs)
 
-    falltime = f";Temps de chute : {delta_t:.2f} us"
+    fall_time_str = f";Temps de chute : {delta_t:.2f} us"
 
     if delta_t <= THRESHOLD_BREAKDOWN:
-        return "Breakdown" + falltime
+        return "Breakdown" + fall_time_str
     elif delta_t > THRESHOLD_FALSE_ALARM:
-        return "False alarm" + falltime
+        return "False alarm" + fall_time_str
     else:
-        return "Quench" + falltime
+        return "Quench" + fall_time_str
 
 @chrono
 def classify_file(file_name):
@@ -353,6 +332,7 @@ def classify_file(file_name):
     """
     with open(file_name, 'rb') as f:
         file_content = f.read()
+
     parameters, time, df_signals, df_defaults, _, header = Read_Signals(
         file_content, 
         compute_defauts=True, 
@@ -360,47 +340,42 @@ def classify_file(file_name):
         plot_signaux=False, 
         show_header=False
     )
-
-    # Création d'un DataFrame de True et de False, True quand un signal est à 0, donc qu'il y a un défaut
-    row_default = (df_defaults == 0).any(axis=1)
-    # Si il y a un signal à 0
-    if row_default.any():
-        #Trouve l'index du premier True
-        first_time_default = row_default.idxmax()
-        #Récupère juste la colonne ou le défaut à lieu
-        value_on_time = df_defaults.loc[first_time_default]
-        #Récupère les nom des défauts (Si il y en a plusieurs)
-        default = value_on_time[value_on_time==0].index.tolist()
-    #print(f'Nom du défauf : {default}')
+     
+    faulty_rows = (df_defaults == 0).any(axis=1)
+    if faulty_rows.any():
+        first_fault_time = faulty_rows.idxmax()
+        faults_at_time = df_defaults.loc[first_fault_time]
+        detected_faults = faults_at_time[faults_at_time == 0].index.tolist()
     else:
-        default = [""]
+        detected_faults = [""]
 
     #Cas de tension presque nulle
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
     ucav_threshold = 0.1
     if np.mean(Ucav.iloc[0:zero_idx]) < ucav_threshold:
-        return f'{default[0]};Other;Tension inférieur à {ucav_threshold}'
+        return f'{detected_faults[0]};Other;Tension inférieur à {ucav_threshold}'
 
-    match default[0]:
+    # Aiguillage selon le premier défaut trouvé
+    match detected_faults[0]:
         case "Seuil pick-up":
-            return default[0]
+            return detected_faults[0]
         case "Coupure externe rapide":
-            return default[0]
+            return detected_faults[0]
         case "Absence autorisation RF":
-            return default[0]
+            return detected_faults[0]
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
-            return default[0] + ";" + classify_void(pickup)
+            return detected_faults[0] + ";" + classify_void(pickup)
         case "Claquage ou quench cavité":
-            return default[0] + ";" + classify_quench(Ucav)
+            return detected_faults[0] + ";" + classify_quench(Ucav)
         case "Dép seuil de sécurité RF":
             Ucat = parameters.get("UCAT")
-            return default[0] + ";" + classify_RF_protections(time, Ucav, Ucat)
+            return detected_faults[0] + ";" + classify_RF_protections(time, Ucav, Ucat)
         case "Rég signal RF hors tolérance":
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
-            return default[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ)
+            return detected_faults[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ)
         case _:
             return "Other"
