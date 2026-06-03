@@ -17,14 +17,8 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     # Récupération de l'index de la valeur de temps la plus proche de 0.0
     zero_idx = np.argmin(np.abs(time))
 
+    # Temps entre chaque point du signal en microsecondes
     dt_microseconds = np.mean(np.diff(time))
-    ucav_threshold = 0.1
-    min_duration_us = 200 
-    required_points = max(2, int(min_duration_us / dt_microseconds))
-    ucav_before_t0 = Ucav.iloc[:zero_idx]
-    drop_mask = ucav_before_t0 < ucav_threshold
-    if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-        return f"Other;Tension inférieur à {ucav_threshold} avant t0"
 
     end_stair = detect_end_of_staircase(Ucav,zero_idx, dt_microseconds)
     if end_stair is not None:
@@ -43,6 +37,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
 
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
     t0_idx_Ucr, _ = detect_t0_zscore(Uci.iloc[end_stair:])
+    print(f't0_idx_Ucr : {t0_idx_Ucr}, t0_idx_Ucr val : {time[t0_idx_Ucr]}')
 
     # On isole la fenêtre d'analyse proche de t0 (avant la coupure)
     # Plage d'analyze pour la tendance global des signaux, et pour pour la tendance plus local
@@ -340,13 +335,31 @@ def classify_file(file_name):
         detected_faults = faults_at_time[faults_at_time == 0].index.tolist()
     else:
         detected_faults = [""]
+    #print(f"Defaut : {detected_faults}")
 
-    #Cas de tension presque nulle
+    # Faisceau désactivé ou boucle de régulation désactivé, Filtre beam = non ou loop = off
+    beam = parameters.get("BEAM")
+    loop = parameters.get("LOOP")
+    if beam == "NON" or loop == "OFF":
+        return f'{detected_faults[0]};Filtered;Loop NON ou Beam OFF'
+
+    # Filtre sur Ucav
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
+    dt_microseconds = np.mean(np.diff(time))
     ucav_threshold = 0.1
+
+    # Cas de tension qui tombe à moins de 0.1 avant le zéro temporel
+    min_duration_us = 200 
+    required_points = max(2, int(min_duration_us / dt_microseconds))
+    ucav_before_t0 = Ucav.iloc[:zero_idx]
+    drop_mask = ucav_before_t0 < ucav_threshold
+    if drop_mask.rolling(window=required_points).sum().max() >= required_points:
+        return f"{detected_faults[0]};Filtered;Tension inférieur à {ucav_threshold} avant t0"   
+
+    # Cas de tension presque nulle
     if np.mean(Ucav.iloc[0:zero_idx]) < ucav_threshold:
-        return f'{detected_faults[0]};Other;Tension inférieur à {ucav_threshold}'
+        return f'{detected_faults[0]};Filtered;Tension inférieur à {ucav_threshold}'
 
     # Aiguillage selon le premier défaut trouvé
     match detected_faults[0]:
