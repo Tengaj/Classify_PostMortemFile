@@ -261,3 +261,28 @@ def detect_end_of_staircase(Ucav, zero_idx, dt_us):
         return end_stair_idx
     else:
         return None
+
+def calculate_fall_time(Ucav, target_pct=0.5):
+    """
+    Calcule le temps mis par le signal pour chuter à un certain pourcentage de son amplitude maximale.
+    Retourne un tuple : (delta_t, u_max, t_start, t_target)
+    Retourne None si le signal ne chute jamais à la valeur cible.
+    """
+    
+    t0_idx, _ = detect_t0_zscore(Ucav)
+    t0_idx = max(0, t0_idx - 1)
+    t0_time = Ucav.index[t0_idx]
+
+    u_max = Ucav.iloc[t0_idx]
+    u_target = u_max * target_pct
+    
+    ucav_fall = Ucav.iloc[t0_idx:]
+    below_target_points = ucav_fall[ucav_fall < u_target]
+    
+    if below_target_points.empty:
+        return None
+        
+    t_target = below_target_points.index[0]
+    delta_t = t_target - t0_time
+    
+    return delta_t, u_max, t0_time, t_target

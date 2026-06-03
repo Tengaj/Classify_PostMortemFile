@@ -294,21 +294,13 @@ def classify_quench(Ucav):
     Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
-    t0_idx, t0_time = detect_t0_zscore(Ucav)
-    t0_idx = t0_idx - 1
-    t0_time = Ucav.index[t0_idx]
-
-    u_max = Ucav.iloc[t0_idx]
-    u_target = u_max * 0.5
+    result = calculate_fall_time(Ucav, target_pct=0.5)
     
-    ucav_fall = Ucav.iloc[t0_idx:]
-    below_50_points = ucav_fall[ucav_fall < u_target]
-    
-    if below_50_points.empty:
+    if result is None:
+        print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
         return "Other;Incomplet (Pas de chute à 50%)"
         
-    t_50 = below_50_points.index[0]
-    delta_t = t_50 - t0_time
+    delta_t, u_max, t0_time, t_50 = result
     
     print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
 
