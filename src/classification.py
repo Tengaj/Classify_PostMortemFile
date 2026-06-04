@@ -27,19 +27,19 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
         start_osci = t0_idx
         end_osci = zero_idx + 10
 
-    osc_uci, f_uci = analyze_oscillation(
+    osc_Uci, f_Uci = analyze_oscillation(
         Uci.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
     )
     osc_modIQ, f_modIQ = analyze_oscillation(
         modIQ.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["modIQ"]
     )
-    osc_ucav, f_ucav = analyze_oscillation(
+    osc_Ucav, f_Ucav = analyze_oscillation(
         Ucav.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Ucav"]
     )
     
     # Si les trois oscillent
-    if osc_uci and osc_modIQ and osc_ucav:
-        frequencies = [f_uci, f_modIQ, f_ucav]
+    if osc_Uci and osc_modIQ and osc_Ucav:
+        frequencies = [f_Uci, f_modIQ, f_Ucav]
         f_max = max(frequencies)
         f_min = max(min(frequencies), 1e-6)
         
@@ -58,7 +58,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
                 is_coherent = True
         
         if is_coherent:
-            if f_ucav > 100:
+            if f_Ucav > 100:
                 return "Loop instability"
             else:
                 return "Taconis"
@@ -87,8 +87,8 @@ def _check_quench_signatures(time, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair, zero
         end_idx = zero_idx
 
     t_win_large = time[start_idx_large:end_idx]
-    uci_win_large = Uci.iloc[start_idx_large:end_idx]
-    ucr_win_large = Ucr.iloc[start_idx_large:end_idx]
+    Uci_win_large = Uci.iloc[start_idx_large:end_idx]
+    Ucr_win_large = Ucr.iloc[start_idx_large:end_idx]
 
     if start_idx_short < end_idx:
         # Couper la fenêtre en deux
@@ -99,38 +99,38 @@ def _check_quench_signatures(time, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair, zero
             mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
             
         end_idx_right = mid_window + np.argmax(Ucr.iloc[mid_window:end_idx])
-        end_idx_right = end_idx
+        #end_idx_right = end_idx
         #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}') 
         #print(f'Window start value short: {time[start_idx_short]}, Window start value large: {time[start_idx_large]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
 
         t_win_left = time[start_idx_short:mid_window]
         t_win_right = time[mid_window:end_idx_right]
-        t_win_right = time[mid_window:end_idx]
+        #t_win_right = time[mid_window:end_idx]
         
-        ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
-        ucr_win_right = Ucr.iloc[mid_window:end_idx_right]
-        Ucr_win_right = Ucr.iloc[mid_window:end_idx]
+        Ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
+        Ucr_win_right = Ucr.iloc[mid_window:end_idx_right]
+        #Ucr_win_right = Ucr.iloc[mid_window:end_idx]
 
         # Analyse des tendances
-        trend_uci = get_trend(t_win_large, uci_win_large, tolerance=1e-5)
-        trend_ucr = get_trend(t_win_large, ucr_win_large, tolerance=1e-5)
-        trend_ucr_left = get_trend(t_win_left, ucr_win_left, tolerance=1e-6)
-        trend_ucr_right = get_trend(t_win_right, ucr_win_right, tolerance=1e-6)
+        trend_Uci = get_trend(t_win_large, Uci_win_large, tolerance=1e-5)
+        trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-5)
+        trend_Ucr_left = get_trend(t_win_left, Ucr_win_left, tolerance=1e-6)
+        trend_Ucr_right = get_trend(t_win_right, Ucr_win_right, tolerance=1e-6)
 
         # Calcul de la perte d'amplitude
-        start_val_ucr = Ucr.iloc[start_idx_short]
-        min_val_ucr = Ucr.iloc[mid_window]
-        fall_depth_ucr = start_val_ucr - min_val_ucr
-        #print(f'fall_depth_Ucr : {fall_depth_ucr}')
+        start_val_Ucr = Ucr.iloc[start_idx_short]
+        min_val_Ucr = Ucr.iloc[mid_window]
+        fall_depth_Ucr = start_val_Ucr - min_val_Ucr
+        #print(f'fall_depth_Ucr : {fall_depth_Ucr}')
         
         THRESHOLD_QUENCH = 0.01 
-        true_v_profile = (trend_ucr_left == -1 and trend_ucr_right == 1 and fall_depth_ucr > THRESHOLD_QUENCH)
+        true_v_profile = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
 
-        if trend_uci == 1:
-            if true_v_profile or trend_ucr == -1:
+        if trend_Uci == 1:
+            if true_v_profile or trend_Ucr == -1:
                 return "Quench"
                 #Ajouté une vérif sur le temps de la chute pour être sur.
-            elif trend_ucr == 1:
+            elif trend_Ucr == 1:
                 return "Quench aside"
                 
     return None
@@ -143,45 +143,45 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_idx):
     idx_base_end = max(1, zero_idx - 100)
     
     base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
-    base_uci   = np.median(Uci.iloc[idx_base_start:idx_base_end])
-    base_ucav  = np.median(Ucav.iloc[idx_base_start:idx_base_end])
+    base_Uci   = np.median(Uci.iloc[idx_base_start:idx_base_end])
+    base_Ucav  = np.median(Ucav.iloc[idx_base_start:idx_base_end])
     
     zone_start = zero_idx - 20
     zone_end   = zero_idx + 30
     
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
-    max_uci_zone = Uci.iloc[zone_start:zone_end].max()
-    min_uci_zone = Uci.iloc[zone_start:zone_end].min()
+    max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
+    min_Uci_zone = Uci.iloc[zone_start:zone_end].min()
     
     delta_modIQ = max_modIQ_zone - base_modIQ
-    delta_pos_uci = max_uci_zone - base_uci
-    delta_neg_uci = min_uci_zone - base_uci
+    delta_pos_Uci = max_Uci_zone - base_Uci
+    delta_neg_Uci = min_Uci_zone - base_Uci
     
     EPSILON = 0.01
     base_modIQ_safe = max(abs(base_modIQ), EPSILON)
-    base_uci_safe = max(abs(base_uci), EPSILON)
+    base_Uci_safe = max(abs(base_Uci), EPSILON)
 
     pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
-    pct_pos_uci = (delta_pos_uci / base_uci_safe) * 100.0
-    pct_neg_uci = (delta_neg_uci / base_uci_safe) * 100.0
+    pct_pos_Uci = (delta_pos_Uci / base_Uci_safe) * 100.0
+    pct_neg_Uci = (delta_neg_Uci / base_Uci_safe) * 100.0
     
-    #print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
-    #print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f}')
-    #print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}%')
+    print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
+    print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f}')
+    print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}%')
     
-    THRESHOLD_NOISE_PCT = 10.0
+    THRESHOLD_NOISE_PCT = 20.0
     THRESHOLD_PEAK_PCT = 90.00
     
-    pct_uci = pct_pos_uci if pct_pos_uci > THRESHOLD_NOISE_PCT else pct_neg_uci
-    trend_ucav_short = get_trend(time[t0_idx:t0_idx+5], Ucav.iloc[t0_idx:t0_idx+5], tolerance=1e-6)
+    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT else pct_neg_Uci
+    trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5], Ucav.iloc[t0_idx:t0_idx+5], tolerance=1e-6)
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
-        if pct_modIQ > THRESHOLD_PEAK_PCT and pct_uci < -THRESHOLD_NOISE_PCT:
+        if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
-        elif pct_uci > THRESHOLD_NOISE_PCT and trend_ucav_short == -1:
+        elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == -1:
             return "Beam loss"
-        elif pct_uci > THRESHOLD_NOISE_PCT and trend_ucav_short == 1:
-            return "Beam loss;Pic Ucav"
+        #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
+            #return "Beam loss;Pic Ucav"
     
     return None
 
@@ -335,19 +335,19 @@ def classify_file(file_name):
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
     dt_microseconds = np.mean(np.diff(time))
-    ucav_threshold = 0.1
+    Ucav_threshold = 0.1
 
     # Cas de tension qui tombe à moins de 0.1 avant le zéro temporel
     min_duration_us = 200 
     required_points = max(2, int(min_duration_us / dt_microseconds))
-    ucav_before_t0 = Ucav.iloc[:zero_idx]
-    drop_mask = ucav_before_t0 < ucav_threshold
+    Ucav_before_t0 = Ucav.iloc[:zero_idx]
+    drop_mask = Ucav_before_t0 < Ucav_threshold
     if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-        return f"{detected_faults[0]};Filtered;Tension inférieur à {ucav_threshold} avant t0"   
+        return f"{detected_faults[0]};Filtered;Tension inférieur à {Ucav_threshold} avant t0"   
 
     # Cas de tension presque nulle
-    if np.mean(Ucav.iloc[0:zero_idx]) < ucav_threshold:
-        return f'{detected_faults[0]};Filtered;Tension inférieur à {ucav_threshold}'
+    if np.mean(Ucav.iloc[0:zero_idx]) < Ucav_threshold:
+        return f'{detected_faults[0]};Filtered;Tension inférieur à {Ucav_threshold}'
 
     # Aiguillage selon le premier défaut trouvé
     match detected_faults[0]:
