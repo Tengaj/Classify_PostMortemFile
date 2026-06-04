@@ -115,3 +115,14 @@ Fichier;Defaut;Label;Détails
 2022 11 29 CMA07_0001;Rég signal RF hors tolérance;Power chain gain
 2022 11 29 CMA07_0005;Rég signal RF hors tolérance;Power chain gain
 2022 11 29 CMA07_0006;Rég signal RF hors tolérance;Power chain gain
+2022 08 30 CMA08_0003;Rég signal RF hors tolérance;Loop instability
+2022 08 30 CMA08_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 08 30 CMA08_0005;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 08 30 CMA08_0006;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 01 CMA08_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 01 CMA08_0002;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 06 CMA08_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 09 CMA08_0001;Rég signal RF hors tolérance;Power chain gain
+2022 09 14 CMA08_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 11 29 CMA08_0001;Rég signal RF hors tolérance;Power chain gain
+2022 11 29 CMA08_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
