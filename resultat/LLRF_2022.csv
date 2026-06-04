@@ -42,3 +42,58 @@ Fichier;Defaut;Label;Détails
 2022 10 21 CMA03_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
 2022 10 21 CMA03_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
 2022 11 29 CMA03_0005;Rég signal RF hors tolérance;Power chain gain
+2022 09 01 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 06 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 09 CMA04_0001;Rég signal RF hors tolérance;Power chain gain
+2022 09 14 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 17 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 11 29 CMA04_0005;Rég signal RF hors tolérance;Power chain gain
+2022 09 06 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 09 CMA05_0001;Rég signal RF hors tolérance;Power chain gain
+2022 09 14 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 14 CMA05_0002;Rég signal RF hors tolérance;Loop instability
+2022 09 14 CMA05_0003;Rég signal RF hors tolérance;Loop instability
+2022 09 14 CMA05_0004;Rég signal RF hors tolérance;Loop instability
+2022 09 15 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 09 15 CMA05_0002;Rég signal RF hors tolérance;Loop instability
+2022 09 15 CMA05_0003;Rég signal RF hors tolérance;Other
+2022 09 15 CMA05_0004;Rég signal RF hors tolérance;Other
+2022 09 15 CMA05_0005;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 15 CMA05_0006;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 15 CMA05_0007;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 20 CMA05_0001;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 30 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA05_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 30 CMA05_0003;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA05_0004;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA05_0005;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA05_0006;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA05_0007;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA05_0008;Rég signal RF hors tolérance;Loop instability
+2022 10 20 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 10 31 CMA05_0002;Rég signal RF hors tolérance;Loop instability
+2022 10 31 CMA05_0003;Rég signal RF hors tolérance;Loop instability
+2022 10 31 CMA05_0004;Rég signal RF hors tolérance;Loop instability
+2022 10 31 CMA05_0005;Rég signal RF hors tolérance;Loop instability
+2022 11 03 CMA05_0005;Rég signal RF hors tolérance;Other
+2022 11 03 CMA05_0006;Rég signal RF hors tolérance;Other
+2022 11 19 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 11 21 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 11 21 CMA05_0002;Rég signal RF hors tolérance;Loop instability
+2022 11 22 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 11 22 CMA05_0002;Rég signal RF hors tolérance;Loop instability
+2022 11 22 CMA05_0003;Rég signal RF hors tolérance;Loop instability
+2022 11 22 CMA05_0004;Rég signal RF hors tolérance;Loop instability
+2022 11 22 CMA05_0005;Rég signal RF hors tolérance;Loop instability
+2022 11 22 CMA05_0006;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0001;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0002;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0003;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0004;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0005;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0006;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0007;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0008;Rég signal RF hors tolérance;Loop instability
+2022 11 24 CMA05_0009;Rég signal RF hors tolérance;Loop instability
+2022 11 29 CMA05_0001;Rég signal RF hors tolérance;Power chain gain
+2022 11 29 CMA05_0005;Rég signal RF hors tolérance;Power chain gain
