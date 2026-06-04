@@ -119,7 +119,7 @@ def get_trend(time, signal, tolerance=1e-5):
     #print(f'{signal.name} | slope : {slope} | trend : {trend}')
     return trend
 
-def detect_t0_zscore(Ucav_series, z_threshold=5.0):
+def detect_t0_zscore(Ucav_series, z_threshold=5.0, calm = True):
     """
     Détecte t0, le moment ou le signal Ucav sort de son amplitude moyenne avec un Z-score.
     - Ucav_series : Doit être une pd.Series.
@@ -190,7 +190,7 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0):
     true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1.0
     last_calm_times = true_calm[true_calm == True]
     
-    if not last_calm_times.empty:
+    if not last_calm_times.empty and calm:
         end_of_last_calm = last_calm_times.index[-1]
         
         # Le vrai t0 est la première anomalie qui arrive APRÈS cette ultime paix

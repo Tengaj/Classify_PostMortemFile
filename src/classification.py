@@ -6,7 +6,8 @@ from signal_processing import (
     analyze_oscillation, 
     get_trend, 
     detect_t0_zscore, 
-    detect_end_of_staircase
+    detect_end_of_staircase,
+    calculate_fall_time
 )
 
 def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
@@ -36,74 +37,6 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
         return "Other;Problème t0"
 
     print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
-    t0_idx_Ucr, _ = detect_t0_zscore(Uci.iloc[end_stair:])
-    print(f't0_idx_Ucr : {t0_idx_Ucr}, t0_idx_Ucr val : {time[t0_idx_Ucr]}')
-
-    # On isole la fenêtre d'analyse proche de t0 (avant la coupure)
-    # Plage d'analyze pour la tendance global des signaux, et pour pour la tendance plus local
-    WINDOW_POINTS_LARGE = 3500
-    WINDOW_POINTS_SHORT = 700
-
-    start_idx_large = max(0, t0_idx - WINDOW_POINTS_LARGE)
-    start_idx_short = max(0, t0_idx - WINDOW_POINTS_SHORT)
-    if end_stair is not None:
-        start_idx_short = t0_idx_Ucr + end_stair
-    else:
-        start_idx_short = t0_idx_Ucr
-    end_idx = t0_idx
-
-    t_win     = time[start_idx_short:end_idx]
-    #Ucav_win  = Ucav.iloc[start_idx_short:end_idx]
-    #modIQ_win = modIQ.iloc[start_idx_short:end_idx]
-    t_win_large = time[start_idx_large:end_idx]
-    Uci_win   = Uci.iloc[start_idx_large:end_idx]
-    Ucr_win   = Ucr.iloc[start_idx_large:end_idx]
-
-    if not start_idx_short >= end_idx:
-        # Couper la fenêtre Ucav_win en deux et regarder la trend des deux parties
-        # Le milieu et la valeur minimal dans l'intervalle
-        start_idx_short = max(0,start_idx_short - 200)
-        mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
-        if mid_window == start_idx_short:
-            mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
-        #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}')
-        #print(f'Window start value : {time[start_idx_short]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
-
-        t_win_left = time[start_idx_short:mid_window]
-        t_win_right = time[mid_window:end_idx]
-        Ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
-        Ucr_win_right = Ucr.iloc[mid_window:end_idx]
-
-        # Analyse des tendances
-        #trend_modIQ = get_trend(t_win, modIQ_win)
-        trend_Uci   = get_trend(t_win_large, Uci_win)
-        trend_Ucr   = get_trend(t_win_large, Ucr_win)
-        trend_Ucr_left = get_trend(t_win_left,Ucr_win_left,tolerance=1e-6)
-        trend_Ucr_right = get_trend(t_win_right,Ucr_win_right,tolerance=1e-6)
-        #print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
-        #print(f'trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
-
-        # On calcule la vraie perte d'amplitude entre le début et le point le plus bas
-        valeur_debut_Ucr = Ucr.iloc[start_idx_short]
-        valeur_min_Ucr = Ucr.iloc[mid_window]
-        fall_depth_Ucr = valeur_debut_Ucr - valeur_min_Ucr
-        #print(f'fall_depth_Ucr : {fall_depth_Ucr}')
-        
-        # Seuil en dessous du quel on considère que se n'est pas un quench
-        THRESHOLD_QUENCH = 0.1 
-        
-        # On définit ce qu'est un vrai profil en V pour un quench
-        true_V_profil = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
-
-        if trend_Uci == 1:
-            # Si on a un vrai creux profond, OU une descente globale nette
-            if true_V_profil or trend_Ucr == -1:
-                return "Quench"
-                
-            # Si la tendance est à la hausse
-            elif trend_Ucr == 1:
-                return "Quench aside"
-
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
 
     SEUILS_AMPLITUDE = {
@@ -113,7 +46,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     }
     
     if t0_idx > zero_idx:
-        start_osci = max(0, zero_idx - 2000)
+        start_osci = max(0, zero_idx - 10000)
         end_osci = zero_idx
     else:
         start_osci = t0_idx
@@ -169,6 +102,80 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
                 return "Taconis"
         else:
             return "Oscillation"
+
+    t0_idx_Ucr, _ = detect_t0_zscore(Uci, calm=False)
+    print(f't0_idx_Ucr : {t0_idx_Ucr}, t0_idx_Ucr val : {time[t0_idx_Ucr]}')
+
+    # On isole la fenêtre d'analyse proche de t0 (avant la coupure)
+    # Plage d'analyze pour la tendance global des signaux, et pour pour la tendance plus local
+    WINDOW_POINTS_LARGE = 3500
+    WINDOW_POINTS_SHORT = 700
+
+    start_idx_large = max(0, t0_idx - WINDOW_POINTS_LARGE)
+    start_idx_short = max(0, t0_idx - WINDOW_POINTS_SHORT)
+    if end_stair is not None:
+        start_idx_short = t0_idx_Ucr + end_stair
+    else:
+        start_idx_short = t0_idx_Ucr
+    end_idx = t0_idx # zero_idx
+    if start_idx_short > end_idx:
+        end_idx = zero_idx
+
+    t_win_short = time[start_idx_short:end_idx]
+    #Ucav_win  = Ucav.iloc[start_idx_short:end_idx]
+    #modIQ_win = modIQ.iloc[start_idx_short:end_idx]
+    t_win_large = time[start_idx_large:end_idx]
+    Uci_win   = Uci.iloc[start_idx_large:end_idx]
+    Ucr_win   = Ucr.iloc[start_idx_large:end_idx]
+
+    if not start_idx_short >= end_idx:
+        # Couper la fenêtre Ucav_win en deux et regarder la trend des deux parties
+        # Le milieu et la valeur minimal dans l'intervalle
+        start_idx_short = max(0,start_idx_short - 200)
+        mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
+        if mid_window == start_idx_short:
+            mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
+        end_idx_right = mid_window + np.argmax(Ucr.iloc[mid_window:end_idx]) 
+        #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}')
+        print(f'Window start value short : {time[start_idx_short]},Window start value large : {time[start_idx_large]},  Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
+
+        t_win_left = time[start_idx_short:mid_window]
+        t_win_right = time[mid_window:end_idx]
+        t_win_right = time[mid_window:end_idx_right]
+        Ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
+        Ucr_win_right = Ucr.iloc[mid_window:end_idx]
+        Ucr_win_right = Ucr.iloc[mid_window:end_idx_right]
+
+        # Analyse des tendances
+        #trend_modIQ = get_trend(t_win, modIQ_win)
+        trend_Uci   = get_trend(t_win_large, Uci_win,tolerance=1e-5)
+        trend_Ucr   = get_trend(t_win_large, Ucr_win,tolerance=1e-5)
+        trend_Ucr_left = get_trend(t_win_left,Ucr_win_left,tolerance=1e-6)
+        trend_Ucr_right = get_trend(t_win_right,Ucr_win_right,tolerance=1e-6)
+        #print(f'trend moqIQ : {trend_modIQ}, trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
+        #print(f'trend Uci : {trend_Uci}, trend Ucr : {trend_Ucr}, trend Ucr left : {trend_Ucr_left}, trend Ucr right : {trend_Ucr_right} ')
+
+        # On calcule la vraie perte d'amplitude entre le début et le point le plus bas
+        valeur_debut_Ucr = Ucr.iloc[start_idx_short]
+        valeur_min_Ucr = Ucr.iloc[mid_window]
+        fall_depth_Ucr = valeur_debut_Ucr - valeur_min_Ucr
+        print(f'fall_depth_Ucr : {fall_depth_Ucr}')
+        
+        # Seuil en dessous du quel on considère que se n'est pas un quench
+        THRESHOLD_QUENCH = 0.01 
+        
+        # On définit ce qu'est un vrai profil en V pour un quench
+        true_V_profil = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
+
+        if trend_Uci == 1:
+            # Si on a un vrai creux profond, OU une descente globale nette
+            if true_V_profil or trend_Ucr == -1:
+                return "Quench"
+                #Ajouté une vérif sur le temps de la chute pour être sur.
+                
+            # Si la tendance est à la hausse
+            elif trend_Ucr == 1:
+                return "Quench aside"
     
     # Calcul du "Niveau de repos" (Baseline)
     # On prend une fenêtre "saine" bien avant t0 (ex: entre t0-500 et t0-100)
@@ -228,7 +235,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     else:
         pct_Uci = pct_neg_Uci
 
-    trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5],Ucav.iloc[t0_idx:t0_idx+5])
+    trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5],Ucav.iloc[t0_idx:t0_idx+5], tolerance=1e-6)
    
     # Si modIQ monte plus que le bruit ambiant
     if pct_modIQ > THRESHOLD_NOISE_PCT:
