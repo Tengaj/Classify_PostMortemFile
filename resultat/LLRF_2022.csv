@@ -215,3 +215,37 @@ Fichier;Defaut;Label;Détails
 2022 11 24 CMA11_0055;Rég signal RF hors tolérance;Loop instability
 2022 11 29 CMA11_0001;Rég signal RF hors tolérance;Power chain gain
 2022 11 29 CMA11_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 01 CMA12_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 09 CMA12_0001;Rég signal RF hors tolérance;Power chain gain
+2022 09 09 CMA12_0002;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2022 09 09 CMA12_0004;Rég signal RF hors tolérance;Other
+2022 09 09 CMA12_0005;Rég signal RF hors tolérance;Other
+2022 09 09 CMA12_0006;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0001;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0002;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0003;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0004;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0005;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0006;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0007;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0009;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0010;Rég signal RF hors tolérance;Other
+2022 09 16 CMA12_0014;Rég signal RF hors tolérance;Oscillation
+2022 09 16 CMA12_0016;Rég signal RF hors tolérance;Power chain gain
+2022 09 16 CMA12_0018;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 16 CMA12_0019;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 17 CMA12_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 17 CMA12_0008;Rég signal RF hors tolérance;Power chain gain
+2022 09 17 CMA12_0009;Rég signal RF hors tolérance;Loop instability
+2022 09 17 CMA12_0010;Rég signal RF hors tolérance;Loop instability
+2022 09 17 CMA12_0011;Rég signal RF hors tolérance;Loop instability
+2022 09 20 CMA12_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 20 CMA12_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 20 CMA12_0007;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 20 CMA12_0008;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 22 CMA12_0002;Rég signal RF hors tolérance;Other
+2022 09 22 CMA12_0003;Rég signal RF hors tolérance;Other
+2022 09 22 CMA12_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 23 CMA12_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2022 09 25 CMA12_0003;Rég signal RF hors tolérance;Other
+2022 09 25 CMA12_0004;Rég signal RF hors tolérance;Other
