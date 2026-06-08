@@ -139,7 +139,7 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_idx):
     """
     [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Gain).
     """
-    idx_base_start = max(0, zero_idx - 500)
+    idx_base_start = max(0, zero_idx - 1000)
     idx_base_end = max(1, zero_idx - 100)
     
     base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
@@ -165,20 +165,23 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_idx):
     pct_pos_Uci = (delta_pos_Uci / base_Uci_safe) * 100.0
     pct_neg_Uci = (delta_neg_Uci / base_Uci_safe) * 100.0
     
-    print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
-    print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f}')
-    print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}%')
+    #print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
+    #print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f}')
+    #print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}%')
     
-    THRESHOLD_NOISE_PCT = 20.0
+    THRESHOLD_NOISE_PCT = 10.00
     THRESHOLD_PEAK_PCT = 90.00
+
+    std_Uci_win = np.std(Uci.iloc[idx_base_start:idx_base_end])
+    #print(f'std Uci window : {np.std(Uci.iloc[idx_base_start:idx_base_end])}')
     
-    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT else pct_neg_Uci
+    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 else pct_neg_Uci
     trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5], Ucav.iloc[t0_idx:t0_idx+5], tolerance=1e-6)
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
-        elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == -1:
+        elif pct_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 and trend_Ucav_short == -1:
             return "Beam loss"
         #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
             #return "Beam loss;Pic Ucav"
