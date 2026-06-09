@@ -298,9 +298,9 @@ def calculate_fall_time(Ucav, target_pct=0.5):
     Retourne un tuple : (delta_t, u_max, t_start, t_target)
     Retourne None si le signal ne chute jamais à la valeur cible.
     """
-
-    t0_idx, _ = detect_t0_zscore(Ucav)
-    t0_idx = max(0, t0_idx - 1)
+    zero_idx = np.argmin(np.abs(Ucav.index))
+    t0_idx, _ = detect_t0_zscore(Ucav.iloc[zero_idx-30:zero_idx+30])
+    t0_idx = (zero_idx - 30) + t0_idx - 1
     t0_time = Ucav.index[t0_idx]
 
     u_max = Ucav.iloc[t0_idx]

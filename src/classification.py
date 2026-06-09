@@ -300,8 +300,8 @@ def classify_quench(Ucav):
     print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
 
     dt_microseconds = np.mean(np.diff(Ucav.index))
-    THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
-    THRESHOLD_FALSE_ALARM = 2000.0  # 2 ms (2000 µs)
+    THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 2.05) # 2 µs
+    THRESHOLD_FALSE_ALARM = 1000.0  # 1 ms (1000 µs)
 
     fall_time_str = f";Temps de chute : {delta_t:.2f} us"
 
