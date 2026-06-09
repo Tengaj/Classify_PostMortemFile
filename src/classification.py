@@ -10,18 +10,27 @@ from signal_processing import (
     calculate_fall_time
 )
 
-def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_idx):
+def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_idx, end_stair_idx):
     """
     [Sous-fonction] Cherche les fréquences de Taconis ou loop instability.
     """
     AMP_THRESHOLDS = {
         "Uci":  0.002,
         "modIQ": 0.1,
-        "Ucav": 0.001
+        "Ucav": 0.001 #0.0001
     }
     
+    #Si t0 est supérieur au zéro temporel, il peut quand même y avoir une oscillation (par exemple le signal oscille depuis le début)
     if t0_idx > zero_idx:
-        start_osci = max(0, zero_idx - 10000)
+        if end_stair_idx:
+            #Si il y a un escalier dans le signal, on analayse à la fin de l'escalier
+            start_osci = end_stair_idx
+        else:
+            #Sinon on cherche à nouveau t0 mais en étant moins tolérant sur les périodes de calme du signal
+            start_osci, _ = detect_t0_zscore(Ucav, calm=False)
+            print(f'start osci {start_osci} | val {Ucav.index[start_osci]}')
+            if start_osci > zero_idx:
+                start_osci = max(0, zero_idx - 10000)
         end_osci = zero_idx
     else:
         start_osci = t0_idx
@@ -216,7 +225,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
 
     # Test des Oscillations
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
-    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_idx)
+    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_idx, end_stair_idx)
     
     if oscillation_label: 
         return oscillation_label

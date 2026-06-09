@@ -4,7 +4,7 @@ from scipy.fft import fft, fftfreq
 from scipy.signal import find_peaks
 from scipy.stats import linregress
 
-def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
+def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
     - snr_threshold : Rapport signal/bruit dans le spectre (relatif).
@@ -85,11 +85,40 @@ def analyze_oscillation(signal, dt, snr_threshold=5.0, min_physical_amp=0.005):
     expected_crossings = 2 * (dominant_freq * (n * dt))
     is_crossing_valid = (actual_crossings >= 2) and (actual_crossings >= 0.45 * expected_crossings)
 
-    is_oscillating = is_above_noise and is_physically_significant and is_crossing_valid
+    # Vérifier si l'oscillation est toujours active à la fin
+    # On calcule l'enveloppe du signal (son amplitude maximale locale)
+    env_window = max(5, int(1.5 * period_points))
+    envelope = pd.Series(np.abs(sig_zcross)).rolling(window=env_window, center=True, min_periods=1).max().to_numpy()
+    active_envelope = envelope[envelope > min_physical_amp]
+
+    is_touching_end = False
+    
+    if len(active_envelope) > 0:
+        # On utilise le 75ème centile pour trouver l'amplitude typique des vagues.
+        typical_env = np.percentile(active_envelope, 75)
+        
+        # Le seuil de "survie" est fixé à 25% de cette amplitude typique
+        alive_threshold = max(min_physical_amp, 0.25 * typical_env)
+        alive_indices = np.where(envelope >= alive_threshold)[0]
+        
+        if len(alive_indices) > 0:
+            last_alive_idx = alive_indices[-1]
+            distance_to_end = n - last_alive_idx
+            
+            # On tolère un "silence" maximal d'environ 1 vague (ou 100 points minimum)
+            max_distance_allowed = max(100, int(1.0 * period_points))
+
+            is_touching_end = (distance_to_end <= max_distance_allowed)
+            
+            # Affichage
+            # print(f"Typical Env (75%): {typical_env:.4f} | Seuil de vie: {alive_threshold:.4f}")
+            # print(f"Dernier vivant: {last_alive_idx}/{n} | Distance: {distance_to_end} (Max permis: {max_distance_allowed})")
+
+    is_oscillating = is_above_noise and is_physically_significant and is_crossing_valid and is_touching_end
 
     # Affichage
     #print(f'snr threshold : {snr_threshold}, min physical amp : {min_physical_amp}')
-    #print(f'is_above_noise : {is_above_noise} | is_physically_significant : {is_physically_significant} | is_crossing_valid : {is_crossing_valid}')
+    #print(f'is_above_noise : {is_above_noise} | is_physically_significant : {is_physically_significant} | is_crossing_valid : {is_crossing_valid} | is_touching_end: {is_touching_end}')
     #print(f"{signal.name} Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {actual_crossings}/{int(expected_crossings)} | is_oscillating: {is_oscillating}")
     
     return is_oscillating, dominant_freq
@@ -105,6 +134,7 @@ def get_trend(time, signal, tolerance=1e-5):
     signal_arr = np.asarray(signal)
 
     if len(signal_arr) < 2 or len(time_arr) < 2:
+        print(f"{signal.name} | array too small (len={len(signal)})")
         return 0
 
     slope = linregress(time, signal).slope
@@ -233,11 +263,11 @@ def detect_end_of_staircase(Ucav, zero_idx, dt_us):
     if len(valleys) >= 2:
         return None 
 
-    step = max(1, int(2000 / dt_us))
+    step = max(1, int(5000 / dt_us))
     derivative = smoothed_signal.diff(periods=step).fillna(0).to_numpy()
 
     # Recherche des pics de la dérivée (les montées de marches)
-    min_step_height = 0.05 # Hauteur minimum en deux marches
+    min_step_height = 0.04 # Hauteur minimum en deux marches
     min_dist_pts = int(20000 / dt_us) # L'écart minimum entre deux marches
     rising_peaks, _ = find_peaks(derivative, height=min_step_height, distance=min_dist_pts)
 
@@ -268,7 +298,7 @@ def calculate_fall_time(Ucav, target_pct=0.5):
     Retourne un tuple : (delta_t, u_max, t_start, t_target)
     Retourne None si le signal ne chute jamais à la valeur cible.
     """
-    
+
     t0_idx, _ = detect_t0_zscore(Ucav)
     t0_idx = max(0, t0_idx - 1)
     t0_time = Ucav.index[t0_idx]
