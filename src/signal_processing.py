@@ -106,7 +106,7 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
             distance_to_end = n - last_alive_idx
             
             # On tolère un "silence" maximal d'environ 1 vague (ou 100 points minimum)
-            max_distance_allowed = max(100, int(1.0 * period_points))
+            max_distance_allowed = max(150, int(1.0 * period_points))
 
             is_touching_end = (distance_to_end <= max_distance_allowed)
             
@@ -250,6 +250,17 @@ def detect_end_of_staircase(Ucav, zero_idx, dt_us):
     signal_before_drop = Ucav.iloc[:zero_idx - safety_margin_pts]
     n = len(signal_before_drop)
     if n < 100:
+        return None
+
+    # On mesure l'amplitude locale brute (max - min) sur une petite fenêtre de 2000µs.
+    check_pts = max(5, int(2000 / dt_us))
+    local_max = signal_before_drop.rolling(window=check_pts).max()
+    local_min = signal_before_drop.rolling(window=check_pts).min()
+    local_thickness = local_max - local_min
+
+    # Si l'épaisseur médiane dépasse 0.10 Volt,
+    # c'est qu'il n'y a pas de vrais plateaux plats : c'est une oscillation
+    if local_thickness.median() > 0.10:
         return None
 
     window_us = 5000 
