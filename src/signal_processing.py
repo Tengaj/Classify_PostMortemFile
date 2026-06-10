@@ -106,7 +106,7 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
             distance_to_end = n - last_alive_idx
             
             # On tolère un "silence" maximal d'environ 1 vague (ou 100 points minimum)
-            max_distance_allowed = max(150, int(1.0 * period_points))
+            max_distance_allowed = max(200, int(1.0 * period_points))
 
             is_touching_end = (distance_to_end <= max_distance_allowed)
             
@@ -303,15 +303,17 @@ def detect_end_of_staircase(Ucav, zero_idx, dt_us):
     else:
         return None
 
-def calculate_fall_time(Ucav, target_pct=0.5):
+def calculate_fall_time(Ucav, target_pct=0.5,z_threshold = 5):
     """
     Calcule le temps mis par le signal pour chuter à un certain pourcentage de son amplitude maximale.
     Retourne un tuple : (delta_t, u_max, t_start, t_target)
     Retourne None si le signal ne chute jamais à la valeur cible.
     """
     zero_idx = np.argmin(np.abs(Ucav.index))
-    t0_idx, _ = detect_t0_zscore(Ucav.iloc[zero_idx-30:zero_idx+30])
-    t0_idx = (zero_idx - 30) + t0_idx - 1
+    start_idx = zero_idx - 100
+    end_idx = zero_idx + 30
+    t0_idx, _ = detect_t0_zscore(Ucav.iloc[start_idx:end_idx] / 10,z_threshold = z_threshold)
+    t0_idx = start_idx + t0_idx - 1
     t0_time = Ucav.index[t0_idx]
 
     u_max = Ucav.iloc[t0_idx]

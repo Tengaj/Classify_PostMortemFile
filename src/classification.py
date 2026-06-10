@@ -76,7 +76,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
             
     return None
 
-def _check_quench_signatures(time, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair, zero_idx):
+def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair, zero_idx):
     """
     [Sous-fonction] Analyse les tendances pour détecter un profil en V typique d'un Quench.
     """
@@ -135,8 +135,29 @@ def _check_quench_signatures(time, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair, zero
         THRESHOLD_QUENCH = 0.01 
         true_v_profile = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
 
+        quench = False
+        target_pct = 0.01
+        result = calculate_fall_time(Ucav, target_pct=target_pct)
+    
+        if result is None:
+            print(f"Alerte : Le signal ne descend jamais à {100 - target_pct * 100}% dans ce fichier.")
+            #return f"Other;Incomplet (Pas de chute à {100 - target_pct * 100}%)"
+            return None
+
+        delta_t, u_max, t0_time, t_95 = result
+        
+        print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
+
+        dt_microseconds = np.mean(np.diff(Ucav.index))
+        THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
+        THRESHOLD_FALSE_ALARM = 10000.0  # 1 ms (1000 µs)
+        
+        if delta_t > THRESHOLD_BREAKDOWN and delta_t < THRESHOLD_FALSE_ALARM:
+            quench = True
+
         if trend_Uci == 1:
-            if true_v_profile or trend_Ucr == -1:
+            #if true_v_profile or trend_Ucr == -1:
+            if quench:
                 return "Quench"
                 #Ajouté une vérif sur le temps de la chute pour être sur.
             elif trend_Ucr == 1:
@@ -234,7 +255,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     t0_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
     print(f't0_idx_Uci : {t0_idx_Uci}, t0_idx_Uci val : {time[t0_idx_Uci]}')
 
-    quench_label = _check_quench_signatures(time, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair_idx, zero_idx)
+    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair_idx, zero_idx)
     
     if quench_label: 
         return quench_label
@@ -289,7 +310,7 @@ def classify_quench(Ucav):
     Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
-    result = calculate_fall_time(Ucav, target_pct=0.5)
+    result = calculate_fall_time(Ucav, target_pct=0.5,z_threshold = 100)
     
     if result is None:
         print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
