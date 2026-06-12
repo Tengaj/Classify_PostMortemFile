@@ -373,6 +373,12 @@ def classify_file(file_name):
     if beam == "NON" or loop == "OFF":
         return f'{detected_faults[0]};Filtered;Loop NON ou Beam OFF'
 
+    # Filtre sur KPI
+    kpi = parameters.get("KPI")
+    kpi_threshold = 10.0
+    if float(kpi) < kpi_threshold:
+        return f'{detected_faults[0]};Filtered;KPI < {kpi_threshold}'
+
     # Filtre sur Ucav
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
