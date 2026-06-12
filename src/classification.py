@@ -104,9 +104,9 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair
     if start_idx_short > end_idx:
         end_idx = zero_idx
 
-    t_win_large = time[start_idx_large:end_idx]
-    Uci_win_large = Uci.iloc[start_idx_large:end_idx]
-    Ucr_win_large = Ucr.iloc[start_idx_large:end_idx]
+    t_win_large = time[start_idx_large:zero_idx]
+    Uci_win_large = Uci.iloc[start_idx_large:zero_idx]
+    Ucr_win_large = Ucr.iloc[start_idx_large:zero_idx]
 
     if start_idx_short < end_idx:
         # Couper la fenêtre en deux
@@ -131,7 +131,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair
 
         # Analyse des tendances
         trend_Uci = get_trend(t_win_large, Uci_win_large, tolerance=1e-5)
-        trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-5)
+        trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-6)
         trend_Ucr_left = get_trend(t_win_left, Ucr_win_left, tolerance=1e-6)
         trend_Ucr_right = get_trend(t_win_right, Ucr_win_right, tolerance=1e-6)
 
@@ -155,7 +155,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair
 
         delta_t, u_max, t0_time, t_95 = result
         
-        print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
+        print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_95: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
 
         dt_microseconds = np.mean(np.diff(Ucav.index))
         THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
