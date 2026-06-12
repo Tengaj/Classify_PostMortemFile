@@ -33,8 +33,17 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
                 start_osci = max(0, zero_idx - 10000)
         end_osci = zero_idx
     else:
-        start_osci = t0_idx
-        end_osci = zero_idx + 10
+        dt_microseconds = np.mean(np.diff(Ucav.index))
+        min_duration_us_1 = 1000 
+        required_points_1 = max(2, int(min_duration_us_1 / dt_microseconds))
+        min_duration_us_2 = 500
+        required_points_2 = max(2, int(min_duration_us_2 / dt_microseconds))
+        if t0_idx > zero_idx - required_points_1 and t0_idx < zero_idx - required_points_2:
+            start_osci = max(0, zero_idx - 10000)
+            end_osci = zero_idx
+        else:
+            start_osci = t0_idx
+            end_osci = zero_idx + 10
 
     osc_Uci, f_Uci = analyze_oscillation(
         Uci.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
