@@ -117,7 +117,7 @@ Fichier;Defaut;Label;Détails
 2023 10 19 CMA10_0004;Seuil de vide;Filtered;Loop NON ou Beam OFF
 2023 08 11 CMA11_0009;Rég signal RF hors tolérance;Other
 2023 08 11 CMA11_0012;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
-2023 11 09 CMA11_0002;Seuil de vide;Leak/outgassing;-33.06uA
+2023 11 09 CMA11_0002;Seuil de vide;Leak/outgassing;-33.06uA,9.29
 2023 07 28 CMA12_0005_D Signal RF hors tolérance;Rég signal RF hors tolérance;Loop instability
 2023 07 28 CMA12_0006_D Signal RF hors tolérance;Rég signal RF hors tolérance;Loop instability
 2023 07 28 CMA12_0007_D Signal RF hors tolérance;Rég signal RF hors tolérance;Loop instability
