@@ -410,6 +410,7 @@ def classify_file(file_name):
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
             void = df_signals.get("vide")
+            return detected_faults[0] + ";" + classify_void(pickup,void)
         case "Claquage ou quench cavité":
             return detected_faults[0] + ";" + classify_quench(Ucav)
         case "Dép seuil de sécurité RF":
