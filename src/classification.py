@@ -158,8 +158,8 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair
         print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_95: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
 
         dt_microseconds = np.mean(np.diff(Ucav.index))
-        THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # 2 µs
-        THRESHOLD_FALSE_ALARM = 10000.0  # 1 ms (1000 µs)
+        THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # environ 11 µs (en général)
+        THRESHOLD_FALSE_ALARM = 10000.0  # 10 ms (10000 µs)
         
         if delta_t > THRESHOLD_BREAKDOWN and delta_t < THRESHOLD_FALSE_ALARM:
             quench = True
@@ -168,7 +168,6 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair
             #if true_v_profile or trend_Ucr == -1:
             if quench:
                 return "Quench"
-                #Ajouté une vérif sur le temps de la chute pour être sur.
             elif trend_Ucr == 1:
                 return "Quench aside"
                 
@@ -293,7 +292,7 @@ def classify_RF_protections(time, Ucav, Ucat):
     # Calculer le ratio sur la fenêtre
     ratio = Ucav.iloc[start_idx:end_idx] / Ucat_fraction
     max_ratio = ratio.max()
-    #print(f"Index de t=0 : {zero_idx} | Ratio maximum mesuré : {max_ratio:.2f}")
+    #print(f"Ratio maximum mesuré : {max_ratio:.2f} | Ucat_fraction : {Ucat_fraction}")
     
     if max_ratio > 8.5:
         return "Ucav max"
