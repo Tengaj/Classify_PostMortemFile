@@ -235,6 +235,31 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0, calm = True):
     t0_idx = Ucav_series.index.get_loc(t0_time)
     return t0_idx, t0_time
 
+def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
+    """
+    Calcule le véritable début de la chute de tension (t0_ampt_idx) en se basant 
+    sur le paramètre de déclenchement AMPT du fichier.
+    """
+
+    ampt_val = ampt / 100.0
+        
+    if ampt_val <= 0 or ampt_val >= 1:
+        ampt_val = 0.03
+
+    trigger_val = Ucav.iloc[zero_idx] 
+    theoretical_plateau = trigger_val / ampt_val
+
+    drop_start_threshold = theoretical_plateau * 0.98
+    signal_before_zero = Ucav.iloc[:zero_idx]
+    points_on_plateau = signal_before_zero[signal_before_zero >= drop_start_threshold]
+    
+    if not points_on_plateau.empty:
+        t0_ampt_idx = np.where(signal_before_zero >= drop_start_threshold)[0][-1]
+    else:
+        t0_ampt_idx = zero_idx
+
+    return t0_ampt_idx, theoretical_plateau
+
 def detect_end_of_staircase(Ucav, zero_idx, dt_us):
     """
     Détecte la fin d'une forme en escalier dans un signal avant une chute.

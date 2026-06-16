@@ -5,12 +5,13 @@ from utils import chrono
 from signal_processing import (
     analyze_oscillation, 
     get_trend, 
-    detect_t0_zscore, 
+    detect_t0_zscore,
+    find_true_t0_with_ampt, 
     detect_end_of_staircase,
     calculate_fall_time
 )
 
-def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_idx, end_stair_idx):
+def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, zero_idx, end_stair_idx):
     """
     [Sous-fonction] Cherche les fréquences de Taconis ou loop instability.
     """
@@ -21,7 +22,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
     }
     
     #Si t0 est supérieur au zéro temporel, il peut quand même y avoir une oscillation (par exemple le signal oscille depuis le début)
-    if t0_idx > zero_idx:
+    if t0_zscore_idx > zero_idx:
         if end_stair_idx:
             #Si il y a un escalier dans le signal, on analayse à la fin de l'escalier
             start_osci = end_stair_idx
@@ -38,11 +39,11 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
         required_points_1 = max(2, int(min_duration_us_1 / dt_microseconds))
         min_duration_us_2 = 500
         required_points_2 = max(2, int(min_duration_us_2 / dt_microseconds))
-        if t0_idx > zero_idx - required_points_1 and t0_idx < zero_idx - required_points_2:
+        if t0_zscore_idx > zero_idx - required_points_1 and t0_zscore_idx < zero_idx - required_points_2:
             start_osci = max(0, zero_idx - 10000)
             end_osci = zero_idx
         else:
-            start_osci = t0_idx
+            start_osci = t0_zscore_idx
             end_osci = zero_idx + 10
 
     osc_Uci, f_Uci = analyze_oscillation(
@@ -85,22 +86,22 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_i
             
     return None
 
-def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair, zero_idx):
+def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair, zero_idx):
     """
     [Sous-fonction] Analyse les tendances pour détecter un profil en V typique d'un Quench.
     """
     WINDOW_POINTS_LARGE = 3500
     WINDOW_POINTS_SHORT = 700
 
-    start_idx_large = max(0, t0_idx - WINDOW_POINTS_LARGE)
-    start_idx_short = max(0, t0_idx - WINDOW_POINTS_SHORT)
+    start_idx_large = max(0, t0_zscore_idx - WINDOW_POINTS_LARGE)
+    start_idx_short = max(0, t0_zscore_idx - WINDOW_POINTS_SHORT)
     
     if end_stair is not None:
-        start_idx_short = t0_idx_Uci + end_stair
+        start_idx_short = t0_zscore_idx_Uci + end_stair
     else:
-        start_idx_short = t0_idx_Uci
+        start_idx_short = t0_zscore_idx_Uci
         
-    end_idx = t0_idx
+    end_idx = t0_zscore_idx
     if start_idx_short > end_idx:
         end_idx = zero_idx
 
@@ -173,7 +174,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair
                 
     return None
     
-def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_idx):
+def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_zscore_idx):
     """
     [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Gain).
     """
@@ -213,20 +214,20 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_idx):
     std_Uci_win = np.std(Uci.iloc[idx_base_start:idx_base_end])
     #print(f'std Uci window : {np.std(Uci.iloc[idx_base_start:idx_base_end])}')
     
-    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 else pct_neg_Uci
-    trend_Ucav_short = get_trend(time[t0_idx:t0_idx+5], Ucav.iloc[t0_idx:t0_idx+5], tolerance=1e-6)
+    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 4 else pct_neg_Uci
+    trend_Ucav_short = get_trend(time[t0_zscore_idx:t0_zscore_idx+5], Ucav.iloc[t0_zscore_idx:t0_zscore_idx+5], tolerance=1e-6)
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
-        elif pct_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 and trend_Ucav_short == -1:
+        elif pct_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 4 and trend_Ucav_short == -1:
             return "Beam loss"
         #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
             #return "Beam loss;Pic Ucav"
     
     return None
 
-def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
+def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, ampt):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
     """
@@ -236,40 +237,43 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ):
     # Temps entre chaque point du signal en microsecondes
     dt_microseconds = np.mean(np.diff(time))
 
+    t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav, zero_idx, ampt)
+    print(f't0_ampt_idx : {t0_ampt_idx}')
+
     end_stair_idx = detect_end_of_staircase(Ucav,zero_idx, dt_microseconds)
     if end_stair_idx is not None:
         print(f"End stair | idx : {end_stair_idx}, valeur : {time[end_stair_idx]}")
-        #t0_idx = end_stair
-        t0_idx, _ = detect_t0_zscore(Ucav.iloc[end_stair_idx:])
-        t0_idx += end_stair_idx
+        #t0_zscore_idx = end_stair
+        t0_zscore_idx, _ = detect_t0_zscore(Ucav.iloc[end_stair_idx:])
+        t0_zscore_idx += end_stair_idx
     else:
-        # t0_idx : index ou le signal Ucav comment à décrocher
-        t0_idx, _ = detect_t0_zscore(Ucav)
-    if t0_idx is None:
+        # t0_zscore_idx : index ou le signal Ucav comment à décrocher
+        t0_zscore_idx, _ = detect_t0_zscore(Ucav)
+    if t0_zscore_idx is None:
         return "Other;Pas de chute de Ucav"
-    if t0_idx == 0:
+    if t0_zscore_idx == 0:
         return "Other;Problème t0"
 
-    print(f't0_idx : {t0_idx}, t0 valeur : {time[t0_idx]}, index de 0 : {zero_idx}')
+    print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]},  index de 0 : {zero_idx}')
 
     # Test des Oscillations
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
-    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_idx, zero_idx, end_stair_idx)
+    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, zero_idx, end_stair_idx)
     
     if oscillation_label: 
         return oscillation_label
 
     # Test des Quenchs
-    t0_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
-    print(f't0_idx_Uci : {t0_idx_Uci}, t0_idx_Uci val : {time[t0_idx_Uci]}')
+    t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
+    print(f't0_zscore_idx_Uci : {t0_zscore_idx_Uci}, t0_zscore_idx_Uci val : {time[t0_zscore_idx_Uci]}')
 
-    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_idx, t0_idx_Uci, end_stair_idx, zero_idx)
+    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair_idx, zero_idx)
     
     if quench_label: 
         return quench_label
 
     # Test des anomalies de pics
-    peaks_label = _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_idx)
+    peaks_label = _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_zscore_idx)
     if peaks_label:
         return peaks_label
             
@@ -431,6 +435,7 @@ def classify_file(file_name):
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
-            return detected_faults[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ)
+            ampt = float(parameters.get("AMPT"))
+            return detected_faults[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, ampt)
         case _:
             return "Other"
