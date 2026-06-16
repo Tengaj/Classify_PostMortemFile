@@ -381,6 +381,17 @@ def classify_file(file_name):
     if float(kpi) < kpi_threshold:
         return f'{detected_faults[0]};Filtered;KPI < {kpi_threshold}'
 
+    
+    #Filtre Mask
+    mask = parameters.get("MASK")
+    file_name_str = str(file_name)
+    if "CMA" in file_name_str:
+        if mask != '0x007D' and mask != '0x007F':
+            return f'{detected_faults[0]};Filtered;Mask problem'
+    if "CMB" in file_name_str:
+        if mask != "0x007F":
+            return f'{detected_faults[0]};Filtered;Mask problem'
+    
     # Filtre sur Ucav
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))

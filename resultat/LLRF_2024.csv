@@ -122,12 +122,12 @@ Fichier;Defaut;Label;Détails
 2024 11 08 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
 2024 09 19 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 09 23 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 09 25 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
-2024 09 25 CMA08_0002_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
-2024 09 25 CMA08_0003_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
-2024 09 25 CMA08_0004_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
-2024 09 25 CMA08_0005_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
-2024 09 27 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2024 09 25 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Mask problem
+2024 09 25 CMA08_0002_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Mask problem
+2024 09 25 CMA08_0003_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Mask problem
+2024 09 25 CMA08_0004_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Mask problem
+2024 09 25 CMA08_0005_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Mask problem
+2024 09 27 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Mask problem
 2024 09 27 CMA08_0002 kn coup sur defaut ampli et regul_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
 2024 09 27 CMA08_0003 kf FFO coup sur defaut regul_D Trig;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 11 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
