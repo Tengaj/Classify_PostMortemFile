@@ -240,25 +240,39 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
     Calcule le véritable début de la chute de tension (t0_ampt_idx) en se basant 
     sur le paramètre de déclenchement AMPT du fichier.
     """
-
     ampt_val = ampt / 100.0
-        
     if ampt_val <= 0 or ampt_val >= 1:
         ampt_val = 0.03
 
     trigger_val = Ucav.iloc[zero_idx] 
-    theoretical_plateau = trigger_val / ampt_val
-
-    drop_start_threshold = theoretical_plateau * 0.98
     signal_before_zero = Ucav.iloc[:zero_idx]
-    points_on_plateau = signal_before_zero[signal_before_zero >= drop_start_threshold]
     
-    if not points_on_plateau.empty:
-        t0_ampt_idx = np.where(signal_before_zero >= drop_start_threshold)[0][-1]
+    idx_base_start = max(0, zero_idx - 1000)
+    idx_base_end = max(1, zero_idx - 300)
+    real_plateau = Ucav.iloc[idx_base_start:idx_base_end].median()
+
+    # Détection du type de défaut (Chute vs Montée)
+    is_drop = trigger_val < real_plateau
+
+    if is_drop:
+        #Cas chute
+        plateau_ref = trigger_val / ampt_val
+        threshold = plateau_ref * 0.99
+        # On cherche les points où le signal était encore "en haut"
+        valid_indices = np.where(signal_before_zero >= threshold)[0]
+        
+    else:
+        # Cas montée
+        plateau_ref = real_plateau
+        threshold = plateau_ref * 1.01
+        valid_indices = np.where(signal_before_zero <= threshold)[0]
+
+    if len(valid_indices) > 0:
+        t0_ampt_idx = valid_indices[-1]
     else:
         t0_ampt_idx = zero_idx
 
-    return t0_ampt_idx, theoretical_plateau
+    return t0_ampt_idx, plateau_ref
 
 def detect_end_of_staircase(Ucav, zero_idx, dt_us):
     """
@@ -328,15 +342,15 @@ def detect_end_of_staircase(Ucav, zero_idx, dt_us):
     else:
         return None
 
-def calculate_fall_time(Ucav, target_pct=0.5,z_threshold = 5):
+def calculate_fall_time(Ucav, real_t0_idx, target_pct=0.5,z_threshold = 5):
     """
     Calcule le temps mis par le signal pour chuter à un certain pourcentage de son amplitude maximale.
     Retourne un tuple : (delta_t, u_max, t_start, t_target)
     Retourne None si le signal ne chute jamais à la valeur cible.
     """
-    zero_idx = np.argmin(np.abs(Ucav.index))
-    start_idx = zero_idx - 100
-    end_idx = zero_idx + 30
+    #zero_idx = np.argmin(np.abs(Ucav.index))
+    start_idx = real_t0_idx - 100
+    end_idx = real_t0_idx + 30
     t0_idx, _ = detect_t0_zscore(Ucav.iloc[start_idx:end_idx] / 10,z_threshold = z_threshold)
     t0_idx = start_idx + t0_idx - 1
     t0_time = Ucav.index[t0_idx]

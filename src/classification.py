@@ -11,7 +11,7 @@ from signal_processing import (
     calculate_fall_time
 )
 
-def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, zero_idx, end_stair_idx):
+def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx):
     """
     [Sous-fonction] Cherche les fréquences de Taconis ou loop instability.
     """
@@ -22,7 +22,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     }
     
     #Si t0 est supérieur au zéro temporel, il peut quand même y avoir une oscillation (par exemple le signal oscille depuis le début)
-    if t0_zscore_idx > zero_idx:
+    if t0_zscore_idx > t0_ampt_idx:
         if end_stair_idx:
             #Si il y a un escalier dans le signal, on analayse à la fin de l'escalier
             start_osci = end_stair_idx
@@ -30,21 +30,21 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
             #Sinon on cherche à nouveau t0 mais en étant moins tolérant sur les périodes de calme du signal
             start_osci, _ = detect_t0_zscore(Ucav, calm=False)
             print(f'start osci {start_osci} | val {Ucav.index[start_osci]}')
-            if start_osci > zero_idx:
-                start_osci = max(0, zero_idx - 10000)
-        end_osci = zero_idx
+            if start_osci > t0_ampt_idx:
+                start_osci = max(0, t0_ampt_idx - 10000)
+        end_osci = t0_ampt_idx
     else:
         dt_microseconds = np.mean(np.diff(Ucav.index))
         min_duration_us_1 = 1000 
         required_points_1 = max(2, int(min_duration_us_1 / dt_microseconds))
         min_duration_us_2 = 500
         required_points_2 = max(2, int(min_duration_us_2 / dt_microseconds))
-        if t0_zscore_idx > zero_idx - required_points_1 and t0_zscore_idx < zero_idx - required_points_2:
-            start_osci = max(0, zero_idx - 10000)
-            end_osci = zero_idx
+        if t0_zscore_idx > t0_ampt_idx - required_points_1 and t0_zscore_idx < t0_ampt_idx - required_points_2:
+            start_osci = max(0, t0_ampt_idx - 10000)
+            end_osci = t0_ampt_idx
         else:
             start_osci = t0_zscore_idx
-            end_osci = zero_idx + 10
+            end_osci = t0_ampt_idx + 10
 
     osc_Uci, f_Uci = analyze_oscillation(
         Uci.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
@@ -86,7 +86,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
             
     return None
 
-def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair, zero_idx):
+def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair, t0_ampt_idx):
     """
     [Sous-fonction] Analyse les tendances pour détecter un profil en V typique d'un Quench.
     """
@@ -103,11 +103,11 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
         
     end_idx = t0_zscore_idx
     if start_idx_short > end_idx:
-        end_idx = zero_idx
+        end_idx = t0_ampt_idx
 
-    t_win_large = time[start_idx_large:zero_idx]
-    Uci_win_large = Uci.iloc[start_idx_large:zero_idx]
-    Ucr_win_large = Ucr.iloc[start_idx_large:zero_idx]
+    t_win_large = time[start_idx_large:t0_ampt_idx]
+    Uci_win_large = Uci.iloc[start_idx_large:t0_ampt_idx]
+    Ucr_win_large = Ucr.iloc[start_idx_large:t0_ampt_idx]
 
     if start_idx_short < end_idx:
         # Couper la fenêtre en deux
@@ -147,7 +147,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
 
         quench = False
         target_pct = 0.01
-        result = calculate_fall_time(Ucav, target_pct=target_pct)
+        result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=target_pct)
     
         if result is None:
             print(f"Alerte : Le signal ne descend jamais à {100 - target_pct * 100}% dans ce fichier.")
@@ -156,7 +156,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
 
         delta_t, u_max, t0_time, t_95 = result
         
-        print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_95: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
+        #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_95: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
 
         dt_microseconds = np.mean(np.diff(Ucav.index))
         THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # environ 11 µs (en général)
@@ -174,19 +174,19 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
                 
     return None
     
-def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_zscore_idx):
+def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx):
     """
     [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Gain).
     """
-    idx_base_start = max(0, zero_idx - 1000)
-    idx_base_end = max(1, zero_idx - 100)
+    idx_base_start = max(0, t0_ampt_idx - 1000)
+    idx_base_end = max(1, t0_ampt_idx - 100)
     
     base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
     base_Uci   = np.median(Uci.iloc[idx_base_start:idx_base_end])
     base_Ucav  = np.median(Ucav.iloc[idx_base_start:idx_base_end])
     
-    zone_start = zero_idx - 20
-    zone_end   = zero_idx + 30
+    zone_start = t0_ampt_idx - 20
+    zone_end   = t0_ampt_idx + 30
     
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
     max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
@@ -214,33 +214,27 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_zscore_idx):
     std_Uci_win = np.std(Uci.iloc[idx_base_start:idx_base_end])
     #print(f'std Uci window : {np.std(Uci.iloc[idx_base_start:idx_base_end])}')
     
-    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 4 else pct_neg_Uci
+    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 else pct_neg_Uci
     trend_Ucav_short = get_trend(time[t0_zscore_idx:t0_zscore_idx+5], Ucav.iloc[t0_zscore_idx:t0_zscore_idx+5], tolerance=1e-6)
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
-        elif pct_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 4 and trend_Ucav_short == -1:
+        elif pct_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 and trend_Ucav_short == -1:
             return "Beam loss"
         #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
             #return "Beam loss;Pic Ucav"
     
     return None
 
-def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, ampt):
+def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
     """
-    # zero_idx : index de 0.0 dans time (ou la valeur la plus proche de 0.0)
-    # Récupération de l'index de la valeur de temps la plus proche de 0.0
-    zero_idx = np.argmin(np.abs(time))
     # Temps entre chaque point du signal en microsecondes
     dt_microseconds = np.mean(np.diff(time))
 
-    t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav, zero_idx, ampt)
-    print(f't0_ampt_idx : {t0_ampt_idx}')
-
-    end_stair_idx = detect_end_of_staircase(Ucav,zero_idx, dt_microseconds)
+    end_stair_idx = detect_end_of_staircase(Ucav,t0_ampt_idx, dt_microseconds)
     if end_stair_idx is not None:
         print(f"End stair | idx : {end_stair_idx}, valeur : {time[end_stair_idx]}")
         #t0_zscore_idx = end_stair
@@ -254,26 +248,27 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, ampt):
     if t0_zscore_idx == 0:
         return "Other;Problème t0"
 
+    zero_idx = np.argmin(np.abs(time))
     print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]},  index de 0 : {zero_idx}')
 
     # Test des Oscillations
     dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
-    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, zero_idx, end_stair_idx)
+    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx)
     
     if oscillation_label: 
         return oscillation_label
 
     # Test des Quenchs
     t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
-    print(f't0_zscore_idx_Uci : {t0_zscore_idx_Uci}, t0_zscore_idx_Uci val : {time[t0_zscore_idx_Uci]}')
+    #print(f't0_zscore_idx_Uci : {t0_zscore_idx_Uci}, t0_zscore_idx_Uci val : {time[t0_zscore_idx_Uci]}')
 
-    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair_idx, zero_idx)
+    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair_idx, t0_ampt_idx)
     
     if quench_label: 
         return quench_label
 
     # Test des anomalies de pics
-    peaks_label = _check_amplitude_anomalies(time, Uci, Ucav, modIQ, zero_idx, t0_zscore_idx)
+    peaks_label = _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx)
     if peaks_label:
         return peaks_label
             
@@ -303,14 +298,13 @@ def classify_RF_protections(time, Ucav, Ucat):
     else:
         return "Pr max"
 
-def classify_void(pickup, void, threshold_pickup=50):
+def classify_void(pickup, void, t0_ampt_idx, threshold_pickup=50):
     """
     Classifie le défaut "Seuil de vide" en mesurant la quantité de courant pickup par rapport au seuil. 
     """
-    zero_idx = np.argmin(np.abs(pickup.index))
-    pickup_win = pickup.iloc[0:zero_idx] #+ 38
+    pickup_win = pickup.iloc[0:t0_ampt_idx] #+ 38
     mean_pickup = pickup_win.mean() #+ 38
-    void_win = void.iloc[0:zero_idx] * 10000000
+    void_win = void.iloc[0:t0_ampt_idx] * 10000000
     mean_void = void_win.mean()
     #print(f'moyenne pickup : {mean_pickup}')
     #print(f'moyenne void : {mean_void}')
@@ -320,12 +314,12 @@ def classify_void(pickup, void, threshold_pickup=50):
     else:
         return f"Leak/outgassing;{mean_pickup:.2f}uA,{mean_void:.2f}"
 
-def classify_quench(Ucav):
+def classify_quench(Ucav, t0_ampt_idx):
     """
     Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
-    result = calculate_fall_time(Ucav, target_pct=0.5,z_threshold = 100)
+    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=0.5,z_threshold = 100)
     
     if result is None:
         print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
@@ -373,7 +367,7 @@ def classify_file(file_name):
         detected_faults = [""]
     #print(f"Defaut : {detected_faults}")
 
-    # Faisceau désactivé ou boucle de régulation désactivé, Filtre beam = non ou loop = off
+    # Filtre Faisceau désactivé ou boucle de régulation désactivé, Filtre beam = non ou loop = off
     beam = parameters.get("BEAM")
     loop = parameters.get("LOOP")
     if beam == "NON" or loop == "OFF":
@@ -385,7 +379,6 @@ def classify_file(file_name):
     if float(kpi) < kpi_threshold:
         return f'{detected_faults[0]};Filtered;KPI < {kpi_threshold}'
 
-    
     #Filtre Mask
     mask = parameters.get("MASK")
     file_name_str = str(file_name)
@@ -414,6 +407,9 @@ def classify_file(file_name):
     if np.mean(Ucav.iloc[0:zero_idx]) < Ucav_threshold:
         return f'{detected_faults[0]};Filtered;Tension inférieur à {Ucav_threshold}'
 
+    ampt = float(parameters.get("AMPT"))
+    t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav,zero_idx, ampt)
+
     # Aiguillage selon le premier défaut trouvé
     match detected_faults[0]:
         case "Seuil pick-up":
@@ -425,9 +421,9 @@ def classify_file(file_name):
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
             void = df_signals.get("vide")
-            return detected_faults[0] + ";" + classify_void(pickup,void)
+            return detected_faults[0] + ";" + classify_void(pickup,void,t0_ampt_idx)
         case "Claquage ou quench cavité":
-            return detected_faults[0] + ";" + classify_quench(Ucav)
+            return detected_faults[0] + ";" + classify_quench(Ucav,t0_ampt_idx)
         case "Dép seuil de sécurité RF":
             Ucat = parameters.get("UCAT")
             return detected_faults[0] + ";" + classify_RF_protections(time, Ucav, Ucat)
@@ -435,7 +431,6 @@ def classify_file(file_name):
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
-            ampt = float(parameters.get("AMPT"))
-            return detected_faults[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, ampt)
+            return detected_faults[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx)
         case _:
             return "Other"
