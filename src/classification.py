@@ -228,16 +228,20 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     THRESHOLD_NOISE_PCT = 10.00
     THRESHOLD_PEAK_PCT = 90.00
 
-    std_Uci_win = np.std(Uci.iloc[idx_base_start:idx_base_end])
-    #print(f'std Uci window : {np.std(Uci.iloc[idx_base_start:idx_base_end])}')
+    base_Uci_window = Uci.iloc[idx_base_start:idx_base_end]
+    # Épaisseur robuste du bruit de fond
+    noise_thickness = np.percentile(base_Uci_window, 95) - np.percentile(base_Uci_window, 5)
+    #print(f'noise_thickness : {noise_thickness}')
     
-    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 else pct_neg_Uci
+    is_real_peak = delta_pos_Uci > (noise_thickness)
+
+    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and is_real_peak else pct_neg_Uci
     trend_Ucav_short = get_trend(time[t0_zscore_idx:t0_zscore_idx+5], Ucav.iloc[t0_zscore_idx:t0_zscore_idx+5], tolerance=1e-6)
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
-        elif pct_Uci > THRESHOLD_NOISE_PCT and delta_pos_Uci > std_Uci_win * 3 and trend_Ucav_short == -1:
+        elif pct_Uci > THRESHOLD_NOISE_PCT and is_real_peak and trend_Ucav_short == -1:
             return "Beam loss"
         #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
             #return "Beam loss;Pic Ucav"
