@@ -147,7 +147,8 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
 
         quench = False
         target_pct = 0.01
-        result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=target_pct)
+        zero_idx = np.argmin(np.abs(time))
+        result = calculate_fall_time(Ucav, zero_idx, target_pct=target_pct)
     
         if result is None:
             print(f"Alerte : Le signal ne descend jamais à {100 - target_pct * 100}% dans ce fichier.")
