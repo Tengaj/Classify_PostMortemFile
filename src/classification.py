@@ -165,12 +165,29 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
         if delta_t > THRESHOLD_BREAKDOWN and delta_t < THRESHOLD_FALSE_ALARM:
             quench = True
 
+        step_points = max(1, int(50.0 / dt_microseconds))
+        
+        total_rise_Uci = Uci_win_large.max() - Uci_win_large.min()
+        
+        # On cherche le plus grand bond que le signal a fait en seulement 50 µs
+        max_jump_Uci = Uci_win_large.diff(periods=step_points).max()
+        
+        is_sudden_spike = False
+        # Si la montée est significative et que plus de 65% de cette montée s'est faite en 50 µs, c'est un pic brutal.
+        if total_rise_Uci > 0.5:
+            if max_jump_Uci > 0.65 * total_rise_Uci:
+                is_sudden_spike = True
+                #print(f"Pic brutal. Hauteur totale: {total_rise_Uci:.2f} | Plus grand saut (50µs): {max_jump_Uci:.2f}")
+
         if trend_Uci == 1:
             #if true_v_profile or trend_Ucr == -1:
             if quench:
                 return "Quench"
             elif trend_Ucr == 1:
-                return "Quench aside"
+                if is_sudden_spike:
+                    return None 
+                else:
+                    return "Quench aside"
                 
     return None
     
