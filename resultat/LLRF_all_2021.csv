@@ -1,0 +1,192 @@
+Fichier;Defaut;Label;Détails
+2021 06 16 CMA01_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 16 CMA01_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 16 CMA01_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA01_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA01_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 13 CMA01_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA01_0003 alarme FF avec kp=35 ki=0,0007;Rég signal RF hors tolérance;Beam loss
+2021 07 21 CMA01_0004 alarme FF avec kp=35 ki=0,0007;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA01_0006 alarme FF kp=5 ki=0,0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 07 21 CMA01_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 07 21 CMA01_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 07 21 CMA01_0009;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA01_0020;Rég signal RF hors tolérance;Other
+2021 07 21 CMA01_0021;Rég signal RF hors tolérance;Other
+2021 07 28 CMA01_0001;Rég signal RF hors tolérance;Beam loss
+2021 07 28 CMA01_0002;Rég signal RF hors tolérance;Other
+2021 07 28 CMA01_0003;Rég signal RF hors tolérance;Beam loss
+2021 07 28 CMA01_0004;Rég signal RF hors tolérance;Other
+2021 07 28 CMA01_0005;Rég signal RF hors tolérance;Beam loss
+2021 07 28 CMA01_0006;Rég signal RF hors tolérance;Other
+2021 08 23 CMA01_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA01_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA01_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA01_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA01_0007;Rég signal RF hors tolérance;Other
+2021 09 03 CMA01_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA01_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA01_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA01_0009;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 10 18 CMA01_0007;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 04 07 CMA02_0001;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 04 07 CMA02_0002;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 04 07 CMA02_0003;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA02_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 23 CMA02_0001 coupure à 99%;Claquage ou quench cavité;Filtered;Loop NON ou Beam OFF
+2021 06 24 CMA02_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 13 CMA02_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 15 CMA02_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA02_0002;Rég signal RF hors tolérance;Other
+2021 07 21 CMA02_0003;Rég signal RF hors tolérance;Other
+2021 07 22 CMA02_0002;Rég signal RF hors tolérance;Other
+2021 07 27 CMA02_0002;Rég signal RF hors tolérance;Other
+2021 07 30 CMA02_0004 D 4mA Alarme reg hors tol;Rég signal RF hors tolérance;Other
+2021 07 30 CMA02_0005;Rég signal RF hors tolérance;Other
+2021 08 23 CMA02_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 23 CMA02_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA02_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA02_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA02_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA02_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA02_0007;Rég signal RF hors tolérance;Other
+2021 09 03 CMA02_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA02_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA02_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA02_0008;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 11 12 CMA02_0001;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 11 12 CMA02_0002;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 11 26 CMA02_0002;Claquage ou quench cavité;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA03_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA03_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 28 CMA03_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 28 CMA03_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 02 CMA03_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 15 CMA03_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA03_0003;Rég signal RF hors tolérance;Other
+2021 07 21 CMA03_0004;Rég signal RF hors tolérance;Other
+2021 07 21 CMA03_0005;Rég signal RF hors tolérance;Other
+2021 07 21 CMA03_0006;Rég signal RF hors tolérance;Other
+2021 07 30 CMA03_0001D 4mA Alarme reg hors tol;Rég signal RF hors tolérance;Other
+2021 07 30 CMA03_0002;Rég signal RF hors tolérance;Other
+2021 08 23 CMA03_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA03_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA03_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA03_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA03_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA03_0007;Rég signal RF hors tolérance;Other
+2021 09 03 CMA03_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0009;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0010;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0011;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0012;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0013;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0014;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0015;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0016;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA03_0017;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 12 03 CMA03_0009;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 12 03 CMA03_0010;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 23 CMA04_0001 coupure sur quench à Ec=8.5;Claquage ou quench cavité;Filtered;Loop NON ou Beam OFF
+2021 07 15 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA04_0003;Rég signal RF hors tolérance;Other
+2021 07 30 CMA04_0001 D 4mA Alarme reg hors tol;Rég signal RF hors tolérance;Other
+2021 07 30 CMA04_0002;Rég signal RF hors tolérance;Other
+2021 07 30 CMA04_0003;Rég signal RF hors tolérance;Other
+2021 07 30 CMA04_0004;Rég signal RF hors tolérance;Other
+2021 07 30 CMA04_0005;Rég signal RF hors tolérance;Other
+2021 07 30 CMA04_0006;Rég signal RF hors tolérance;Other
+2021 08 23 CMA04_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA04_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA04_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA04_0005;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA04_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA04_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA04_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA05_0002;Dép seuil de sécurité RF;Filtered;Loop NON ou Beam OFF
+2021 06 17 CMA05_0003;Dép seuil de sécurité RF;Filtered;Loop NON ou Beam OFF
+2021 06 22 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 22 CMA05_0005;Dép seuil de sécurité RF;Filtered;Loop NON ou Beam OFF
+2021 06 28 CMA05_0001;Claquage ou quench cavité;Filtered;Loop NON ou Beam OFF
+2021 06 29 CMA05_0001 faux quench à 8MVpm;Claquage ou quench cavité;Filtered;Loop NON ou Beam OFF
+2021 07 15 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA05_0005;Rég signal RF hors tolérance;Other
+2021 07 21 CMA05_0008;Rég signal RF hors tolérance;Other
+2021 07 30 CMA05_0001 D 4mA Alarme reg hors tol;Rég signal RF hors tolérance;Other
+2021 07 30 CMA05_0002;Rég signal RF hors tolérance;Other
+2021 08 23 CMA05_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 23 CMA05_0003;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA05_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA05_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA05_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA05_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA05_0009;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 13 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 21 CMA05_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0009;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0010;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 21 CMA05_0011;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 09 28 CMA05_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 10 22 CMA05_0002 faux quench à 2MVm;Claquage ou quench cavité;False alarm;Temps de chute : 1419.61 us
+2021 10 26 CMA05_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 11 12 CMA05_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 11 12 CMA05_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 11 12 CMA05_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2021 11 30 CMA05_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 15 CMA06_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 15 CMA06_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 06 16 CMA06_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 13 CMA06_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 15 CMA06_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA06_0003;Rég signal RF hors tolérance;Other
+2021 07 21 CMA06_0004;Rég signal RF hors tolérance;Other
+2021 07 21 CMA06_0005;Rég signal RF hors tolérance;Other
+2021 07 21 CMA06_0006;Rég signal RF hors tolérance;Other
+2021 07 30 CMA06_0001 D 4mA Alarme reg hors tol;Rég signal RF hors tolérance;Other
+2021 07 30 CMA06_0002;Rég signal RF hors tolérance;Other
+2021 07 30 CMA06_0003;Rég signal RF hors tolérance;Other
+2021 07 30 CMA06_0004;Rég signal RF hors tolérance;Other
+2021 07 30 CMA06_0005;Rég signal RF hors tolérance;Other
+2021 07 30 CMA06_0006;Rég signal RF hors tolérance;Other
+2021 08 23 CMA06_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA06_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA06_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA06_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA06_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA06_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA06_0008;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA06_0011;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 09 CMA06_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 09 CMA06_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 11 16 CMA06_0004 5mA;Rég signal RF hors tolérance;Other
+2021 04 07 CMA07_0001;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 04 07 CMA07_0002;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 04 07 CMA07_0003;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 04 07 CMA07_0004;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2021 07 13 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 15 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 07 21 CMA07_0002;Rég signal RF hors tolérance;Other
+2021 07 21 CMA07_0003;Rég signal RF hors tolérance;Other
+2021 07 30 CMA07_0001 D 4mA Alarme reg hors tol;Rég signal RF hors tolérance;Other
+2021 07 30 CMA07_0002;Rég signal RF hors tolérance;Other
+2021 08 23 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 27 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 08 29 CMA07_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA07_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 03 CMA07_0006;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 09 09 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2021 11 12 CMA07_0001;Seuil de vide;Leak/outgassing;-0.97uA,48.45
+2021 11 16 CMA07_0001 SRFHT avec kp=75+ FF;Rég signal RF hors tolérance;Other
+2021 11 16 CMA07_0013;Rég signal RF hors tolérance;Beam loss
