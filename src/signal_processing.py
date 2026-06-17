@@ -240,11 +240,15 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
     Calcule le véritable début de la chute de tension (t0_ampt_idx) en se basant 
     sur le paramètre de déclenchement AMPT du fichier.
     """
+    # Si ampt est trop bas l'ecart entre t0_ampt_idx et zero_idx est négligeable
+    if ampt <= 3.00:
+        return zero_idx, None
+
     ampt_val = ampt / 100.0
     if ampt_val <= 0 or ampt_val >= 1:
         ampt_val = 0.03
 
-    trigger_val = Ucav.iloc[zero_idx] 
+    trigger_val = Ucav.iloc[zero_idx]
     signal_before_zero = Ucav.iloc[:zero_idx]
     
     idx_base_start = max(0, zero_idx - 1000)
@@ -256,7 +260,7 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
 
     if is_drop:
         #Cas chute
-        plateau_ref = trigger_val / ampt_val
+        plateau_ref = trigger_val / (1.0 - ampt_val)
         threshold = plateau_ref * 0.99
         # On cherche les points où le signal était encore "en haut"
         valid_indices = np.where(signal_before_zero >= threshold)[0]
@@ -269,9 +273,17 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
 
     if len(valid_indices) > 0:
         t0_ampt_idx = valid_indices[-1]
+        MAX_DISTANCE_ALLOWED = 1000
+        #Si l'index trouver est trop éloigné, c'est qu'il n'y a pas de décalage signifivatif.
+        if (zero_idx - t0_ampt_idx) > MAX_DISTANCE_ALLOWED:
+            # print(f"Alerte : t0_ampt_idx trop éloigné ({zero_idx - t0_ampt_idx} pts). Annulation.")
+            t0_ampt_idx = zero_idx
     else:
         t0_ampt_idx = zero_idx
 
+    #print(f'ampt_val : {ampt_val}')
+    #print(f'trigger_val : {trigger_val}') 
+    #print(f'plateau_ref : {plateau_ref}')
     return t0_ampt_idx, plateau_ref
 
 def detect_end_of_staircase(Ucav, zero_idx, dt_us):
