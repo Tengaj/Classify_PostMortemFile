@@ -89,7 +89,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
     start_idx_short = max(0, t0_zscore_idx - WINDOW_POINTS_SHORT)
     
     if end_stair is not None:
-        start_idx_short = t0_zscore_idx_Uci + end_stair
+        start_idx_short = end_stair
     else:
         start_idx_short = t0_zscore_idx_Uci
         
@@ -147,9 +147,9 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
             #return f"Other;Incomplet (Pas de chute à {100 - target_pct * 100}%)"
             return None
 
-        delta_t, u_max, t0_time, t_95 = result
+        delta_t, u_max, t0_time, t = result
         
-        #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_95: {t_95:.1f}µs | Chute en: {delta_t:.2f} µs")
+        #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t: {t:.1f}µs | Chute en: {delta_t:.2f} µs")
 
         dt_microseconds = np.mean(np.diff(Ucav.index))
         THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # environ 11 µs (en général)
@@ -160,27 +160,45 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
 
         step_points = max(1, int(50.0 / dt_microseconds))
         
+        # On définit une fenêtre d'observation autour du saut
+        pts_150 = max(1, int(150.0 / dt_microseconds)) 
+        
         total_rise_Uci = Uci_win_large.max() - Uci_win_large.min()
         
         # On cherche le plus grand bond que le signal a fait en seulement 50 µs
-        max_jump_Uci = Uci_win_large.diff(periods=step_points).max()
+        diff_50 = Uci_win_large.diff(periods=step_points)
+        max_jump_Uci = diff_50.max()
         
         is_sudden_spike = False
-        # Si la montée est significative et que plus de 65% de cette montée s'est faite en 50 µs, c'est un pic brutal.
+        
+        # Si la montée est significative et que > 65% se fait en 50 µs
         if total_rise_Uci > 0.5:
             if max_jump_Uci > 0.65 * total_rise_Uci:
-                is_sudden_spike = True
-                #print(f"Pic brutal. Hauteur totale: {total_rise_Uci:.2f} | Plus grand saut (50µs): {max_jump_Uci:.2f}")
+                
+                jump_idx = np.nanargmax(diff_50)
+                
+                idx_before = max(0, jump_idx - pts_150)
+                idx_after = min(len(Uci_win_large) - 1, jump_idx + pts_150)
+                
+                val_before = Uci_win_large.iloc[idx_before]
+                val_after = Uci_win_large.iloc[idx_after]
+                
+                true_shift = val_after - val_before
+                
+                # Si ce décalage durable représente au moins 40% du saut, c'est un vrai escalier.
+                # Sinon, c'est que le signal est retombé à sa place
+                if true_shift > 0.40 * max_jump_Uci:
+                    is_sudden_spike = True
+                    #print(f"Pic brutal,  Hauteur: {total_rise_Uci:.2f} | Saut: {max_jump_Uci:.2f} | Décalage durable: {true_shift:.2f}")
 
         if trend_Uci == 1:
+            if is_sudden_spike:
+                    return None 
             #if true_v_profile or trend_Ucr == -1:
             if quench:
                 return "Quench"
             elif trend_Ucr == 1:
-                if is_sudden_spike:
-                    return None 
-                else:
-                    return "Quench aside"
+                return "Quench aside"
                 
     return None
     
