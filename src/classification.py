@@ -188,6 +188,8 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     """
     [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Gain).
     """
+    zero_idx = np.argmin(np.abs(time))
+
     idx_base_start = max(0, t0_ampt_idx - 1000)
     idx_base_end = max(1, t0_ampt_idx - 100)
     
@@ -200,7 +202,7 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
     max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
-    min_Uci_zone = Uci.iloc[zone_start:zone_end].min()
+    min_Uci_zone = Uci.iloc[zone_start:zero_idx+ 30].min()
     
     delta_modIQ = max_modIQ_zone - base_modIQ
     delta_pos_Uci = max_Uci_zone - base_Uci
@@ -229,7 +231,8 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     is_real_peak = delta_pos_Uci > (noise_thickness)
 
     pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and is_real_peak else pct_neg_Uci
-    trend_Ucav_short = get_trend(time[t0_zscore_idx:t0_zscore_idx+5], Ucav.iloc[t0_zscore_idx:t0_zscore_idx+5], tolerance=1e-6)
+    trend_Ucav_short = get_trend(time[t0_zscore_idx-1:t0_zscore_idx+5], Ucav.iloc[t0_zscore_idx-1:t0_zscore_idx+5], tolerance=1e-6)
+    #print(f'pct_Uci : {pct_Uci}, is_real_peak : {is_real_peak}, trend_Ucav_short : {trend_Ucav_short}')
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
