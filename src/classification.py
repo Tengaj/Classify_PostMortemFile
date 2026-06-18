@@ -29,22 +29,14 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
         else:
             #Sinon on cherche à nouveau t0 mais en étant moins tolérant sur les périodes de calme du signal
             start_osci, _ = detect_t0_zscore(Ucav, calm=False)
-            print(f'start osci {start_osci} | val {Ucav.index[start_osci]}')
             if start_osci > t0_ampt_idx:
                 start_osci = max(0, t0_ampt_idx - 10000)
         end_osci = t0_ampt_idx
     else:
-        dt_microseconds = np.mean(np.diff(Ucav.index))
-        min_duration_us_1 = 1000 
-        required_points_1 = max(2, int(min_duration_us_1 / dt_microseconds))
-        min_duration_us_2 = 500
-        required_points_2 = max(2, int(min_duration_us_2 / dt_microseconds))
-        if t0_zscore_idx > t0_ampt_idx - required_points_1 and t0_zscore_idx < t0_ampt_idx - required_points_2:
-            start_osci = max(0, t0_ampt_idx - 10000)
-            end_osci = t0_ampt_idx
-        else:
-            start_osci = t0_zscore_idx
-            end_osci = t0_ampt_idx + 10
+        start_osci = t0_zscore_idx
+        end_osci = t0_ampt_idx + 2
+
+    #print(f'Osci window : {Ucav.index[start_osci]}, {Ucav.index[end_osci]}')
 
     osc_Uci, f_Uci = analyze_oscillation(
         Uci.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
