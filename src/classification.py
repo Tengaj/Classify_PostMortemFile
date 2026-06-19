@@ -318,21 +318,28 @@ def classify_RF_protections(time, Ucav, Ucat):
     """
     Classifie le défaut "Dép seuil de sécurité RF" en comparant la valeur de la tension (Ucav) par rapport au seuil maximal (Ucat). 
     """
-    # index du temps t=0 (le moment de la coupure)
+    n_points = len(time)
+
     zero_idx = np.argmin(np.abs(time))
     
-    # Définir la zone autour de 0
+    # Fenêtre étroitre autour du défaut
     start_idx = max(0, zero_idx - 20)
-    end_idx   = min(len(time), zero_idx + 20)
+    end_idx   = min(n_points, zero_idx + 20)
     
+    # Calcul du ratio maximum
     Ucat_fraction = float(Ucat) / 100.0
 
-    # Calculer le ratio sur la fenêtre
-    ratio = Ucav.iloc[start_idx:end_idx] / Ucat_fraction
-    max_ratio = ratio.max()
+    # On extrait la zone et on trouve la tension maximale atteinte
+    search_window = Ucav.iloc[start_idx:end_idx]
+    max_Ucav = search_window.max()
+
+    max_ratio = max_Ucav / Ucat_fraction
     #print(f"Ratio maximum mesuré : {max_ratio:.2f} | Ucat_fraction : {Ucat_fraction}")
+
+    # Classification
+    threshold_ucav_max = 8.5 # Seuil empirique de distinction
     
-    if max_ratio > 8.5:
+    if max_ratio > threshold_ucav_max:
         return "Ucav max"
     else:
         return "Pr max"
