@@ -151,17 +151,17 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
         
         #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t: {t:.1f}µs | Chute en: {delta_t:.2f} µs")
 
-        dt_microseconds = np.mean(np.diff(Ucav.index))
-        THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 1.05) # environ 11 µs (en général)
+        dt_us = np.mean(np.diff(Ucav.index))
+        THRESHOLD_BREAKDOWN = max(2.0, dt_us * 1.05) # environ 11 µs (en général)
         THRESHOLD_FALSE_ALARM = 10000.0  # 10 ms (10000 µs)
         
         if delta_t > THRESHOLD_BREAKDOWN and delta_t < THRESHOLD_FALSE_ALARM:
             quench = True
 
-        step_points = max(1, int(50.0 / dt_microseconds))
+        step_points = max(1, int(50.0 / dt_us))
         
         # On définit une fenêtre d'observation autour du saut
-        pts_150 = max(1, int(150.0 / dt_microseconds)) 
+        pts_150 = max(1, int(150.0 / dt_us)) 
         
         total_rise_Uci = Uci_win_large.max() - Uci_win_large.min()
         
@@ -258,7 +258,7 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
         elif pct_Uci > THRESHOLD_NOISE_PCT and is_real_peak and trend_Ucav_short == -1:
             return "Beam loss"
         #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
-            #return "Beam loss;Pic Ucav"
+            #return "Other,Faulty beam presence"
     
     return None
 
@@ -267,9 +267,9 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
     Classifie le défaut "Rég signal RF hors tolérance". 
     """
     # Temps entre chaque point du signal en microsecondes
-    dt_microseconds = np.mean(np.diff(time))
+    dt_us = np.mean(np.diff(time))
 
-    end_stair_idx = detect_end_of_staircase(Ucav,t0_ampt_idx, dt_microseconds)
+    end_stair_idx = detect_end_of_staircase(Ucav,t0_ampt_idx, dt_us)
     if end_stair_idx is not None:
         print(f"End stair | idx : {end_stair_idx}, valeur : {time[end_stair_idx]}")
         #t0_zscore_idx = end_stair
@@ -287,7 +287,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
     print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]},  index de 0 : {zero_idx}')
 
     # Test des Oscillations
-    dt_seconds = dt_microseconds * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
+    dt_seconds = dt_us * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
     oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx)
     
     if oscillation_label: 
@@ -368,8 +368,8 @@ def classify_quench(Ucav, t0_ampt_idx):
     
     print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
 
-    dt_microseconds = np.mean(np.diff(Ucav.index))
-    THRESHOLD_BREAKDOWN = max(2.0, dt_microseconds * 2.05) # 2 µs
+    dt_us = np.mean(np.diff(Ucav.index))
+    THRESHOLD_BREAKDOWN = max(2.0, dt_us * 2.05) # 2 µs
     THRESHOLD_FALSE_ALARM = 1000.0  # 1 ms (1000 µs)
 
     fall_time_str = f";Temps de chute : {delta_t:.2f} us"
