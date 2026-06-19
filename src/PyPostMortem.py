@@ -428,6 +428,10 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
         # df_signaux["MODP2"]= np.angle([df_signaux["I modulateur binary"]+ df_signaux["Q modulateur binary"]*1j])
         df_signaux.loc[:,"MODP"]= np.degrees(np.arctan2(df_signaux["Q modulateur binary"],(df_signaux["I modulateur binary"])))
 
-    df_defaut = df_defaut.astype(bool)
-    df_states = df_states.astype(bool)
+    if compute_defauts:
+        df_defaut = df_defaut.astype(bool)
+
+    if compute_etats:
+        df_states = df_states.astype(bool)
+
     return parameters,time, df_signaux, df_defaut, df_states,Header
