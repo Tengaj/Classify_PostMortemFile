@@ -152,10 +152,10 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
         #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t: {t:.1f}µs | Chute en: {delta_t:.2f} µs")
 
         dt_us = np.mean(np.diff(Ucav.index))
-        THRESHOLD_BREAKDOWN = max(2.0, dt_us * 1.05) # environ 11 µs (en général)
-        THRESHOLD_FALSE_ALARM = 10000.0  # 10 ms (10000 µs)
+        threshold_breakdown = max(2.0, dt_us * 1.05) # environ 11 µs (en général)
+        threshold_false_alarm = 10000.0  # 10 ms (10000 µs)
         
-        if delta_t > THRESHOLD_BREAKDOWN and delta_t < THRESHOLD_FALSE_ALARM:
+        if delta_t > threshold_breakdown and delta_t < threshold_false_alarm:
             quench = True
 
         step_points = max(1, int(50.0 / dt_us))
