@@ -4,6 +4,40 @@ from scipy.fft import fft, fftfreq
 from scipy.signal import find_peaks
 from scipy.stats import linregress
 
+def _verify_zero_crossings(signal, dominant_freq, dt, peak_amp):
+    """
+    Vérifie si le signal traverse son point d'équilibre un nombre de fois
+    cohérent avec sa fréquence dominante estimée.
+    """
+    n = len(signal)
+    period_points = int(1.0 / (dominant_freq * dt))
+    
+    # Fenêtre pour centrer le signal sur zéro
+    zcross_window_size = max(5, 3 * period_points)
+    zcross_baseline = pd.Series(signal).rolling(window=zcross_window_size, center=True, min_periods=1).mean().to_numpy()
+    sig_zcross = signal - zcross_baseline
+
+    # Seuil d'hystérésis pour ignorer le micro-bruit lors du passage par zéro
+    hysteresis_threshold = 0.3 * peak_amp  
+    
+    states = np.zeros_like(sig_zcross)
+    states[sig_zcross > hysteresis_threshold] = 1
+    states[sig_zcross < -hysteresis_threshold] = -1
+    
+    valid_states = states[states != 0]
+    
+    if len(valid_states) > 0:
+        actual_crossings = np.sum(np.abs(np.diff(valid_states)) == 2)
+    else:
+        actual_crossings = 0
+    
+    expected_crossings = 2 * (dominant_freq * (n * dt))
+    
+    # Validation : au moins 2 croisements, et au moins 45% de ce que la FFT prédisait
+    is_crossing_valid = (actual_crossings >= 2) and (actual_crossings >= 0.45 * expected_crossings)
+
+    return is_crossing_valid, actual_crossings, expected_crossings, sig_zcross, period_points
+
 def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
@@ -62,28 +96,8 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = peak_amp > min_physical_amp
 
-    # Zero-Crossing
-    period_points = int(1.0 / (dominant_freq * dt))
-    zcross_window_size = max(5, 3 * period_points)
-    
-    zcross_baseline = pd.Series(signal).rolling(window=zcross_window_size, center=True, min_periods=1).mean().to_numpy()
-    sig_zcross = signal - zcross_baseline
-
-    hysteresis_threshold = 0.3 * peak_amp  
-    
-    states = np.zeros_like(sig_zcross)
-    states[sig_zcross > hysteresis_threshold] = 1
-    states[sig_zcross < -hysteresis_threshold] = -1
-    
-    valid_states = states[states != 0]
-    
-    if len(valid_states) > 0:
-        actual_crossings = np.sum(np.abs(np.diff(valid_states)) == 2)
-    else:
-        actual_crossings = 0
-    
-    expected_crossings = 2 * (dominant_freq * (n * dt))
-    is_crossing_valid = (actual_crossings >= 2) and (actual_crossings >= 0.45 * expected_crossings)
+    # Verification zero crossing
+    is_crossing_valid, act_cross, exp_cross, sig_zcross, period_points = _verify_zero_crossings(signal, dominant_freq, dt, peak_amp)
 
     # Vérifier si l'oscillation est toujours active à la fin
     # On calcule l'enveloppe du signal (son amplitude maximale locale)
