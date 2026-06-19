@@ -294,7 +294,11 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
         return oscillation_label
 
     # Test des Quenchs
-    t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
+    if end_stair_idx is not None:
+        t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci.iloc[end_stair_idx:], calm=False)
+        t0_zscore_idx_Uci += end_stair_idx
+    else:
+        t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
     #print(f't0_zscore_idx_Uci : {t0_zscore_idx_Uci}, t0_zscore_idx_Uci val : {time[t0_zscore_idx_Uci]}')
 
     quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair_idx, t0_ampt_idx)

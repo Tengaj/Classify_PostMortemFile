@@ -1264,7 +1264,7 @@ Fichier;Defaut;Label;Détails
 2022 09 29 CMB07-CAV2_0008;Rég signal RF hors tolérance;Other
 2022 09 30 CMB07-CAV2_0001;Rég signal RF hors tolérance;Other
 2022 09 30 CMB07-CAV2_0002;Claquage ou quench cavité;False alarm;Temps de chute : 2203.23 us
-2022 09 30 CMB07-CAV2_0003;Rég signal RF hors tolérance;Other
+2022 09 30 CMB07-CAV2_0003;Rég signal RF hors tolérance;Quench aside
 2022 09 30 CMB07-CAV2_0004;Rég signal RF hors tolérance;Loop instability
 2022 10 04 CMB07-CAV2_0001;Claquage ou quench cavité;False alarm;Temps de chute : 2203.23 us
 2022 10 04 CMB07-CAV2_0002;Rég signal RF hors tolérance;Other

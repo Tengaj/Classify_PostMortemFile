@@ -273,7 +273,7 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
 
     if len(valid_indices) > 0:
         t0_ampt_idx = valid_indices[-1]
-        MAX_DISTANCE_ALLOWED = 1000
+        MAX_DISTANCE_ALLOWED = 6000
         #Si l'index trouver est trop éloigné, c'est qu'il n'y a pas de décalage signifivatif.
         if (zero_idx - t0_ampt_idx) > MAX_DISTANCE_ALLOWED:
             # print(f"Alerte : t0_ampt_idx trop éloigné ({zero_idx - t0_ampt_idx} pts). Annulation.")
