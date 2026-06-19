@@ -38,6 +38,41 @@ def _verify_zero_crossings(signal, dominant_freq, dt, peak_amp):
 
     return is_crossing_valid, actual_crossings, expected_crossings, sig_zcross, period_points
 
+def _verify_oscillation_survival(sig_zcross, period_points, min_physical_amp):
+    """
+    Vérifie si l'oscillation persiste jusqu'à la fin de la fenêtre d'analyse 
+    en étudiant l'enveloppe du signal.
+    """
+    n = len(sig_zcross)
+    env_window = max(5, int(1.5 * period_points))
+    envelope = pd.Series(np.abs(sig_zcross)).rolling(window=env_window, center=True, min_periods=1).max().to_numpy()
+    active_envelope = envelope[envelope > min_physical_amp]
+
+    is_touching_end = False
+    
+    if len(active_envelope) > 0:
+        # On utilise le 75ème centile pour trouver l'amplitude typique des vagues.
+        typical_env = np.percentile(active_envelope, 75)
+        
+        # Le seuil de survie est fixé à 25% de cette amplitude typique
+        alive_threshold = max(min_physical_amp, 0.25 * typical_env)
+        alive_indices = np.where(envelope >= alive_threshold)[0]
+        
+        if len(alive_indices) > 0:
+            last_alive_idx = alive_indices[-1]
+            distance_to_end = n - last_alive_idx
+            
+            # Écart toléré entre la fin de l'oscillation et la chute de tension
+            max_distance_allowed = max(200, int(1.0 * period_points))
+
+            is_touching_end = (distance_to_end <= max_distance_allowed)
+            
+            # Affichage
+            # print(f"Typical Env (75%): {typical_env:.4f} | Seuil de vie: {alive_threshold:.4f}")
+            # print(f"Dernier vivant: {last_alive_idx}/{n} | Distance: {distance_to_end} (Max permis: {max_distance_allowed})")
+            
+    return is_touching_end
+
 def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
@@ -99,41 +134,15 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     # Verification zero crossing
     is_crossing_valid, act_cross, exp_cross, sig_zcross, period_points = _verify_zero_crossings(signal, dominant_freq, dt, peak_amp)
 
-    # Vérifier si l'oscillation est toujours active à la fin
-    # On calcule l'enveloppe du signal (son amplitude maximale locale)
-    env_window = max(5, int(1.5 * period_points))
-    envelope = pd.Series(np.abs(sig_zcross)).rolling(window=env_window, center=True, min_periods=1).max().to_numpy()
-    active_envelope = envelope[envelope > min_physical_amp]
-
-    is_touching_end = False
-    
-    if len(active_envelope) > 0:
-        # On utilise le 75ème centile pour trouver l'amplitude typique des vagues.
-        typical_env = np.percentile(active_envelope, 75)
-        
-        # Le seuil de "survie" est fixé à 25% de cette amplitude typique
-        alive_threshold = max(min_physical_amp, 0.25 * typical_env)
-        alive_indices = np.where(envelope >= alive_threshold)[0]
-        
-        if len(alive_indices) > 0:
-            last_alive_idx = alive_indices[-1]
-            distance_to_end = n - last_alive_idx
-            
-            # On tolère un "silence" maximal d'environ 1 vague (ou 100 points minimum)
-            max_distance_allowed = max(200, int(1.0 * period_points))
-
-            is_touching_end = (distance_to_end <= max_distance_allowed)
-            
-            # Affichage
-            # print(f"Typical Env (75%): {typical_env:.4f} | Seuil de vie: {alive_threshold:.4f}")
-            # print(f"Dernier vivant: {last_alive_idx}/{n} | Distance: {distance_to_end} (Max permis: {max_distance_allowed})")
+    # Verification si l'oscillation est toujours active à la fin
+    is_touching_end = _verify_oscillation_survival(sig_zcross, period_points, min_physical_amp)
 
     is_oscillating = is_above_noise and is_physically_significant and is_crossing_valid and is_touching_end
 
     # Affichage
     #print(f'snr threshold : {snr_threshold}, min physical amp : {min_physical_amp}')
     #print(f'is_above_noise : {is_above_noise} | is_physically_significant : {is_physically_significant} | is_crossing_valid : {is_crossing_valid} | is_touching_end: {is_touching_end}')
-    #print(f"{signal.name} Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {actual_crossings}/{int(expected_crossings)} | is_oscillating: {is_oscillating}")
+    #print(f"{signal.name} Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {act_cross}/{int(exp_cross)} | is_oscillating: {is_oscillating}")
     
     return is_oscillating, dominant_freq
 
