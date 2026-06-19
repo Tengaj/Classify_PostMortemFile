@@ -85,17 +85,14 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     n = len(signal)
     sig_array = np.asarray(signal)
     
-    # Fenêtre glissante dynamique (20% de la durée de l'emballement fourni)
     dyn_window = max(5, int(n * 0.20))
-
     baseline = pd.Series(sig_array).rolling(window=dyn_window, center=True, min_periods=1).median().to_numpy()
     sig_detrended = sig_array - baseline
 
-    # Fenêtrage (Hanning Window)
+    # Fenêtrage
     window = np.hanning(n)
     sig_windowed = sig_detrended * window
     
-    # Calcul de la FFT
     yf = np.abs(fft(sig_windowed))
     xf = fftfreq(n, d=dt)
 
@@ -105,30 +102,24 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     min_valid_freq = 0.5 * freq_resolution
 
     mask = xf > min_valid_freq
-
-    # Si la fenêtre est trop petite et qu'il n'y a plus de fréquences valides 
     if not np.any(mask):
         return False, 0.0
 
     xf_pos, yf_pos = xf[mask], yf[mask]
 
-    # Recherche du pic dominant 
     peaks_indices, _ = find_peaks(yf_pos)
     if len(peaks_indices) > 0:
         best_peak_idx = np.argmax(yf_pos[peaks_indices])
         max_idx = peaks_indices[best_peak_idx]
     else:
-        # Sécurité : Si aucun pic n'est trouvé (signal plat ou pente pure), on retombe sur argmax
         max_idx = np.argmax(yf_pos)
     
     dominant_freq = xf_pos[max_idx]
     peak_amp = yf_pos[max_idx]
 
+    # Vérification d'amplitude
     noise_level = snr_threshold * np.median(yf_pos)
-    
-    # Le pic sort-il vraiment du bruit de fond spectral ?
     is_above_noise = peak_amp > noise_level
-    # L'amplitude de l'oscillation est-elle physiquement significative ?
     is_physically_significant = peak_amp > min_physical_amp
 
     # Verification zero crossing
@@ -137,6 +128,7 @@ def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
     # Verification si l'oscillation est toujours active à la fin
     is_touching_end = _verify_oscillation_survival(sig_zcross, period_points, min_physical_amp)
 
+    # Verdict final 
     is_oscillating = is_above_noise and is_physically_significant and is_crossing_valid and is_touching_end
 
     # Affichage
