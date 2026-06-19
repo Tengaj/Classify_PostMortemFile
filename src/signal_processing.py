@@ -145,14 +145,12 @@ def get_trend(time, signal, tolerance=1e-5):
     Retourne 1 si le signal est croissant, -1 si il est décroissant et 0 sinon
     La tolérance permet d'ignorer le bruit plat.
     """
-    time_arr = np.asarray(time)
-    signal_arr = np.asarray(signal)
-
-    if len(signal_arr) < 2 or len(time_arr) < 2:
-        print(f"{signal.name} | array too small (len={len(signal)})")
+    if signal.size < 2 or time.size < 2:
+        signal_name = getattr(signal, 'name', 'Unknown signal')
+        print(f"{signal_name} | array too small (len={len(signal)})")
         return 0
 
-    slope = linregress(time, signal).slope
+    slope = np.polyfit(time, signal, 1)[0]
 
     if slope > tolerance:
         trend = 1
@@ -161,7 +159,8 @@ def get_trend(time, signal, tolerance=1e-5):
     else:
         trend = 0
 
-    #print(f'{signal.name} | slope : {slope} | trend : {trend}')
+    #signal_name = getattr(signal, 'name', 'Unknown signal')
+    #print(f'{signal_name} | slope : {slope:.7f} | trend : {trend}')
     return trend
 
 def detect_t0_zscore(Ucav_series, z_threshold=5.0, calm = True):
