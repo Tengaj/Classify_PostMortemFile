@@ -163,28 +163,28 @@ def get_trend(time, signal, tolerance=1e-5):
     #print(f'{signal_name} | slope : {slope:.7f} | trend : {trend}')
     return trend
 
-def detect_t0_zscore(Ucav_series, z_threshold=5.0, calm = True):
+def detect_t0_zscore(Ucav, z_threshold=5.0, calm = True):
     """
     Détecte t0, le moment ou le signal Ucav sort de son amplitude moyenne avec un Z-score.
-    - Ucav_series : Doit être une pd.Series.
     - z_threshold : Nombre d'écarts-types pour déclencher l'alarme (5 est standard).
     """
-    zero_idx = np.argmin(np.abs(Ucav_series.index))
-    Ucav_mean = Ucav_series.rolling(window=1000, min_periods=1).mean() 
+    zero_idx = np.argmin(np.abs(Ucav.index))
 
-    # On définit la zone sûre
+    # Baseline et zone sûre
+    Ucav_mean = Ucav.rolling(window=1000, min_periods=1).mean() 
     end_safe_zone = max(100, zero_idx - 20000) 
-    safe_zone = Ucav_series.iloc[0:end_safe_zone]
+    safe_zone = Ucav.iloc[0:end_safe_zone]
     search_window = min(10000, len(safe_zone))
 
-    # On cherche l'écart type minimum
-    all_stds = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
-    Ucav_std = max(all_stds.min(), 1e-6)
-    
-    z_scores_amp = abs((Ucav_series - Ucav_mean) / Ucav_std)
+    # Z-score d'amplitude
+    all_stds_amp = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
+    Ucav_std = max(all_stds_amp.min(), 1e-6)
+    z_scores_amp = abs((Ucav - Ucav_mean) / Ucav_std)
 
-    Ucav_diff = Ucav_series.diff(periods=20).fillna(0)
+    # Z-score différentiel (dérivée)
+    Ucav_diff = Ucav.diff(periods=20).fillna(0)
     safe_zone_diff = Ucav_diff.iloc[0:end_safe_zone]
+
     all_stds_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
     all_means_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).mean()
     
@@ -194,59 +194,57 @@ def detect_t0_zscore(Ucav_series, z_threshold=5.0, calm = True):
     
     z_scores_diff = abs((Ucav_diff - diff_mean) / diff_std)
 
-    # Pour chaque point, on retient la pire des deux anomalies.
-    z_scores = pd.DataFrame({'amp': z_scores_amp, 'diff': z_scores_diff}).max(axis=1)
-    
-    '''
-    target_time = -23400
-    exact_row = Ucav_series.index.get_indexer([target_time], method='nearest')[0]
-    true_time = Ucav_series.index[exact_row]                            
-    raw_val = Ucav_series.iloc[exact_row]
-    mean_val  = Ucav_mean.iloc[exact_row]                                                                    
-    #val_std   = Ucav_std.iloc[exact_row]
-    print(f"Temps cherché: {target_time} | Trouvé: {true_time}")
-    print(f"Val : {raw_val:.4f} | Mean : {mean_val:.4f} | std : {Ucav_std:.4f}")
-    print(f'z score : {abs((raw_val - mean_val) / Ucav_std)}')
-    '''
+    # Combiner les deux Z-scores (en gardant la pire anomalie pour chaque point)
+    z_scores = np.maximum(z_scores_amp, z_scores_diff)
 
+    # Détection d'anomalies (Points consécutifs)
     target_z_scores = z_scores.iloc[0:zero_idx + 40]
-    MIN_CONSECUTIVE = 3 
+    min_consecutive = 3 
     
     is_anomaly_bin = (target_z_scores > z_threshold).astype(int)
-    future_window = is_anomaly_bin.iloc[::-1].rolling(window=MIN_CONSECUTIVE).min().iloc[::-1]
+
+    future_window = is_anomaly_bin.iloc[::-1].rolling(window=min_consecutive).min().iloc[::-1]
     valid_anomaly_starts = (future_window == 1)
+
+    #On vérifie si les N prochains points sont anormaux en regardant vers l'avant avec un décalage négatif
+    valid_anomaly_starts = is_anomaly_bin.rolling(window=min_consecutive).min().shift(-(min_consecutive - 1)) == 1
     
-    # On extrait uniquement les Z-scores qui démarrent une vraie chute
     anomalies = target_z_scores[valid_anomaly_starts]
+
+    # On extrait uniquement les Z-scores qui démarrent une vraie chute
     if anomalies.empty:
         return zero_idx-10000, None
 
-    Ucav_median = safe_zone.median()
-    SURVIVAL_THRESHOLD = Ucav_median * 0.5 
-    target_ucav = Ucav_series.iloc[0:zero_idx + 40]
-    
-    # Un point est sain SEULEMENT SI le Z-score est bon ET que la cavité est allumée
-    is_zscore_ok = (target_z_scores <= z_threshold)
-    is_amplitude_ok = (np.abs(target_ucav) > SURVIVAL_THRESHOLD)
-    is_healthy = (is_zscore_ok & is_amplitude_ok).astype(int)
-    
-    # Un vrai calme c'est quand le signal est sain sur au moins 200 points consécutifs.
-    true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1.0
-    last_calm_times = true_calm[true_calm == True]
-    
-    if not last_calm_times.empty and calm:
-        end_of_last_calm = last_calm_times.index[-1]
+    # Le filtre calme
+    if calm:
+        Ucav_median = safe_zone.median()
+        survival_threshold = Ucav_median * 0.5 
+        target_ucav = Ucav.iloc[0:zero_idx + 40]
         
-        # Le vrai t0 est la première anomalie qui arrive APRÈS cette ultime paix
-        final_anomalies = anomalies[anomalies.index > end_of_last_calm]
+        # Un point est sain seulement si le Z-score est bon et que la cavité est allumée
+        is_zscore_ok = (target_z_scores <= z_threshold)
+        is_amplitude_ok = (np.abs(target_ucav) > survival_threshold)
+        is_healthy = (is_zscore_ok & is_amplitude_ok).astype(int)
         
-        if not final_anomalies.empty:
-            t0_time = final_anomalies.index[0]
-            t0_idx = Ucav_series.index.get_loc(t0_time)
-            return t0_idx, t0_time
+        # Un vrai calme c'est quand le signal est sain sur au moins 200 points consécutifs.
+        true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1.0
+        last_calm_times = true_calm[True]
+        
+        if not last_calm_times.empty:
+            end_of_last_calm = last_calm_times.index[-1]
+            
+            # Le vrai t0 est la première anomalie qui arrive APRÈS cette ultime paix
+            final_anomalies = anomalies[anomalies.index > end_of_last_calm]
+            
+            if not final_anomalies.empty:
+                t0_time = final_anomalies.index[0]
+                t0_idx = Ucav.index.get_loc(t0_time)
+                return t0_idx, t0_time
 
+    # Repli si aucun filtre de calme ou si le filtre n'a rien trouvé
     t0_time = anomalies.index[0]
-    t0_idx = Ucav_series.index.get_loc(t0_time)
+    t0_idx = Ucav.index.get_loc(t0_time)
+    
     return t0_idx, t0_time
 
 def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
