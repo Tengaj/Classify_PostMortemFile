@@ -304,73 +304,80 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
     
     return t0_ampt_idx, plateau_ref
 
-def detect_end_of_staircase(Ucav, zero_idx, dt_us):
+def detect_end_of_staircase(signal, zero_idx, dt_us):
     """
     Détecte la fin d'une forme en escalier dans un signal avant une chute.
-    
-    Retourne:
-        end_stair_idx : L'index où l'escalier se termine et le plateau commence.
-                        (Retourne None si aucun escalier n'est détecté).
+    Retourne l'index numérique de la fin de l'escalier, ou None si aucun n'est détecté.
     """
     safety_margin_pts = int(500 / dt_us)
+
     if zero_idx - safety_margin_pts <= 0:
         return None
 
-    signal_before_drop = Ucav.iloc[:zero_idx - safety_margin_pts]
-    n = len(signal_before_drop)
-    if n < 100:
+    signal_before_drop = signal.iloc[:zero_idx - safety_margin_pts]
+    n_points = len(signal_before_drop)
+
+    if n_points < 100:
         return None
 
-    # On mesure l'amplitude locale brute (max - min) sur une petite fenêtre de 2000µs.
+    # Vérification de l'épaisseur du bruit (Filtre anti-oscillation)
     check_pts = max(5, int(2000 / dt_us))
     local_max = signal_before_drop.rolling(window=check_pts).max()
     local_min = signal_before_drop.rolling(window=check_pts).min()
     local_thickness = local_max - local_min
 
-    # Si l'épaisseur médiane dépasse 0.10 Volt,
-    # c'est qu'il n'y a pas de vrais plateaux plats : c'est une oscillation
+    # Si l'épaisseur médiane dépasse le seuil, ce n'est pas plat : c'est une oscillation
     if local_thickness.median() > 0.10:
         return None
 
+    # Lissage du signal
     window_us = 5000 
     window_pts = max(3, int(window_us / dt_us))
-    smoothed_signal = signal_before_drop.rolling(window=window_pts, center=True, min_periods=1).mean()
+    smoothed_series = signal_before_drop.rolling(window=window_pts, center=True, min_periods=1).mean()
 
-    # On cherche si le signal lui-même possède des creux (valleys) d'au moins 0.3 de profondeur.
+    # Conversion en tableau NumPy pur pour éviter les plantages avec SciPy
+    smoothed_array = smoothed_series.to_numpy()
+
+    # Détection des creux (Valleys)
     wave_amplitude_threshold = 0.3
+
     # On cherche les creux sur le signal inversé
-    valleys, _ = find_peaks(-smoothed_signal, prominence=wave_amplitude_threshold)
+    valleys, _ = find_peaks(-smoothed_array, prominence=wave_amplitude_threshold)
     if len(valleys) >= 2:
         return None 
 
+    # Analyse de la dérivé (Marche de l'escalier)
     step = max(1, int(5000 / dt_us))
-    derivative = smoothed_signal.diff(periods=step).fillna(0).to_numpy()
+    derivative = smoothed_series.diff(periods=step).fillna(0).to_numpy()
+
+    min_step_height = 0.04
+    min_dist_pts = int(20000 / dt_us)
 
     # Recherche des pics de la dérivée (les montées de marches)
-    min_step_height = 0.04 # Hauteur minimum en deux marches
-    min_dist_pts = int(20000 / dt_us) # L'écart minimum entre deux marches
     rising_peaks, _ = find_peaks(derivative, height=min_step_height, distance=min_dist_pts)
 
     min_fall_height = 0.20 
+
     # Recherche des descentes (pics sur la dérivée inversée)
     falling_peaks, _ = find_peaks(-derivative, height=min_fall_height, distance=min_dist_pts)
+
     # Si on trouve plusieurs vraies grandes descentes, c'est de l'oscillation
     if len(falling_peaks) >= 2: 
         return None
 
+    # Conclusion et positionnement
     min_steps_required = 3
 
-    # Déterminer la fin de l'escalier
     if len(rising_peaks) > min_steps_required:
         last_peak_idx = rising_peaks[-1]
-        # On se place juste un peu après la fin de la dernière montée
-        # On ajoute la moitié de la fenêtre de lissage pour être "sur le plat".
+
+        # On se place juste un peu après la fin de la dernière montée (sur le plat)
         end_stair_idx = last_peak_idx + int(window_pts / 2)
         end_stair_idx = min(end_stair_idx, len(signal_before_drop) - 1)
 
         return end_stair_idx
-    else:
-        return None
+        
+    return None
 
 def calculate_fall_time(Ucav, real_t0_idx, target_pct=0.5,z_threshold = 5):
     """
