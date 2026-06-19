@@ -163,27 +163,27 @@ def get_trend(time, signal, tolerance=1e-5):
     #print(f'{signal_name} | slope : {slope:.7f} | trend : {trend}')
     return trend
 
-def detect_t0_zscore(Ucav, z_threshold=5.0, calm = True):
+def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
     """
-    Détecte t0, le moment ou le signal Ucav sort de son amplitude moyenne avec un Z-score.
+    Détecte t0, le moment ou le signal signal sort de son amplitude moyenne avec un Z-score.
     - z_threshold : Nombre d'écarts-types pour déclencher l'alarme (5 est standard).
     """
-    zero_idx = np.argmin(np.abs(Ucav.index))
+    zero_idx = np.argmin(np.abs(signal.index))
 
     # Baseline et zone sûre
-    Ucav_mean = Ucav.rolling(window=1000, min_periods=1).mean() 
+    signal_mean = signal.rolling(window=1000, min_periods=1).mean() 
     end_safe_zone = max(100, zero_idx - 20000) 
-    safe_zone = Ucav.iloc[0:end_safe_zone]
+    safe_zone = signal.iloc[0:end_safe_zone]
     search_window = min(10000, len(safe_zone))
 
     # Z-score d'amplitude
     all_stds_amp = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
-    Ucav_std = max(all_stds_amp.min(), 1e-6)
-    z_scores_amp = abs((Ucav - Ucav_mean) / Ucav_std)
+    signal_std = max(all_stds_amp.min(), 1e-6)
+    z_scores_amp = abs((signal - signal_mean) / signal_std)
 
     # Z-score différentiel (dérivée)
-    Ucav_diff = Ucav.diff(periods=20).fillna(0)
-    safe_zone_diff = Ucav_diff.iloc[0:end_safe_zone]
+    signal_diff = signal.diff(periods=20).fillna(0)
+    safe_zone_diff = signal_diff.iloc[0:end_safe_zone]
 
     all_stds_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
     all_means_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).mean()
@@ -192,7 +192,7 @@ def detect_t0_zscore(Ucav, z_threshold=5.0, calm = True):
     diff_std = max(all_stds_diff[best_idx_diff], 1e-6)
     diff_mean = all_means_diff[best_idx_diff]
     
-    z_scores_diff = abs((Ucav_diff - diff_mean) / diff_std)
+    z_scores_diff = abs((signal_diff - diff_mean) / diff_std)
 
     # Combiner les deux Z-scores (en gardant la pire anomalie pour chaque point)
     z_scores = np.maximum(z_scores_amp, z_scores_diff)
@@ -217,9 +217,9 @@ def detect_t0_zscore(Ucav, z_threshold=5.0, calm = True):
 
     # Le filtre calme
     if calm:
-        Ucav_median = safe_zone.median()
-        survival_threshold = Ucav_median * 0.5 
-        target_ucav = Ucav.iloc[0:zero_idx + 40]
+        signal_median = safe_zone.median()
+        survival_threshold = signal_median * 0.5 
+        target_ucav = signal.iloc[0:zero_idx + 40]
         
         # Un point est sain seulement si le Z-score est bon et que la cavité est allumée
         is_zscore_ok = (target_z_scores <= z_threshold)
@@ -238,12 +238,12 @@ def detect_t0_zscore(Ucav, z_threshold=5.0, calm = True):
             
             if not final_anomalies.empty:
                 t0_time = final_anomalies.index[0]
-                t0_idx = Ucav.index.get_loc(t0_time)
+                t0_idx = signal.index.get_loc(t0_time)
                 return t0_idx, t0_time
 
     # Repli si aucun filtre de calme ou si le filtre n'a rien trouvé
     t0_time = anomalies.index[0]
-    t0_idx = Ucav.index.get_loc(t0_time)
+    t0_idx = signal.index.get_loc(t0_time)
     
     return t0_idx, t0_time
 
