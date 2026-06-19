@@ -389,87 +389,97 @@ def classify_file(file_name):
     with open(file_name, 'rb') as f:
         file_content = f.read()
 
-    parameters, time, df_signals, df_defaults, _, header = Read_Signals(
+    parameters, time, df_signals, df_defaults, _, _ = Read_Signals(
         file_content, 
         compute_defauts=True, 
-        compute_etats=True, 
+        compute_etats=False, 
         plot_signaux=False, 
         show_header=False
     )
      
+    # Identification du premier défaut déclenché
     faulty_rows = (df_defaults == 0).any(axis=1)
     if faulty_rows.any():
         first_fault_time = faulty_rows.idxmax()
         faults_at_time = df_defaults.loc[first_fault_time]
         detected_faults = faults_at_time[faults_at_time == 0].index.tolist()
+        primary_fault = detected_faults[0]
     else:
-        detected_faults = [""]
+        primary_fault = ""
     #print(f"Defaut : {detected_faults}")
 
-    # Filtre Faisceau désactivé ou boucle de régulation désactivé, Filtre beam = non ou loop = off
+    # Filtre Faisceau (BEAM) ou Boucle (LOOP) désactivés
     beam = parameters.get("BEAM")
     loop = parameters.get("LOOP")
     if beam == "NON" or loop == "OFF":
-        return f'{detected_faults[0]};Filtered;Loop NON ou Beam OFF'
+        return f'{primary_fault};Filtered;Loop NON ou Beam OFF'
 
     # Filtre sur KPI
-    kpi = parameters.get("KPI")
+    kpi = float(parameters.get("KPI", 0))
     kpi_threshold = 10.0
-    if float(kpi) < kpi_threshold:
-        return f'{detected_faults[0]};Filtered;KPI < {kpi_threshold}'
+    if kpi < kpi_threshold:
+        return f'{primary_fault};Filtered;KPI < {kpi_threshold}'
 
-    #Filtre Mask
+    # Filtre sur le Masque
     mask = parameters.get("MASK")
     file_name_str = str(file_name)
-    if "CMA" in file_name_str:
-        if mask != '0x007D' and mask != '0x007F':
-            return f'{detected_faults[0]};Filtered;Mask problem'
-    if "CMB" in file_name_str:
-        if mask != "0x007F":
-            return f'{detected_faults[0]};Filtered;Mask problem'
     
-    # Filtre sur Ucav
+    if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
+        return f"{primary_fault};Filtered;Mask problem"
+        
+    if "CMB" in file_name_str and mask != "0x007F":
+        return f"{primary_fault};Filtered;Mask problem"
+    
+    # Filtre sur la tension cavité (Ucav)
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
-    dt_microseconds = np.mean(np.diff(time))
+    dt_us = np.mean(np.diff(time))
     Ucav_threshold = 0.1
 
-    # Cas de tension qui tombe à moins de 0.1 avant le zéro temporel
-    min_duration_us = 200 
-    required_points = max(2, int(min_duration_us / dt_microseconds))
     Ucav_before_t0 = Ucav.iloc[:zero_idx]
+
+    # Cas de tension presque nulle en moyenne avant le défaut
+    if np.mean(Ucav.iloc[0:zero_idx]) < Ucav_threshold:
+        return f'{primary_fault};Filtered;Tension moyenne inférieur à {Ucav_threshold}'
+
+    # Cas de tension qui tombe trop bas pendant un certain temps avant le zéro temporel
+    min_duration_us = 200 
+    required_points = max(2, int(min_duration_us / dt_us))
+    
     drop_mask = Ucav_before_t0 < Ucav_threshold
     if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-        return f"{detected_faults[0]};Filtered;Tension inférieur à {Ucav_threshold} avant t0"   
+        return f"{primary_fault};Filtered;Tension inférieur à {Ucav_threshold} avant t0"   
 
-    # Cas de tension presque nulle
-    if np.mean(Ucav.iloc[0:zero_idx]) < Ucav_threshold:
-        return f'{detected_faults[0]};Filtered;Tension inférieur à {Ucav_threshold}'
-
-    ampt = float(parameters.get("AMPT"))
+    # Préparation du temps de départ
+    ampt = float(parameters.get("AMPT", 3.0))
     t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav,zero_idx, ampt)
 
-    # Aiguillage selon le premier défaut trouvé
-    match detected_faults[0]:
-        case "Seuil pick-up":
-            return detected_faults[0]
-        case "Coupure externe rapide":
-            return detected_faults[0]
-        case "Absence autorisation RF":
-            return detected_faults[0]
+    # Aiguillage vers les sous-classificateurs
+    match primary_fault:
+        case "Seuil pick-up" | "Coupure externe rapide" | "Absence autorisation RF":
+            return primary_fault
+        
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
             void = df_signals.get("vide")
-            return detected_faults[0] + ";" + classify_void(pickup,void,t0_ampt_idx)
+            label = classify_void(pickup, void, t0_ampt_idx)
+            return f"{primary_fault};{label}"
+        
         case "Claquage ou quench cavité":
-            return detected_faults[0] + ";" + classify_quench(Ucav,t0_ampt_idx)
+            label = classify_quench(Ucav,t0_ampt_idx)
+            return f"{primary_fault};{label}" 
+
         case "Dép seuil de sécurité RF":
             Ucat = parameters.get("UCAT")
-            return detected_faults[0] + ";" + classify_RF_protections(time, Ucav, Ucat)
+            label = classify_RF_protections(time, Ucav, Ucat)
+            return f"{primary_fault};{label}"
+
         case "Rég signal RF hors tolérance":
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
-            return detected_faults[0] + ";"+ classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx)
+            label = classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx)
+            return f"{primary_fault};{label}"
+
         case _:
             return "Other"

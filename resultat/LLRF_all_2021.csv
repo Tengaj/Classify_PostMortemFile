@@ -1097,7 +1097,7 @@ Fichier;Defaut;Label;Détails
 2021 10 26 CMB06-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 11 12 CMB06-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 11 12 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2021 11 15 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;Tension inférieur à 0.1 avant t0
+2021 11 15 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;Tension moyenne inférieur à 0.1
 2021 11 15 CMB06-CAV2_0004;Rég signal RF hors tolérance;Other
 2021 11 15 CMB06-CAV2_0005;Rég signal RF hors tolérance;Other
 2021 11 15 CMB06-CAV2_0006;Rég signal RF hors tolérance;Other
