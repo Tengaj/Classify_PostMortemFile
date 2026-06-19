@@ -263,6 +263,7 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
     trigger_val = Ucav.iloc[zero_idx]
     signal_before_zero = Ucav.iloc[:zero_idx]
     
+    # Définition de la ligne de base (plateau réel avant l'événement)
     idx_base_start = max(0, zero_idx - 1000)
     idx_base_end = max(1, zero_idx - 300)
     real_plateau = Ucav.iloc[idx_base_start:idx_base_end].median()
@@ -281,13 +282,17 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
         # Cas montée
         plateau_ref = real_plateau
         threshold = plateau_ref * 1.01
+        # On cherche les points où le signal était encore "en bas"
         valid_indices = np.where(signal_before_zero <= threshold)[0]
+
+    # Validation de l'index trouvé
+    max_distance_allowed = 6000
 
     if len(valid_indices) > 0:
         t0_ampt_idx = valid_indices[-1]
-        MAX_DISTANCE_ALLOWED = 6000
+        
         #Si l'index trouver est trop éloigné, c'est qu'il n'y a pas de décalage signifivatif.
-        if (zero_idx - t0_ampt_idx) > MAX_DISTANCE_ALLOWED:
+        if (zero_idx - t0_ampt_idx) > max_distance_allowed:
             # print(f"Alerte : t0_ampt_idx trop éloigné ({zero_idx - t0_ampt_idx} pts). Annulation.")
             t0_ampt_idx = zero_idx
     else:
@@ -296,6 +301,7 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
     #print(f'ampt_val : {ampt_val}')
     #print(f'trigger_val : {trigger_val}') 
     #print(f'plateau_ref : {plateau_ref}')
+    
     return t0_ampt_idx, plateau_ref
 
 def detect_end_of_staircase(Ucav, zero_idx, dt_us):
