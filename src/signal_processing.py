@@ -385,17 +385,25 @@ def calculate_fall_time(Ucav, real_t0_idx, target_pct=0.5,z_threshold = 5):
     Retourne un tuple : (delta_t, u_max, t_start, t_target)
     Retourne None si le signal ne chute jamais à la valeur cible.
     """
-    #zero_idx = np.argmin(np.abs(Ucav.index))
-    start_idx = real_t0_idx - 100
-    end_idx = real_t0_idx + 30
-    t0_idx, _ = detect_t0_zscore(Ucav.iloc[start_idx:end_idx] / 10,z_threshold = z_threshold)
-    t0_idx = start_idx + t0_idx - 1
-    t0_time = Ucav.index[t0_idx]
+    n_points = len(Ucav)
+    start_idx = max(0, real_t0_idx - 100)
+    end_idx = min(n_points, real_t0_idx + 30)
 
-    u_max = Ucav.iloc[t0_idx]
+    search_window = Ucav.iloc[start_idx:end_idx]
+
+    # Appel de la fonction z-score sur la petite fenêtre
+    local_t0_idx, _ = detect_t0_zscore(search_window / 10.0, z_threshold=z_threshold)
+
+    # Repositionnement de l'index local vers l'index global du fichier
+    global_t0_idx = start_idx + local_t0_idx - 1
+    global_t0_idx = max(0, min(n_points - 1, global_t0_idx))
+
+    t0_time = Ucav.index[global_t0_idx]
+
+    u_max = Ucav.iloc[global_t0_idx]
     u_target = u_max * target_pct
     
-    ucav_fall = Ucav.iloc[t0_idx:]
+    ucav_fall = Ucav.iloc[global_t0_idx:]
     below_target_points = ucav_fall[ucav_fall < u_target]
     
     if below_target_points.empty:
