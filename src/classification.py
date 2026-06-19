@@ -358,28 +358,33 @@ def classify_quench(Ucav, t0_ampt_idx):
     Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
-    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=0.5,z_threshold = 100)
+    # Calcul du temps de chute
+    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=0.5,z_threshold=100.0)
     
     if result is None:
-        print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
+        #print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
         return "Other;Incomplet (Pas de chute à 50%)"
         
     delta_t, u_max, t0_time, t_50 = result
     
-    print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
+    #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t_50: {t_50:.1f}µs | Chute en: {delta_t:.2f} µs")
 
+    # Définition des seuils physiques
     dt_us = np.mean(np.diff(Ucav.index))
-    THRESHOLD_BREAKDOWN = max(2.0, dt_us * 2.05) # 2 µs
-    THRESHOLD_FALSE_ALARM = 1000.0  # 1 ms (1000 µs)
 
+    threshold_breakdown = max(2.0, dt_us * 2.05) # environ 11 µs (en général)
+    threshold_false_alarm = 1000.0  # 1 ms (1000 µs)
+
+    # Classification
     fall_time_str = f";Temps de chute : {delta_t:.2f} us"
 
-    if delta_t <= THRESHOLD_BREAKDOWN:
-        return "Breakdown" + fall_time_str
-    elif delta_t > THRESHOLD_FALSE_ALARM:
-        return "False alarm" + fall_time_str
+    if delta_t <= threshold_breakdown:
+        return f"Breakdown{fall_time_str}"
+    elif delta_t > threshold_false_alarm:
+        return f"False alarm{fall_time_str}"
     else:
-        return "Quench" + fall_time_str
+        # N'est pas sensé arriver
+        return f"Quench{fall_time_str}"
 
 @chrono
 def classify_file(file_name):
