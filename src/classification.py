@@ -70,9 +70,9 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
         
         if is_coherent:
             if f_Ucav > 100:
-                return "Loop instability"
+                return "Loop instability" # f"Loop instability;{f_Ucav:.0f}Hz"
             else:
-                return "Taconis"
+                return "Taconis" #f"Taconis;{f_Ucav:.0f}Hz"
         else:
             return "Oscillation"
             
@@ -424,13 +424,13 @@ def classify_file(file_name):
     beam = parameters.get("BEAM")
     loop = parameters.get("LOOP")
     if beam == "NON" or loop == "OFF":
-        return f'{primary_fault};Filtered;Loop NON ou Beam OFF'
+        return f"{primary_fault};Filtered;Loop NON ou Beam OFF"
 
     # Filtre sur KPI
     kpi = float(parameters.get("KPI", 0))
     kpi_threshold = 10.0
     if kpi < kpi_threshold:
-        return f'{primary_fault};Filtered;KPI < {kpi_threshold}'
+        return f"{primary_fault};Filtered;KPI < {kpi_threshold}"
 
     # Filtre sur le Masque
     mask = parameters.get("MASK")
@@ -441,6 +441,12 @@ def classify_file(file_name):
         
     if "CMB" in file_name_str and mask != "0x007F":
         return f"{primary_fault};Filtered;Mask problem"
+
+    #Filtre sur l'amplitude (AMPT)
+    ampt = float(parameters.get("AMPT", 3.0))
+    ampt_threshold = 10.0
+    if ampt > ampt_threshold:
+        return f"{primary_fault};Filtered;AMPT > {ampt_threshold}%"
     
     # Filtre sur la tension cavité (Ucav)
     Ucav = df_signals.get("Ucav")
@@ -463,7 +469,6 @@ def classify_file(file_name):
         return f"{primary_fault};Filtered;Tension inférieur à {Ucav_threshold} avant t0"   
 
     # Préparation du temps de départ
-    ampt = float(parameters.get("AMPT", 3.0))
     t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav,zero_idx, ampt)
 
     # Aiguillage vers les sous-classificateurs
