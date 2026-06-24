@@ -21,7 +21,7 @@ Fichier;Defaut;Label;Détails
 2025 09 03 CMA07_0001;Rég signal RF hors tolérance;Other
 2025 09 03 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
 2025 10 14 CMB01-CAV1_0002;Dép seuil de sécurité RF;Filtered;KPI < 10.0
-2025 10 14 CMB01-CAV1_0004;Rég signal RF hors tolérance;Beam loss
+2025 10 14 CMB01-CAV1_0004;Rég signal RF hors tolérance;Loop instability
 2025 10 14 CMB01-CAV1_0005;Rég signal RF hors tolérance;Beam loss
 2025 10 17 CMB01-CAV1_0003;Rég signal RF hors tolérance;Taconis
 2025 10 20 CMB01-CAV1_0001;Rég signal RF hors tolérance;Taconis

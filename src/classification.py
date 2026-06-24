@@ -18,7 +18,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     AMP_THRESHOLDS = {
         "Uci":  0.002,
         "modIQ": 0.1,
-        "Ucav": 0.001 #0.0001
+        "Ucav": 0.0001
     }
     
     #Si t0 est supérieur au zéro temporel, il peut quand même y avoir une oscillation (par exemple le signal oscille depuis le début)
