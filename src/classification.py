@@ -292,45 +292,51 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
     """
     # Temps entre chaque point du signal en microsecondes
     dt_us = np.mean(np.diff(time))
+    dt_seconds = dt_us * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
 
+    # Détection d'un éventuel palier (escalier) avant le défaut
     end_stair_idx = detect_end_of_staircase(Ucav,t0_ampt_idx, dt_us)
+
+    # Détection du décrochage (t0_zscore)
     if end_stair_idx is not None:
-        print(f"End stair | idx : {end_stair_idx}, valeur : {time[end_stair_idx]}")
-        #t0_zscore_idx = end_stair
+        # On cherche le décrochage uniquement après l'escalier
         t0_zscore_idx, _ = detect_t0_zscore(Ucav.iloc[end_stair_idx:])
         t0_zscore_idx += end_stair_idx
     else:
-        # t0_zscore_idx : index ou le signal Ucav comment à décrocher
+        # Recherche normal sur tout le signal
         t0_zscore_idx, _ = detect_t0_zscore(Ucav)
-    if t0_zscore_idx is None:
-        return "Other;Pas de chute de Ucav"
-    if t0_zscore_idx == 0:
-        return "Other;Problème t0"
 
-    zero_idx = np.argmin(np.abs(time))
-    print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]},  index de 0 : {zero_idx}')
+    # Affichage t0 zcore et ampt
+    print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]}')
 
     # Test des Oscillations
-    dt_seconds = dt_us * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
-    oscillation_label = _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx)
+    oscillation_label = _check_instability_oscillations(
+        Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx
+    )
     
     if oscillation_label: 
         return oscillation_label
 
     # Test des Quenchs
-    if end_stair_idx is not None:
-        start_idx_Uci_rise = detect_uci_rise_start(Uci, t0_ampt_idx, dt_us, start_limit_idx=end_stair_idx)
-    else:
-        start_idx_Uci_rise = detect_uci_rise_start(Uci, t0_ampt_idx, dt_us)
+    # On définit la limite de début de recherche (après l'escalier si présent)
+    start_limit = end_stair_idx if end_stair_idx is not None else 0
+    
+    start_idx_Uci_rise = detect_uci_rise_start(Uci, t0_ampt_idx, dt_us, start_limit_idx=start_limit)
+
+    #Affichage début montée Uci
     #print(f'start_idx_Uci_rise : {start_idx_Uci_rise}, start_idx_Uci_rise val : {time[start_idx_Uci_rise]}')
 
-    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair_idx, t0_ampt_idx)
+    quench_label = _check_quench_signatures(
+        time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair_idx, t0_ampt_idx
+    )
     
     if quench_label: 
         return quench_label
 
     # Test des anomalies de pics
-    peaks_label = _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx)
+    peaks_label = _check_amplitude_anomalies(
+        time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx
+    )
     if peaks_label:
         return peaks_label
             
