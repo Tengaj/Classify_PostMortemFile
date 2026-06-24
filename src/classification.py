@@ -109,8 +109,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     Uci_win_large = Uci.iloc[start_idx_large:t0_ampt_idx]
     Ucr_win_large = Ucr.iloc[start_idx_large:t0_ampt_idx]
 
-    # --- 3. FILTRE : AMPLITUDE DE LA MONTÉE Uci ---
-    # On sécurise les index avec max() pour éviter de chercher dans les index négatifs
+    # Filtre : amplitude de la montée Uci
     base_start = max(0, start_idx_large - 500)
     base_end   = max(1, start_idx_large - 100)
     
@@ -125,11 +124,11 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
         # print(f"Ratio d'augmentation Uci trop bas ({ratio_Uci:.1f}%). Pas de quench.")
         return None
 
-    # --- 4. ANALYSE DES TENDANCES GLOBALES ---
+    # Analyse des tendances globales
     trend_Uci = get_trend(t_win_large, Uci_win_large, tolerance=1e-5)
     trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-6)
 
-    # --- 5. CALCUL DE LA CHUTE DE TENSION (Ucav) ---
+    # Calcul de la chute de la tension
     quench = False
     target_pct = 0.01
     
@@ -149,7 +148,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     if threshold_breakdown < delta_t < threshold_false_alarm:
         quench = True
 
-    # --- 6. DÉTECTION DES PICS BRUTAUX (SPIKES) SUR Uci ---
+    # Détection des pics brutaux (spikes) sur Uci
     step_points = max(1, int(50.0 / dt_us))
     pts_150     = max(1, int(150.0 / dt_us)) 
     
@@ -177,7 +176,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
                 is_sudden_spike = True
                 # print(f"Pic brutal, Hauteur: {total_rise_Uci:.2f} | Saut: {max_jump_Uci:.2f} | Décalage durable: {true_shift:.2f}")
 
-    # --- 7. VERDICT FINAL ---
+    # Verdict final
     if trend_Uci == 1:
         if is_sudden_spike:
             return None 
