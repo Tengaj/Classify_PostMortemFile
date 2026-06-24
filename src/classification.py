@@ -228,28 +228,38 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     
 def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx):
     """
-    [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Gain).
+    [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Power chain gain).
     """
-    zero_idx = np.argmin(np.abs(time))
-
+    # Zone du calcul du bruit de fond
     idx_base_start = max(0, t0_ampt_idx - 1000)
     idx_base_end = max(1, t0_ampt_idx - 100)
-    
-    base_modIQ = np.median(modIQ.iloc[idx_base_start:idx_base_end])
-    base_Uci   = np.median(Uci.iloc[idx_base_start:idx_base_end])
-    base_Ucav  = np.median(Ucav.iloc[idx_base_start:idx_base_end])
-    
+
+    # Zone de recherche du pic
+    zero_idx = np.argmin(np.abs(time))
     zone_start = t0_ampt_idx - 20
     zone_end   = t0_ampt_idx + 30
     
+    # Calcul du bruit de fond
+    base_window_modIQ = modIQ.iloc[idx_base_start:idx_base_end]
+    base_window_Uci   = Uci.iloc[idx_base_start:idx_base_end]
+    
+    base_modIQ = np.median(base_window_modIQ)
+    base_Uci   = np.median(base_window_Uci)
+
+    # Épaisseur robuste du bruit de fond (entre le 5e et 95e percentile)
+    noise_thickness = np.percentile(base_window_Uci, 95) - np.percentile(base_window_Uci, 5)
+    
+    # Mesure des êxtremes dans la zone de défaut
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
     max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
-    min_Uci_zone = Uci.iloc[zone_start:zero_idx+ 30].min()
+    min_Uci_zone = Uci.iloc[zone_start:zone_end].min()
     
+    # Deltas absolus
     delta_modIQ = max_modIQ_zone - base_modIQ
     delta_pos_Uci = max_Uci_zone - base_Uci
     delta_neg_Uci = min_Uci_zone - base_Uci
     
+    # Protection division par zéro  
     EPSILON = 0.01
     base_modIQ_safe = max(abs(base_modIQ), EPSILON)
     base_Uci_safe = max(abs(base_Uci), EPSILON)
@@ -261,26 +271,38 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     #print(f'index start : {zone_start} | index end : {zone_end}, start time value : {time[zone_start]} | end time value : {time[zone_end]}')
     #print(f'Deltas absolus -> modIQ: {delta_modIQ:.4f} | Uci_pos: {delta_pos_Uci:.4f} | Uci_neg: {delta_neg_Uci:.4f}')
     #print(f'Variations (%) -> modIQ: {pct_modIQ:.1f}% | Uci_pos: {pct_pos_Uci:.1f}% | Uci_neg: {pct_neg_Uci:.4f}%')
+    #print(f'noise_thickness : {noise_thickness}')
     
+    # Analyse et désicion
     THRESHOLD_NOISE_PCT = 10.00
     THRESHOLD_PEAK_PCT = 90.00
 
-    base_Uci_window = Uci.iloc[idx_base_start:idx_base_end]
-    # Épaisseur robuste du bruit de fond
-    noise_thickness = np.percentile(base_Uci_window, 95) - np.percentile(base_Uci_window, 5)
-    #print(f'noise_thickness : {noise_thickness}')
-    
+    # Un vrai pic doit dépasser significativement le bruit ambiant
     is_real_peak = delta_pos_Uci > (noise_thickness)
 
-    pct_Uci = pct_pos_Uci if pct_pos_Uci > THRESHOLD_NOISE_PCT and is_real_peak else pct_neg_Uci
-    trend_Ucav_short = get_trend(time[t0_zscore_idx-1:t0_zscore_idx+5], Ucav.iloc[t0_zscore_idx-1:t0_zscore_idx+5], tolerance=1e-6)
+    # Sélection du pourcentage Uci pertinent (positif si vrai pic, sinon on garde le creux négatif)
+    if pct_pos_Uci > THRESHOLD_NOISE_PCT and is_real_peak:
+        pct_Uci = pct_pos_Uci
+    else:
+        pct_Uci = pct_neg_Uci
+    
+    # Tendance très courte sur Ucav au moment exact du décrochage (sécurisé contre les index négatifs)
+    trend_start = max(0, t0_zscore_idx - 1)
+    trend_end   = t0_zscore_idx + 5
+    trend_Ucav_short = get_trend(time[trend_start:trend_end], Ucav.iloc[trend_start:trend_end], tolerance=1e-6)
     #print(f'pct_Uci : {pct_Uci}, is_real_peak : {is_real_peak}, trend_Ucav_short : {trend_Ucav_short}')
    
     if pct_modIQ > THRESHOLD_NOISE_PCT:
+
+        # Power chain gain, gros pic modIQ, suivit d'une chute de Uci
         if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
             return "Power chain gain"
+
+        # Beam loss (Pic modIQ et Uci, chute de Ucav)
         elif pct_Uci > THRESHOLD_NOISE_PCT and is_real_peak and trend_Ucav_short == -1:
             return "Beam loss"
+
+        # Beam loss mais montée de Ucav
         #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
             #return "Other,Faulty beam presence"
     
