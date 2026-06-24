@@ -14,21 +14,23 @@ from signal_processing import (
 
 def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx):
     """
-    [Sous-fonction] Cherche les fréquences de Taconis ou loop instability.
+    [Sous-fonction] Vérifie la présence d'oscillations cohérentes pour classifier les défauts de type "Taconis" ou "Loop instability".
     """
+    # Définition des seuils d'amplitude
     AMP_THRESHOLDS = {
         "Uci":  0.002,
         "modIQ": 0.1,
         "Ucav": 0.0001
     }
     
-    #Si t0 est supérieur au zéro temporel, il peut quand même y avoir une oscillation (par exemple le signal oscille depuis le début)
+    # Définition de la fenêtre d'analyse
+    # Si le décrochage (z-score) est détecté APRÈS le défaut (ampt), cela signifie que le signal oscillait potentiellement depuis le début.
     if t0_zscore_idx > t0_ampt_idx:
-        if end_stair_idx:
-            #Si il y a un escalier dans le signal, on analayse à la fin de l'escalier
+        if end_stair_idx is not None:
+            # S'il y a un escalier, on analyse juste après
             start_osci = end_stair_idx
         else:
-            #Sinon on cherche à nouveau t0 mais en étant moins tolérant sur les périodes de calme du signal
+            # Sinon, on cherche t0 sans le filtre de "calme"
             start_osci, _ = detect_t0_zscore(Ucav, calm=False)
             if start_osci > t0_ampt_idx:
                 start_osci = max(0, t0_ampt_idx - 10000)
@@ -37,43 +39,51 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
         start_osci = t0_zscore_idx
         end_osci = t0_ampt_idx + 2
 
-    #print(f'Osci window : {Ucav.index[start_osci]}, {Ucav.index[end_osci]}')
+    # Sécurité : on vérifie que la fenêtre est valide (start avant end)
+    if start_osci >= end_osci:
+        return None
 
-    osc_Uci, f_Uci = analyze_oscillation(
-        Uci.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
+    # print(f'Osci window : {Ucav.index[start_osci]}, {Ucav.index[end_osci]}')
+
+    # Analyse des oscillations pour chaque signal
+    osc_Uci, f_Uci     = analyze_oscillation(
+    	Uci.iloc[start_osci:end_osci],   dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
     )
     osc_modIQ, f_modIQ = analyze_oscillation(
-        modIQ.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["modIQ"]
+    	modIQ.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["modIQ"]
     )
-    osc_Ucav, f_Ucav = analyze_oscillation(
-        Ucav.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["Ucav"]
+    osc_Ucav, f_Ucav   = analyze_oscillation(
+    	Ucav.iloc[start_osci:end_osci],  dt_seconds, min_physical_amp=AMP_THRESHOLDS["Ucav"]
     )
     
-    # Si les trois oscillent
+    # Verdict de cohérence et classification
+    # Il faut que les trois signaux oscillent de manière significative
     if osc_Uci and osc_modIQ and osc_Ucav:
         frequencies = [f_Uci, f_modIQ, f_Ucav]
         f_max = max(frequencies)
-        f_min = max(min(frequencies), 1e-6)
+        f_min = max(min(frequencies), 1e-6)  # Sécurité division par zéro
         
         ratio = f_max / f_min
-        #print(f'Ratio : {ratio}')
-        closest_integer = round(ratio)
+        # print(f'Ratio : {ratio}')
         
         is_coherent = False
         
-        # Fondamentale (les fréquences sont quasi-identiques)
+        # Cas A : Fondamentale (les fréquences sont quasi-identiques)
         if ratio <= 1.5:
             is_coherent = True
-        # Harmonique (Le ratio est très proche d'un entier, de la 2ème à la 5ème harmonique)
-        elif 2 <= closest_integer <= 5:
-            if abs(ratio - closest_integer) <= 0.2:
+            
+        # Cas B : Harmonique (Le ratio correspond à la 2ème, 3ème, 4ème ou 5ème harmonique)
+        else:
+            closest_integer = round(ratio)
+            if 2 <= closest_integer <= 5 and abs(ratio - closest_integer) <= 0.2:
                 is_coherent = True
         
+        # Classification finale si les oscillations sont liées physiquement
         if is_coherent:
             if f_Ucav > 100:
                 return "Loop instability" # f"Loop instability;{f_Ucav:.0f}Hz"
             else:
-                return "Taconis" #f"Taconis;{f_Ucav:.0f}Hz"
+                return "Taconis"          # f"Taconis;{f_Ucav:.0f}Hz"
         else:
             return "Oscillation"
             
