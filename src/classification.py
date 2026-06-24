@@ -8,7 +8,8 @@ from signal_processing import (
     detect_t0_zscore,
     find_true_t0_with_ampt, 
     detect_end_of_staircase,
-    calculate_fall_time
+    calculate_fall_time,
+    detect_uci_rise_start
 )
 
 def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx):
@@ -78,20 +79,34 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
             
     return None
 
-def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair, t0_ampt_idx):
+def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair, t0_ampt_idx):
     """
     [Sous-fonction] Analyse les tendances pour détecter un profil en V typique d'un Quench.
     """
+    
+    # Filtre de détection d'une montée trop précoce
+    zero_idx = np.argmin(np.abs(time))
+    
+    # On définit la limite à 50% de la portion du signal située avant le défaut (t=0)
+    limit_early_rise = int(zero_idx * 0.5)
+    
+    # Si la montée d'Uci (start_idx_Uci_rise) commence avant cette limite, ce n'est pas ni un Quench ni un quench aside
+    if start_idx_Uci_rise < limit_early_rise:
+        # print(f"Montée Uci trop précoce (Index {start_idx_Uci_rise} < Limite {limit_early_rise}). Rejet du Quench.")
+        return None
+    
+        
     WINDOW_POINTS_LARGE = 3500
     WINDOW_POINTS_SHORT = 700
 
     start_idx_large = max(0, t0_zscore_idx - WINDOW_POINTS_LARGE)
+    start_idx_large = start_idx_Uci_rise
     start_idx_short = max(0, t0_zscore_idx - WINDOW_POINTS_SHORT)
     
     if end_stair is not None:
         start_idx_short = end_stair
     else:
-        start_idx_short = t0_zscore_idx_Uci
+        start_idx_short = start_idx_Uci_rise
         
     end_idx = t0_zscore_idx
     if start_idx_short > end_idx:
@@ -101,7 +116,16 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
     Uci_win_large = Uci.iloc[start_idx_large:t0_ampt_idx]
     Ucr_win_large = Ucr.iloc[start_idx_large:t0_ampt_idx]
 
-    if start_idx_short < end_idx:
+    base_Uci   = np.median(Uci.iloc[start_idx_large-500:start_idx_large-100])
+    delta_Uci = np.median(Uci_win_large) - base_Uci 
+    ratio_Uci = (delta_Uci / base_Uci) * 100
+    #print(f'Ratio : {( delta_Uci / base_Uci) * 100}')
+
+    if ratio_Uci < 10.0:
+        #print(f"Ration d'augmentation trop bas. ({ratio_Uci}%) Pas de quench")
+        return None
+
+    if start_idx_short <= end_idx:
         # Couper la fenêtre en deux
         start_idx_short = max(0, start_idx_short - 200)
         mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
@@ -125,8 +149,8 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
         # Analyse des tendances
         trend_Uci = get_trend(t_win_large, Uci_win_large, tolerance=1e-5)
         trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-6)
-        trend_Ucr_left = get_trend(t_win_left, Ucr_win_left, tolerance=1e-6)
-        trend_Ucr_right = get_trend(t_win_right, Ucr_win_right, tolerance=1e-6)
+        #trend_Ucr_left = get_trend(t_win_left, Ucr_win_left, tolerance=1e-6)
+        #trend_Ucr_right = get_trend(t_win_right, Ucr_win_right, tolerance=1e-6)
 
         # Calcul de la perte d'amplitude
         start_val_Ucr = Ucr.iloc[start_idx_short]
@@ -135,7 +159,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_
         #print(f'fall_depth_Ucr : {fall_depth_Ucr}')
         
         THRESHOLD_QUENCH = 0.01 
-        true_v_profile = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
+        #true_v_profile = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
 
         quench = False
         target_pct = 0.01
@@ -295,13 +319,12 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
 
     # Test des Quenchs
     if end_stair_idx is not None:
-        t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci.iloc[end_stair_idx:], calm=False)
-        t0_zscore_idx_Uci += end_stair_idx
+        start_idx_Uci_rise = detect_uci_rise_start(Uci, t0_ampt_idx, dt_us, start_limit_idx=end_stair_idx)
     else:
-        t0_zscore_idx_Uci, _ = detect_t0_zscore(Uci, calm=False)
-    #print(f't0_zscore_idx_Uci : {t0_zscore_idx_Uci}, t0_zscore_idx_Uci val : {time[t0_zscore_idx_Uci]}')
+        start_idx_Uci_rise = detect_uci_rise_start(Uci, t0_ampt_idx, dt_us)
+    #print(f'start_idx_Uci_rise : {start_idx_Uci_rise}, start_idx_Uci_rise val : {time[start_idx_Uci_rise]}')
 
-    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, t0_zscore_idx_Uci, end_stair_idx, t0_ampt_idx)
+    quench_label = _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair_idx, t0_ampt_idx)
     
     if quench_label: 
         return quench_label
