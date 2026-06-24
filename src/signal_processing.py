@@ -413,3 +413,47 @@ def calculate_fall_time(Ucav, real_t0_idx, target_pct=0.5,z_threshold = 5):
     delta_t = t_target - t0_time
     
     return delta_t, u_max, t0_time, t_target
+
+def detect_uci_rise_start(Uci, t0_ampt_idx, dt_us, start_limit_idx=0):
+    """
+    Détecte l'index du véritable début de la grande montée du signal Uci,
+    en cherchant le moment où le signal quitte son niveau de base.
+    """
+    search_window = Uci.iloc[start_limit_idx:t0_ampt_idx]
+    
+    if len(search_window) < 1000:
+        return max(0, t0_ampt_idx - int(5000 / dt_us))
+        
+    # Lissage robuste
+    window_pts = max(5, int(2000 / dt_us))
+    smoothed_uci = search_window.rolling(window=window_pts, center=True, min_periods=1).mean()
+    
+    valid_smoothed = smoothed_uci.dropna()
+    if valid_smoothed.empty:
+        return max(0, t0_ampt_idx - int(5000 / dt_us))
+        
+    # Calcul des niveaux
+    base_val = np.percentile(valid_smoothed, 2)   
+    peak_val = np.percentile(valid_smoothed, 98)  
+    amplitude = peak_val - base_val
+    
+    if amplitude < 1.0:
+        return max(0, t0_ampt_idx - int(5000 / dt_us))
+        
+    # Définition du fil de détente
+    threshold_val = base_val + 0.05 * amplitude
+    
+    # Recherche à rebours
+    peak_idx_label = valid_smoothed[valid_smoothed >= peak_val].index[0]
+    peak_pos = search_window.index.get_loc(peak_idx_label)
+    
+    before_peak = smoothed_uci.iloc[:peak_pos]
+    
+    below_threshold_mask = before_peak < threshold_val
+    below_indices = np.where(below_threshold_mask)[0]
+    
+    if len(below_indices) > 0:
+        start_idx = start_limit_idx + below_indices[-1]
+        return start_idx
+        
+    return start_limit_idx
