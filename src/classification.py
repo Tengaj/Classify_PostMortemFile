@@ -81,149 +81,101 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
 
 def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair, t0_ampt_idx):
     """
-    [Sous-fonction] Analyse les tendances pour détecter un profil en V typique d'un Quench.
+    [Sous-fonction] Analyse les tendances de Uci, Ucr et le temps de chute de Ucav
+    pour détecter un Quench ou un Quench aside.
     """
-    
-    # Filtre de détection d'une montée trop précoce
+    # Filtre montée trop précoce
     zero_idx = np.argmin(np.abs(time))
-    
-    # On définit la limite à 50% de la portion du signal située avant le défaut (t=0)
     limit_early_rise = int(zero_idx * 0.5)
     
-    # Si la montée d'Uci (start_idx_Uci_rise) commence avant cette limite, ce n'est pas ni un Quench ni un quench aside
     if start_idx_Uci_rise < limit_early_rise:
         # print(f"Montée Uci trop précoce (Index {start_idx_Uci_rise} < Limite {limit_early_rise}). Rejet du Quench.")
         return None
-    
         
-    WINDOW_POINTS_LARGE = 3500
-    WINDOW_POINTS_SHORT = 700
-
-    start_idx_large = max(0, t0_zscore_idx - WINDOW_POINTS_LARGE)
+    # Définitions des fenêtres
     start_idx_large = start_idx_Uci_rise
-    start_idx_short = max(0, t0_zscore_idx - WINDOW_POINTS_SHORT)
-    
-    if end_stair is not None:
-        start_idx_short = end_stair
-    else:
-        start_idx_short = start_idx_Uci_rise
-        
-    end_idx = t0_zscore_idx
-    if start_idx_short > end_idx:
-        end_idx = t0_ampt_idx
 
-    t_win_large = time[start_idx_large:t0_ampt_idx]
+    t_win_large   = time[start_idx_large:t0_ampt_idx]
     Uci_win_large = Uci.iloc[start_idx_large:t0_ampt_idx]
     Ucr_win_large = Ucr.iloc[start_idx_large:t0_ampt_idx]
 
-    base_Uci   = np.median(Uci.iloc[start_idx_large-500:start_idx_large-100])
+    # --- 3. FILTRE : AMPLITUDE DE LA MONTÉE Uci ---
+    # On sécurise les index avec max() pour éviter de chercher dans les index négatifs
+    base_start = max(0, start_idx_large - 500)
+    base_end   = max(1, start_idx_large - 100)
+    
+    base_Uci  = np.median(Uci.iloc[base_start:base_end])
     delta_Uci = np.median(Uci_win_large) - base_Uci 
-    ratio_Uci = (delta_Uci / base_Uci) * 100
-    #print(f'Ratio : {( delta_Uci / base_Uci) * 100}')
+    
+    # Sécurité contre la division par zéro
+    base_Uci_safe = max(abs(base_Uci), 0.01)
+    ratio_Uci = (delta_Uci / base_Uci_safe) * 100
 
     if ratio_Uci < 10.0:
-        #print(f"Ration d'augmentation trop bas. ({ratio_Uci}%) Pas de quench")
+        # print(f"Ratio d'augmentation Uci trop bas ({ratio_Uci:.1f}%). Pas de quench.")
         return None
 
-    if start_idx_short <= end_idx:
-        # Couper la fenêtre en deux
-        start_idx_short = max(0, start_idx_short - 200)
-        mid_window = start_idx_short + np.argmin(Ucr.iloc[start_idx_short:end_idx]) 
-        
-        if mid_window == start_idx_short:
-            mid_window = end_idx - int(WINDOW_POINTS_SHORT * 0.5)
-            
-        end_idx_right = mid_window + np.argmax(Ucr.iloc[mid_window:end_idx])
-        #end_idx_right = end_idx
-        #print(f'Window start : {start_idx_short}, Window mid : {mid_window}, Window end : {end_idx}') 
-        #print(f'Window start value short: {time[start_idx_short]}, Window start value large: {time[start_idx_large]}, Window mid value: {time[mid_window]}, Window end value: {time[end_idx]}')
+    # --- 4. ANALYSE DES TENDANCES GLOBALES ---
+    trend_Uci = get_trend(t_win_large, Uci_win_large, tolerance=1e-5)
+    trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-6)
 
-        t_win_left = time[start_idx_short:mid_window]
-        t_win_right = time[mid_window:end_idx_right]
-        #t_win_right = time[mid_window:end_idx]
-        
-        Ucr_win_left = Ucr.iloc[start_idx_short:mid_window]
-        Ucr_win_right = Ucr.iloc[mid_window:end_idx_right]
-        #Ucr_win_right = Ucr.iloc[mid_window:end_idx]
-
-        # Analyse des tendances
-        trend_Uci = get_trend(t_win_large, Uci_win_large, tolerance=1e-5)
-        trend_Ucr = get_trend(t_win_large, Ucr_win_large, tolerance=1e-6)
-        #trend_Ucr_left = get_trend(t_win_left, Ucr_win_left, tolerance=1e-6)
-        #trend_Ucr_right = get_trend(t_win_right, Ucr_win_right, tolerance=1e-6)
-
-        # Calcul de la perte d'amplitude
-        start_val_Ucr = Ucr.iloc[start_idx_short]
-        min_val_Ucr = Ucr.iloc[mid_window]
-        fall_depth_Ucr = start_val_Ucr - min_val_Ucr
-        #print(f'fall_depth_Ucr : {fall_depth_Ucr}')
-        
-        THRESHOLD_QUENCH = 0.01 
-        #true_v_profile = (trend_Ucr_left == -1 and trend_Ucr_right == 1 and fall_depth_Ucr > THRESHOLD_QUENCH)
-
-        quench = False
-        target_pct = 0.01
-        zero_idx = np.argmin(np.abs(time))
-        result = calculate_fall_time(Ucav, zero_idx, target_pct=target_pct)
+    # --- 5. CALCUL DE LA CHUTE DE TENSION (Ucav) ---
+    quench = False
+    target_pct = 0.01
     
-        if result is None:
-            print(f"Alerte : Le signal ne descend jamais à {100 - target_pct * 100}% dans ce fichier.")
-            #return f"Other;Incomplet (Pas de chute à {100 - target_pct * 100}%)"
-            return None
+    result = calculate_fall_time(Ucav, zero_idx, target_pct=target_pct)
+    
+    if result is None:
+        # print(f"Alerte : Le signal ne descend jamais à {100 - target_pct * 100}% dans ce fichier.")
+        return None
 
-        delta_t, u_max, t0_time, t = result
-        
-        #print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t: {t:.1f}µs | Chute en: {delta_t:.2f} µs")
+    delta_t, u_max, t0_time, t = result
+    # print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t: {t:.1f}µs | Chute en: {delta_t:.2f} µs")
 
-        dt_us = np.mean(np.diff(Ucav.index))
-        threshold_breakdown = max(2.0, dt_us * 1.05) # environ 11 µs (en général)
-        threshold_false_alarm = 10000.0  # 10 ms (10000 µs)
-        
-        if delta_t > threshold_breakdown and delta_t < threshold_false_alarm:
-            quench = True
+    dt_us = np.mean(np.diff(time))
+    threshold_breakdown = max(2.0, dt_us * 1.05) # ~11 µs
+    threshold_false_alarm = 10000.0  # 10 ms
+    
+    if threshold_breakdown < delta_t < threshold_false_alarm:
+        quench = True
 
-        step_points = max(1, int(50.0 / dt_us))
-        
-        # On définit une fenêtre d'observation autour du saut
-        pts_150 = max(1, int(150.0 / dt_us)) 
-        
-        total_rise_Uci = Uci_win_large.max() - Uci_win_large.min()
-        
-        # On cherche le plus grand bond que le signal a fait en seulement 50 µs
-        diff_50 = Uci_win_large.diff(periods=step_points)
-        max_jump_Uci = diff_50.max()
-        
-        is_sudden_spike = False
-        
-        # Si la montée est significative et que > 65% se fait en 50 µs
-        if total_rise_Uci > 0.5:
-            if max_jump_Uci > 0.65 * total_rise_Uci:
-                
-                jump_idx = np.nanargmax(diff_50)
-                
-                idx_before = max(0, jump_idx - pts_150)
-                idx_after = min(len(Uci_win_large) - 1, jump_idx + pts_150)
-                
-                val_before = Uci_win_large.iloc[idx_before]
-                val_after = Uci_win_large.iloc[idx_after]
-                
-                true_shift = val_after - val_before
-                
-                # Si ce décalage durable représente au moins 40% du saut, c'est un vrai escalier.
-                # Sinon, c'est que le signal est retombé à sa place
-                if true_shift > 0.40 * max_jump_Uci:
-                    is_sudden_spike = True
-                    #print(f"Pic brutal,  Hauteur: {total_rise_Uci:.2f} | Saut: {max_jump_Uci:.2f} | Décalage durable: {true_shift:.2f}")
+    # --- 6. DÉTECTION DES PICS BRUTAUX (SPIKES) SUR Uci ---
+    step_points = max(1, int(50.0 / dt_us))
+    pts_150     = max(1, int(150.0 / dt_us)) 
+    
+    total_rise_Uci = Uci_win_large.max() - Uci_win_large.min()
+    diff_50        = Uci_win_large.diff(periods=step_points)
+    max_jump_Uci   = diff_50.max()
+    
+    is_sudden_spike = False
+    
+    if total_rise_Uci > 0.5:
+        if max_jump_Uci > 0.65 * total_rise_Uci:
+            
+            jump_idx = np.nanargmax(diff_50)
+            
+            idx_before = max(0, jump_idx - pts_150)
+            idx_after  = min(len(Uci_win_large) - 1, jump_idx + pts_150)
+            
+            val_before = Uci_win_large.iloc[idx_before]
+            val_after  = Uci_win_large.iloc[idx_after]
+            
+            true_shift = val_after - val_before
+            
+            # Si le décalage durable représente au moins 40% du saut
+            if true_shift > 0.40 * max_jump_Uci:
+                is_sudden_spike = True
+                # print(f"Pic brutal, Hauteur: {total_rise_Uci:.2f} | Saut: {max_jump_Uci:.2f} | Décalage durable: {true_shift:.2f}")
 
-        if trend_Uci == 1:
-            if is_sudden_spike:
-                    return None 
-            #if true_v_profile or trend_Ucr == -1:
-            if quench:
-                return "Quench"
-            elif trend_Ucr == 1:
-                return "Quench aside"
-                
+    # --- 7. VERDICT FINAL ---
+    if trend_Uci == 1:
+        if is_sudden_spike:
+            return None 
+        if quench:
+            return "Quench"
+        elif trend_Ucr == 1:
+            return "Quench aside"
+            
     return None
     
 def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx):
