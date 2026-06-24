@@ -1,0 +1,55 @@
+# ==========================================
+# CONFIGURATION - CLASSIFICATION LLRF
+# ==========================================
+
+# ----------------------------------
+# Filtres de Validité
+# ----------------------------------
+filters:
+  check_beam: true           # Désactiver pour ignorer l'état du faisceau
+  check_loop: true           # Désactiver pour ignorer l'état de la boucle
+  check_kpi: true            # Désactiver pour ignoner la valeur de KPI
+  check_ampt: true           # Désactiver pour ignorer la valeur de AMPT
+  check_ucav_healthy : true  # Désactiver pour ignorer l'état de la tension
+  min_kpi: 10.0              # KPI minimum pour analyser le fichier
+  max_ampt: 10.0             # AMPT maximum pour analyser le fichier
+  ucav_min_healthy: 0.1      # Tension minimale avant défaut pour considérer le signal valide
+
+# ----------------------------------
+# Paramètres Communs (Analyse du signal)
+# ----------------------------------
+signal_processing:
+  z_score_threshold: 5.0     # Sensibilité de détection de t0
+
+# ----------------------------------
+# Seuils par Défaut Majeur
+# ----------------------------------
+thresholds:
+  
+  ecav_instability:
+
+    # Loop et Taconis
+    taconis_max_hz: 100
+    #loop_instability_ratio_max: 1.5   # Ratio pour considérer les fréquences comme identiques
+    min_physical_amp_moqiq: 0.1
+    min_physical_amp_uci: 0.002
+    min_physical_amp_ucav: 0.001
+
+    # Quench 
+    fall_target_pct: 0.01 # Objectif de chute (99%)
+    min_false_alarm_us: 10000.0  # Limite basse en µs pour une fausse alarme
+
+    # Peak
+    thresholds_noise_pct : 10.0 # Pourcentage minimum pour que le pic sorte du bruit
+  
+  quench:
+    min_false_alarm_us: 1000.0  # Limite basse en µs pour une fausse alarme
+    fall_target_pct: 0.5     # Objectif de chute (50%)
+    z_score_threshold_local: 100.0 # Z-score spécifique pour la recherche t0 du quench
+    max_breakdown_us_mult: 2.05 # Multiplicateur pour déterminer un breakdown
+  
+  rf_protection:
+    max_ratio_ucat: 8.5      # Au-delà de ce ratio Ucav/Ucat, c'est un "Ucav max"
+    
+  vacuum:
+    pickup_threshold: 50.0   # En uA
