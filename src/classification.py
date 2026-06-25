@@ -16,12 +16,12 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     """
     [Sous-fonction] Vérifie la présence d'oscillations cohérentes pour classifier les défauts de type "Taconis" ou "Loop instability".
     """
-    # Définition des seuils d'amplitude
-    AMP_THRESHOLDS = {
-        "Uci":  0.002,
-        "modIQ": 0.1,
-        "Ucav": 0.0001
-    }
+    cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
+    
+    amp_uci = cfg.get("min_physical_amp_uci", 0.002)
+    amp_modiq = cfg.get("min_physical_amp_modiq", 0.1)
+    amp_ucav = cfg.get("min_physical_amp_ucav", 0.0001)
+    taconis_max_hz = cfg.get("taconis_max_hz", 100)
     
     # Définition de la fenêtre d'analyse
     # Si le décrochage (z-score) est détecté APRÈS le défaut (ampt), cela signifie que le signal oscillait potentiellement depuis le début.
@@ -47,13 +47,13 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
 
     # Analyse des oscillations pour chaque signal
     osc_Uci, f_Uci     = analyze_oscillation(
-    	Uci.iloc[start_osci:end_osci],   dt_seconds, min_physical_amp=AMP_THRESHOLDS["Uci"]
+    	Uci.iloc[start_osci:end_osci],   dt_seconds, min_physical_amp=amp_uci
     )
     osc_modIQ, f_modIQ = analyze_oscillation(
-    	modIQ.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=AMP_THRESHOLDS["modIQ"]
+    	modIQ.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=amp_modiq
     )
     osc_Ucav, f_Ucav   = analyze_oscillation(
-    	Ucav.iloc[start_osci:end_osci],  dt_seconds, min_physical_amp=AMP_THRESHOLDS["Ucav"]
+    	Ucav.iloc[start_osci:end_osci],  dt_seconds, min_physical_amp=amp_ucav
     )
     
     # Verdict de cohérence et classification
@@ -80,7 +80,7 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
         
         # Classification finale si les oscillations sont liées physiquement
         if is_coherent:
-            if f_Ucav > 100:
+            if f_Ucav > taconis_max_hz:
                 return "Loop instability" # f"Loop instability;{f_Ucav:.0f}Hz"
             else:
                 return "Taconis"          # f"Taconis;{f_Ucav:.0f}Hz"
@@ -94,6 +94,11 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     [Sous-fonction] Analyse les tendances de Uci, Ucr et le temps de chute de Ucav
     pour détecter un Quench ou un Quench aside.
     """
+    cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
+    
+    target_pct = cfg.get("fall_target_pct", 1.0) / 100.0
+    min_false_alarm_us = cfg.get("min_false_alarm_us", 10000.0)
+
     # Filtre montée trop précoce
     zero_idx = np.argmin(np.abs(time))
     limit_early_rise = int(zero_idx * 0.5)
@@ -130,7 +135,6 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
 
     # Calcul de la chute de la tension
     quench = False
-    target_pct = 0.01
     
     result = calculate_fall_time(Ucav, zero_idx, target_pct=target_pct)
     
@@ -142,10 +146,9 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     # print(f"U_max: {u_max:.2f} | t_start: {t0_time:.1f}µs | t: {t:.1f}µs | Chute en: {delta_t:.2f} µs")
 
     dt_us = np.mean(np.diff(time))
-    threshold_breakdown = max(2.0, dt_us * 1.05) # ~11 µs
-    threshold_false_alarm = 10000.0  # 10 ms
+    threshold_breakdown = max(2.0, dt_us * 2.0) # ~11 µs
     
-    if threshold_breakdown < delta_t < threshold_false_alarm:
+    if threshold_breakdown < delta_t < min_false_alarm_us:
         quench = True
 
     # Détection des pics brutaux (spikes) sur Uci
@@ -234,14 +237,15 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     #print(f'noise_thickness : {noise_thickness}')
     
     # Analyse et désicion
-    THRESHOLD_NOISE_PCT = 10.00
-    THRESHOLD_PEAK_PCT = 90.00
+    cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
+    threshold_noise_pct = cfg.get("threshold_noise_pct", 10.0)
+    threshold_peak_pct  = cfg.get("threshold_peak_pct", 90.0)
 
     # Un vrai pic doit dépasser significativement le bruit ambiant
     is_real_peak = delta_pos_Uci > (noise_thickness)
 
     # Sélection du pourcentage Uci pertinent (positif si vrai pic, sinon on garde le creux négatif)
-    if pct_pos_Uci > THRESHOLD_NOISE_PCT and is_real_peak:
+    if pct_pos_Uci > threshold_noise_pct and is_real_peak:
         pct_Uci = pct_pos_Uci
     else:
         pct_Uci = pct_neg_Uci
@@ -252,18 +256,18 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     trend_Ucav_short = get_trend(time[trend_start:trend_end], Ucav.iloc[trend_start:trend_end], tolerance=1e-6)
     #print(f'pct_Uci : {pct_Uci}, is_real_peak : {is_real_peak}, trend_Ucav_short : {trend_Ucav_short}')
    
-    if pct_modIQ > THRESHOLD_NOISE_PCT:
+    if pct_modIQ > threshold_noise_pct:
 
         # Power chain gain, gros pic modIQ, suivit d'une chute de Uci
-        if pct_modIQ > THRESHOLD_PEAK_PCT and pct_Uci < -THRESHOLD_NOISE_PCT:
+        if pct_modIQ > threshold_peak_pct and pct_Uci < -threshold_noise_pct:
             return "Power chain gain"
 
         # Beam loss (Pic modIQ et Uci, chute de Ucav)
-        elif pct_Uci > THRESHOLD_NOISE_PCT and is_real_peak and trend_Ucav_short == -1:
+        elif pct_Uci > threshold_noise_pct and is_real_peak and trend_Ucav_short == -1:
             return "Beam loss"
 
         # Beam loss mais montée de Ucav
-        #elif pct_Uci > THRESHOLD_NOISE_PCT and trend_Ucav_short == 1:
+        #elif pct_Uci > threshold_noise_pct and trend_Ucav_short == 1:
             #return "Other,Faulty beam presence"
     
     return None
@@ -348,7 +352,7 @@ def classify_RF_protections(time, Ucav, Ucat):
     #print(f"Ratio maximum mesuré : {max_ratio:.2f} | Ucat_fraction : {Ucat_fraction}")
 
     # Classification
-    threshold_ucav_max = 8.5 # Seuil empirique de distinction
+    threshold_ucav_max = CONFIG.get("thresholds", {}).get("rf_protection", {}).get("threshold_ucav_max", 8.5)
     
     if max_ratio > threshold_ucav_max:
         return "Ucav max"
@@ -379,12 +383,10 @@ def classify_quench(Ucav, t0_ampt_idx):
     cfg = CONFIG.get("thresholds", {}).get("quench", {})
 
     target_pct         = cfg.get("fall_target_pct", 50.0) / 100.0
-    z_thresh_local     = cfg.get("z_score_threshold_local", 100.0)
     min_false_alarm_us = cfg.get("min_false_alarm_us", 1000.0)
-    breakdown_mult     = cfg.get("max_breakdown_us_mult", 2.00)
 
     # Calcul du temps de chute
-    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=target_pct,z_threshold=z_thresh_local)
+    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=target_pct,z_threshold=100.0)
     
     if result is None:
         # print(f"Alerte : Le signal ne descend jamais à {target_pct*100}% dans ce fichier.")
@@ -397,7 +399,7 @@ def classify_quench(Ucav, t0_ampt_idx):
     # Définition des seuils physiques
     dt_us = np.mean(np.diff(Ucav.index))
 
-    threshold_breakdown = max(2.0, dt_us * breakdown_mult)
+    threshold_breakdown = max(2.0, dt_us * 2)
     threshold_false_alarm = min_false_alarm_us
 
     # Classification
