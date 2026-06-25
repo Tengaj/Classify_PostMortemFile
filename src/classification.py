@@ -376,12 +376,19 @@ def classify_quench(Ucav, t0_ampt_idx):
     Classifie le défaut "Claquage ou quench cavité" en mesurant le temps de chute 
     de la tension cavité (Ucav) de 100% à 50%.
     """
+    cfg = CONFIG.get("thresholds", {}).get("quench", {})
+
+    target_pct         = cfg.get("fall_target_pct", 50.0) / 100.0
+    z_thresh_local     = cfg.get("z_score_threshold_local", 100.0)
+    min_false_alarm_us = cfg.get("min_false_alarm_us", 1000.0)
+    breakdown_mult     = cfg.get("max_breakdown_us_mult", 2.00)
+
     # Calcul du temps de chute
-    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=0.5,z_threshold=100.0)
+    result = calculate_fall_time(Ucav, t0_ampt_idx, target_pct=target_pct,z_threshold=z_thresh_local)
     
     if result is None:
-        #print("Alerte : Le signal ne descend jamais à 50% dans ce fichier.")
-        return "Other;Incomplet (Pas de chute à 50%)"
+        # print(f"Alerte : Le signal ne descend jamais à {target_pct*100}% dans ce fichier.")
+        return f"Other;Incomplet (Pas de chute à {target_pct*100:.0f}%)"
         
     delta_t, u_max, t0_time, t_50 = result
     
@@ -390,8 +397,8 @@ def classify_quench(Ucav, t0_ampt_idx):
     # Définition des seuils physiques
     dt_us = np.mean(np.diff(Ucav.index))
 
-    threshold_breakdown = max(2.0, dt_us * 2.05) # environ 11 µs (en général)
-    threshold_false_alarm = 1000.0  # 1 ms (1000 µs)
+    threshold_breakdown = max(2.0, dt_us * breakdown_mult)
+    threshold_false_alarm = min_false_alarm_us
 
     # Classification
     fall_time_str = f";Temps de chute : {delta_t:.2f} us"
