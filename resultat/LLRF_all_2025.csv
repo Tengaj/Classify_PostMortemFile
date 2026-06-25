@@ -2,15 +2,15 @@ Fichier;Defaut;Label;Détails
 2025 09 03 CMA01_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 09 03 CMA01_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 09 03 CMA01_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2025 09 03 CMA01_0004;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2025 09 03 CMA01_0004;Rég signal RF hors tolérance;Filtered;Beam NON
 2025 10 23 CMA01_0001;Dép seuil de sécurité RF;Ucav max
-2025 09 03 CMA03_0001;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
-2025 09 03 CMA03_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
-2025 09 26 CMA04_0002;Seuil de vide;Filtered;Loop NON ou Beam OFF
-2025 10 02 CMA04_0005;Seuil de vide;Filtered;Loop NON ou Beam OFF
-2025 10 03 CMA04_0003;Seuil de vide;Filtered;Loop NON ou Beam OFF
-2025 10 23 CMA04_0003;Seuil de vide;Filtered;Loop NON ou Beam OFF
-2025 10 23 CMA04_0004;Seuil de vide;Filtered;Loop NON ou Beam OFF
+2025 09 03 CMA03_0001;Rég signal RF hors tolérance;Filtered;Beam NON
+2025 09 03 CMA03_0002;Rég signal RF hors tolérance;Filtered;Beam NON
+2025 09 26 CMA04_0002;Seuil de vide;Filtered;Beam NON
+2025 10 02 CMA04_0005;Seuil de vide;Filtered;Beam NON
+2025 10 03 CMA04_0003;Seuil de vide;Filtered;Beam NON
+2025 10 23 CMA04_0003;Seuil de vide;Filtered;Beam NON
+2025 10 23 CMA04_0004;Seuil de vide;Filtered;Beam NON
 2025 09 05 CMA05_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 09 19 CMA05_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 09 19 CMA05_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -19,7 +19,7 @@ Fichier;Defaut;Label;Détails
 2025 10 17 CMA05_0005;Rég signal RF hors tolérance;Other
 2025 10 17 CMA05_0006;Rég signal RF hors tolérance;Beam loss
 2025 09 03 CMA07_0001;Rég signal RF hors tolérance;Other
-2025 09 03 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop NON ou Beam OFF
+2025 09 03 CMA07_0002;Rég signal RF hors tolérance;Filtered;Beam NON
 2025 10 14 CMB01-CAV1_0002;Dép seuil de sécurité RF;Filtered;KPI < 10.0
 2025 10 14 CMB01-CAV1_0004;Rég signal RF hors tolérance;Loop instability
 2025 10 14 CMB01-CAV1_0005;Rég signal RF hors tolérance;Beam loss
@@ -28,7 +28,7 @@ Fichier;Defaut;Label;Détails
 2025 10 23 CMB01-CAV1_0001;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2025 10 15 CMB01-CAV2_0002;Rég signal RF hors tolérance;Other
 2025 10 17 CMB01-CAV2_0003;Rég signal RF hors tolérance;Other
-2025 10 17 CMB01-CAV2_0004;Claquage ou quench cavité;Filtered;Loop NON ou Beam OFF
+2025 10 17 CMB01-CAV2_0004;Claquage ou quench cavité;Filtered;Beam NON
 2025 10 18 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other
 2025 10 18 CMB01-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 10 20 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other

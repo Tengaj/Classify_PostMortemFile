@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from PyPostMortem import Read_Signals
-from utils import chrono
+from utils import chrono, CONFIG
 from signal_processing import (
     analyze_oscillation, 
     get_trend, 
@@ -196,7 +196,6 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     idx_base_end = max(1, t0_ampt_idx - 100)
 
     # Zone de recherche du pic
-    zero_idx = np.argmin(np.abs(time))
     zone_start = t0_ampt_idx - 20
     zone_end   = t0_ampt_idx + 30
     
@@ -432,53 +431,65 @@ def classify_file(file_name):
         primary_fault = ""
     #print(f"Defaut : {detected_faults}")
 
+    cfg = CONFIG.get("filters", {})
+
     # Filtre Faisceau (BEAM) ou Boucle (LOOP) désactivés
     beam = parameters.get("BEAM")
     loop = parameters.get("LOOP")
-    if beam == "NON" or loop == "OFF":
-        return f"{primary_fault};Filtered;Loop NON ou Beam OFF"
+
+    if cfg.get("check_beam", True) and beam == "NON":
+        return f"{primary_fault};Filtered;Beam NON"
+        
+    if cfg.get("check_loop", True) and loop == "OFF":
+        return f"{primary_fault};Filtered;Loop OFF"
 
     # Filtre sur KPI
-    kpi = float(parameters.get("KPI", 0))
-    kpi_threshold = 10.0
-    if kpi < kpi_threshold:
-        return f"{primary_fault};Filtered;KPI < {kpi_threshold}"
+    if cfg.get("check_kpi", True):
+        kpi = float(parameters.get("KPI", 0))
+        kpi_threshold = cfg.get("min_kpi", 10.0)
+        if kpi < kpi_threshold:
+            return f"{primary_fault};Filtered;KPI < {kpi_threshold}"
 
     # Filtre sur le Masque
     mask = parameters.get("MASK")
     file_name_str = str(file_name)
-    
-    if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
-        return f"{primary_fault};Filtered;Mask problem"
-        
-    if "CMB" in file_name_str and mask != "0x007F":
-        return f"{primary_fault};Filtered;Mask problem"
+
+    if cfg.get("check_mask", True):
+        mask = parameters.get("MASK")
+        file_name_str = str(file_name)
+        if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
+            return f"{primary_fault};Filtered;Mask problem"
+        if "CMB" in file_name_str and mask != "0x007F":
+            return f"{primary_fault};Filtered;Mask problem"
 
     #Filtre sur l'amplitude (AMPT)
     ampt = float(parameters.get("AMPT", 3.0))
-    ampt_threshold = 10.0
-    if ampt > ampt_threshold:
-        return f"{primary_fault};Filtered;AMPT > {ampt_threshold}%"
+    if cfg.get("check_ampt", True):
+        ampt_threshold = cfg.get("max_ampt", 10.0)
+        if ampt > ampt_threshold:
+            return f"{primary_fault};Filtered;AMPT > {ampt_threshold}%"
     
-    # Filtre sur la tension cavité (Ucav)
+    # Filtre sur la tension cavité (Ucav)  
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
-    dt_us = np.mean(np.diff(time))
-    Ucav_threshold = 0.1
-
-    Ucav_before_t0 = Ucav.iloc[:zero_idx]
-
-    # Cas de tension presque nulle en moyenne avant le défaut
-    if np.mean(Ucav.iloc[0:zero_idx]) < Ucav_threshold:
-        return f'{primary_fault};Filtered;Tension moyenne inférieur à {Ucav_threshold}'
-
-    # Cas de tension qui tombe trop bas pendant un certain temps avant le zéro temporel
-    min_duration_us = 200 
-    required_points = max(2, int(min_duration_us / dt_us))
     
-    drop_mask = Ucav_before_t0 < Ucav_threshold
-    if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-        return f"{primary_fault};Filtered;Tension inférieur à {Ucav_threshold} avant t0"   
+    if cfg.get("check_ucav_healthy", True):
+        dt_us = np.mean(np.diff(time))
+        ucav_min = cfg.get("ucav_min_healthy", 0.1)
+        max_duration_us = cfg.get("ucav_low_max_duration_us", 200.0)
+
+        Ucav_before_t0 = Ucav.iloc[:zero_idx]
+
+        # Cas A : Tension presque nulle en moyenne avant le défaut
+        if np.mean(Ucav_before_t0) < ucav_min:
+            return f'{primary_fault};Filtered;Tension moyenne < {ucav_min}'
+
+        # Cas B : Tension qui tombe trop bas pendant un certain temps avant t0
+        required_points = max(2, int(max_duration_us / dt_us))
+        drop_mask = Ucav_before_t0 < ucav_min
+        
+        if drop_mask.rolling(window=required_points).sum().max() >= required_points:
+            return f"{primary_fault};Filtered;Tension < {ucav_min} avant t0" 
 
     # Préparation du temps de départ
     t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav,zero_idx, ampt)
