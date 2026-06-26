@@ -272,7 +272,27 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
     
     return None
 
-def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
+def _check_beam_anomalies(beam_presence, t0_zscore_idx):
+    """
+    [Sous-fonction] Vérifie si le faisceau présente des instabilités autour du moment du défaut.
+    """
+    start_idx = max(0, t0_zscore_idx - 20)
+    end_idx = max(1, t0_zscore_idx + 10)
+    
+    beam_window = beam_presence.iloc[start_idx:end_idx]
+    
+    if len(beam_window) > 0:
+        # On compte le nombre exact de points où le faisceau est présent (état = 1)
+        points_on = beam_window.sum()
+        total_points = len(beam_window)
+        
+        # Le faisceau est présent au moins 2 points mais il n'est pas parfaitement stable
+        if points_on >= 2 and points_on < total_points:
+            return "Other;Beam anomaly"
+            
+    return None
+
+def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
     """
@@ -325,6 +345,11 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx):
     )
     if peaks_label:
         return peaks_label
+
+    # Test des anomalies liées à la présence du faisceau
+    beam_label = _check_beam_anomalies(beam_presence, t0_zscore_idx)
+    if beam_label:
+        return beam_label
             
     # Si aucune condition n'est remplie
     return "Other"
@@ -424,7 +449,7 @@ def classify_file(file_name):
     parameters, time, df_signals, df_defaults, _, _ = Read_Signals(
         file_content, 
         compute_defauts=True, 
-        compute_etats=False, 
+        compute_etats=True, 
         plot_signaux=False, 
         show_header=False
     )
@@ -527,7 +552,8 @@ def classify_file(file_name):
             Uci = df_signals.get("Uci")
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
-            label = classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, t0_ampt_idx)
+            beam_presence = df_signals.get("Presence faisceau")
+            label = classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx)
             return f"{primary_fault};{label}"
 
         case _:
