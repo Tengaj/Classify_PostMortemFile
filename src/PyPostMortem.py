@@ -428,6 +428,11 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
         # df_signaux["MODP2"]= np.angle([df_signaux["I modulateur binary"]+ df_signaux["Q modulateur binary"]*1j])
         df_signaux.loc[:,"MODP"]= np.degrees(np.arctan2(df_signaux["Q modulateur binary"],(df_signaux["I modulateur binary"])))
 
+    if df_states is not None and 'Temp RF int' in df_states.columns:
+        beam_data = df_states['Temp RF int'].values
+        if len(beam_data) == len(df_signaux):
+            df_signaux['Presence faisceau'] = beam_data
+
     if compute_defauts:
         df_defaut = df_defaut.astype(bool)
 
