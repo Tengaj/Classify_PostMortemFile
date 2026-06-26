@@ -235,7 +235,7 @@ Fichier;Defaut;Label;Détails
 2024 11 04 CMB02-CAV1_0003;Rég signal RF hors tolérance;Quench
 2024 11 04 CMB02-CAV1_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 08 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 14 CMB02-CAV1_0001 0749;Rég signal RF hors tolérance;Other
+2024 11 14 CMB02-CAV1_0001 0749;Rég signal RF hors tolérance;Other;Wrong alarm
 2024 11 25 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 27 CMB02-CAV1_0001;Rég signal RF hors tolérance;Quench
 2024 11 29 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -260,9 +260,9 @@ Fichier;Defaut;Label;Détails
 2024 10 23 CMB03-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 10 24 CMB03-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 24 CMB03-CAV1_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 04 CMB03-CAV1_0001;Rég signal RF hors tolérance;Other
-2024 11 08 CMB03-CAV1_0001;Rég signal RF hors tolérance;Other
-2024 11 08 CMB03-CAV1_0002;Rég signal RF hors tolérance;Other
+2024 11 04 CMB03-CAV1_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2024 11 08 CMB03-CAV1_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2024 11 08 CMB03-CAV1_0002;Rég signal RF hors tolérance;Other;Wrong alarm
 2024 11 25 CMB03-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 29 CMB03-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 29 CMB03-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0

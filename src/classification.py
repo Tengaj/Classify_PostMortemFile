@@ -323,6 +323,46 @@ def _check_detuning_anomalies(time, Uci, Ucr, start_idx_Uci_rise, t0_ampt_idx):
         
     return None
 
+def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
+    """
+    [Sous-fonction] Vérifie le comportement "Wrong alarm" (Chute standard).
+    """
+    zero_idx = np.argmin(np.abs(time))
+
+    # Fenêtres de mesure
+    idx_before_start = max(0, zero_idx - 20)
+    idx_before_end   = max(1, zero_idx - 2)
+    
+    idx_after_start  = zero_idx
+    idx_after_end    = min(len(Uci), zero_idx + 50)
+
+    if idx_after_start >= len(Uci) - 2:
+        return None
+
+    # Extraction des niveaux calmes juste avant la coupure
+    ucr_before = np.median(Ucr.iloc[idx_before_start:idx_before_end])
+
+    # Extraction des extrêmes atteints juste après la coupure
+    uci_after = Uci.iloc[idx_after_start:idx_after_end].min()
+    iq_after  = modIQ.iloc[idx_after_start:idx_after_end].min()
+    ucr_after = Ucr.iloc[idx_after_start:idx_after_end].max()
+
+    # Évaluation des conditions
+    # Uci chute presque à 0 
+    is_uci_zero = uci_after < 0.05
+
+    # modIQ chute presque à 0
+    is_iq_zero = iq_after < 0.05
+
+    # Ucr monte très vite
+    is_ucr_spike = (ucr_after - ucr_before) > 0.3
+
+    # Verdict
+    if is_uci_zero and is_iq_zero and is_ucr_spike:
+        return "Other;Wrong alarm"
+
+    return None
+
 def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
@@ -389,6 +429,13 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
     )
     if detuning_label:
         return detuning_label
+
+    # Test de chute standard (Wrong alarm)
+    wrong_alarm_label = _check_wrong_alarm_anomalies(
+        time, Uci, Ucr, modIQ
+    )
+    if wrong_alarm_label:
+        return wrong_alarm_label
             
     # Si aucune condition n'est remplie
     return "Other"
