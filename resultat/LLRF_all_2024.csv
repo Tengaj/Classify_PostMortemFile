@@ -24,14 +24,14 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMA02_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 10 24 CMA02_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 04 CMA02_0001;Rég signal RF hors tolérance;Beam loss
-2024 11 04 CMA02_0002;Rég signal RF hors tolérance;Other
+2024 11 04 CMA02_0002;Rég signal RF hors tolérance;Beam anomaly
 2024 11 04 CMA02_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 04 CMA02_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 04 CMA02_0005;Rég signal RF hors tolérance;Other
+2024 11 04 CMA02_0005;Rég signal RF hors tolérance;Beam anomaly
 2024 11 04 CMA02_0006;Rég signal RF hors tolérance;Other
 2024 11 04 CMA02_0007;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMA02_0001;Rég signal RF hors tolérance;Beam loss
-2024 11 08 CMA02_0002;Rég signal RF hors tolérance;Other
+2024 11 08 CMA02_0002;Rég signal RF hors tolérance;Beam anomaly
 2024 11 08 CMA02_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMA02_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMA02_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
@@ -60,7 +60,7 @@ Fichier;Defaut;Label;Détails
 2024 11 08 CMA03_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMA03_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 25 CMA03_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 25 CMA03_0003;Rég signal RF hors tolérance;Other
+2024 11 25 CMA03_0003;Rég signal RF hors tolérance;Beam anomaly
 2024 11 29 CMA03_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 09 19 CMA04_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 09 23 CMA04_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -123,7 +123,7 @@ Fichier;Defaut;Label;Détails
 2024 11 08 CMA06_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 25 CMA06_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 29 CMA06_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 04 CMA07_0001;Rég signal RF hors tolérance;Other
+2024 11 04 CMA07_0001;Rég signal RF hors tolérance;Beam anomaly
 2024 11 04 CMA07_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 09 19 CMA08_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
