@@ -292,6 +292,37 @@ def _check_beam_anomalies(beam_presence, t0_zscore_idx):
             
     return None
 
+def _check_detuning_anomalies(time, Uci, Ucr, start_idx_Uci_rise, t0_ampt_idx):
+    """
+    [Sous-fonction] Vérifie si Uci et Ucr montent continuellement depuis le début du fichier.
+    Caractéristique des dérives lentes.
+    """
+    #print(f"start_idx_Uci_rise : {start_idx_Uci_rise}")
+    zero_idx = np.argmin(np.abs(time))
+    
+    limit_early_rise = int(zero_idx * 0.5)
+
+    #start_idx_Uci_rise = 0
+    
+    # Si la montée commence tardivement, on annule.
+    if start_idx_Uci_rise >= limit_early_rise:
+        return None
+
+    # Définition de la fenêtre d'analyse
+    t_win = time[start_idx_Uci_rise:t0_ampt_idx]
+    Uci_win = Uci.iloc[start_idx_Uci_rise:t0_ampt_idx]
+    Ucr_win = Ucr.iloc[start_idx_Uci_rise:t0_ampt_idx]
+
+    # Analyse des tendance
+    trend_Uci = get_trend(t_win, Uci_win, tolerance=1e-6)
+    trend_Ucr = get_trend(t_win, Ucr_win, tolerance=1e-6)
+
+    # Si les deux signaux montent
+    if trend_Uci == 1 and trend_Ucr == 1:
+        return "Other;Detuning control error"
+        
+    return None
+
 def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
@@ -301,11 +332,12 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
     dt_seconds = dt_us * 1e-6 # Conversion en secondes pour obtenir la fréquence en Hz et pas Mhz 
 
     # Détection d'un éventuel palier (escalier) avant le défaut
-    end_stair_idx = detect_end_of_staircase(Ucav,t0_ampt_idx, dt_us)
+    end_stair_idx = detect_end_of_staircase(Ucav, t0_ampt_idx, dt_us)
 
     # Détection du décrochage (t0_zscore)
     if end_stair_idx is not None:
         # On cherche le décrochage uniquement après l'escalier
+        print(f"end_stair_idx : {end_stair_idx} end_stair time : {time[end_stair_idx]}")
         t0_zscore_idx, _ = detect_t0_zscore(Ucav.iloc[end_stair_idx:])
         t0_zscore_idx += end_stair_idx
     else:
@@ -350,6 +382,13 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
     beam_label = _check_beam_anomalies(beam_presence, t0_zscore_idx)
     if beam_label:
         return beam_label
+
+    # Test des detuning lent
+    detuning_label = _check_detuning_anomalies(
+        time, Uci, Ucr, start_idx_Uci_rise, t0_ampt_idx
+    )
+    if detuning_label:
+        return detuning_label
             
     # Si aucune condition n'est remplie
     return "Other"

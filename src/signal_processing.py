@@ -309,7 +309,7 @@ def detect_end_of_staircase(signal, zero_idx, dt_us):
     Détecte la fin d'une forme en escalier dans un signal avant une chute.
     Retourne l'index numérique de la fin de l'escalier, ou None si aucun n'est détecté.
     """
-    safety_margin_pts = int(500 / dt_us)
+    safety_margin_pts = int(10000 / dt_us)
 
     if zero_idx - safety_margin_pts <= 0:
         return None
@@ -362,7 +362,7 @@ def detect_end_of_staircase(signal, zero_idx, dt_us):
     falling_peaks, _ = find_peaks(-derivative, height=min_fall_height, distance=min_dist_pts)
 
     # Si on trouve plusieurs vraies grandes descentes, c'est de l'oscillation
-    if len(falling_peaks) >= 2: 
+    if len(falling_peaks) >= 2:
         return None
 
     # Conclusion et positionnement
