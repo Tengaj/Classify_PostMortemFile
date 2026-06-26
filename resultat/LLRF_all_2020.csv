@@ -124,7 +124,7 @@ Fichier;Defaut;Label;Détails
 2020 11 12 CMA05_0001;Rég signal RF hors tolérance;Filtered;Beam NON
 2020 11 12 CMA05_0002;Rég signal RF hors tolérance;Power chain gain
 2020 11 18 CMA05_0001;Rég signal RF hors tolérance;Other
-2020 11 19 CMA05_0001;Rég signal RF hors tolérance;Beam anomaly
+2020 11 19 CMA05_0001;Rég signal RF hors tolérance;Other;Beam anomaly
 2020 12 02 CMA05_0002;Rég signal RF hors tolérance;Filtered;Beam NON
 2020 12 06 CMA05_0001;Rég signal RF hors tolérance;Filtered;Beam NON
 2020 07 17 CMA06_0016;Rég signal RF hors tolérance;Filtered;Beam NON
