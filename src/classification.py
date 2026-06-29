@@ -328,13 +328,18 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     [Sous-fonction] Vérifie le comportement "Wrong alarm" (Chute standard).
     """
     zero_idx = np.argmin(np.abs(time))
+    dt_us = np.mean(np.diff(time))
 
     # Fenêtres de mesure
-    idx_before_start = max(0, zero_idx - 20)
-    idx_before_end   = max(1, zero_idx - 2)
-    
+    pts_before_start = max(1, int(440.0 / dt_us))
+    pts_before_end = max(1, int(100.0 / dt_us))
+    pts_after = max(1, int(550.0 / dt_us))
+
+    idx_before_start = max(0, zero_idx - pts_before_start)
+    idx_before_end   = max(1, zero_idx - pts_before_end)
+
     idx_after_start  = zero_idx
-    idx_after_end    = min(len(Uci), zero_idx + 50)
+    idx_after_end    = min(len(Uci), zero_idx + pts_after)
 
     if idx_after_start >= len(Uci) - 2:
         return None
@@ -347,15 +352,18 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     iq_after  = modIQ.iloc[idx_after_start:idx_after_end].min()
     ucr_after = Ucr.iloc[idx_after_start:idx_after_end].max()
 
-    # Évaluation des conditions
-    # Uci chute presque à 0 
-    is_uci_zero = uci_after < 0.05
+    # Calcul du pourcentage de variations
+    delta_pos_Ucr = ucr_after - ucr_before
+    ucr_before_safe = max(abs(ucr_before), 0.001)
+    pct_pos_Ucr = (delta_pos_Ucr / ucr_before_safe) * 100.0
 
-    # modIQ chute presque à 0
-    is_iq_zero = iq_after < 0.05
+    # Évaluation des conditions
+    # Uci et modIQ chutent presque à 0
+    is_uci_zero = uci_after < 0.5
+    is_iq_zero = iq_after < 0.5
 
     # Ucr monte très vite
-    is_ucr_spike = (ucr_after - ucr_before) > 0.3
+    is_ucr_spike = pct_pos_Ucr > 10.0
 
     # Verdict
     if is_uci_zero and is_iq_zero and is_ucr_spike:
