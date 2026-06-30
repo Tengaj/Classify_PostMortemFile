@@ -7,6 +7,8 @@
 # Paramètres d'exécution
 # ----------------------------------
 execution:
+  input_path: "../../LLRF/"
+  output_path: "../resultat/"
   combine_csvs: false   # true : résultat dans un seul csv, false : résultat dans un csv par année
   years:                # Année à analyser
     - 2020
