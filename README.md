@@ -1,6 +1,22 @@
 # Classification automatique des défauts dans les cavités supraconductrices RF de SPIRAL 2
 
-Ce projet permet l'analyse post-mortem et la classification automatique des signaux LLRF (Low Level Radio Frequency). Il traite les données brutes pour identifier la nature physique des pannes.
+Ce projet permet l'analyse post-mortem et la classification automatique des signaux LLRF (Low Level Radio Frequency). Il traite les données brutes pour identifier la nature physique des pannes. Il permet une analyse annuelle ou complète des fichiers post-mortem. 
+
+## Prérequis
+
+Ce programme fonctionne sous Python 3.10 (développé et testé sur la version 3.10.12).
+
+Il nécessite les bibliothèques externes suivantes (non incluses par défaut dans Python) :
+ - NumPy
+ - Pandas
+ - SciPy
+ - PyYAML
+
+Pour installer rapidement toutes les dépendances publiques, vous pouvez exécuter la commande suivante dans votre terminal :
+
+```bash
+pip install numpy pandas scipy pyyaml
+```
 
 ## Utilisation et lancement 
 
@@ -14,6 +30,18 @@ cd src/
 python3 main.py
 
 ```
+
+## Format des résultats
+
+Les résultats de l'analyse sont exportés sous forme de fichiers CSV (séparateur : point-virgule `;`). Selon votre configuration (`combine_csvs`), vous obtiendrez soit un fichier par année, soit un fichier global. 
+
+Le fichier généré contient les colonnes suivantes :
+
+ - **Fichier** : Le nom exact du fichier de données brutes analysé.
+ - **Annee** : L'année de l'événement *(colonne présente uniquement si l'option de fichier combiné global est activée)*.
+ - **Defaut** : La catégorie majeure du défaut renseignée par la machine (ex: "Rég signal RF hors tolérance").
+ - **Label** : La classification physique précise trouvée par l'algorithme (ex: "Quench", "Taconis", "Other").
+ - **Détails** : Informations supplémentaires sur le fichier (ex: temps de chute pour un "Quench" ou la raison de filtrage).
 
 ## Configuration 
 
