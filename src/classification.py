@@ -532,8 +532,66 @@ def classify_quench(Ucav, t0_ampt_idx):
         # N'est pas sensé arriver
         return f"Quench{fall_time_str}"
 
+def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
+    """
+    Vérifie si les conditions d'exploitation du signal sont valides avant de procéderà son analyse complète. 
+    S'appuie sur les paramètres définis dans le fichier de configuration.
+    """
+    cfg = CONFIG.get("filters", {})
+
+    # Filtre Faisceau (BEAM) ou Boucle (LOOP) désactivés
+    beam = parameters.get("BEAM")
+    loop = parameters.get("LOOP")
+
+    if cfg.get("check_beam", True) and beam == "NON":
+        return f"Filtered;Beam NON"
+        
+    if cfg.get("check_loop", True) and loop == "OFF":
+        return f"Filtered;Loop OFF"
+
+    # Filtre sur KPI
+    if cfg.get("check_kpi", True):
+        kpi = float(parameters.get("KPI", 0))
+        kpi_threshold = cfg.get("min_kpi", 10.0)
+        if kpi < kpi_threshold:
+            return f"Filtered;KPI < {kpi_threshold}"
+
+    # Filtre sur le Masque
+    if cfg.get("check_mask", True):
+        mask = parameters.get("MASK")
+        file_name_str = str(file_name)
+        if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
+            return f"Filtered;Mask problem"
+        if "CMB" in file_name_str and mask != "0x007F":
+            return f"Filtered;Mask problem"
+
+    #Filtre sur l'amplitude (AMPT)
+    if cfg.get("check_ampt", True):
+        ampt_threshold = cfg.get("max_ampt", 10.0)
+        if ampt > ampt_threshold:
+            return f"Filtered;AMPT > {ampt_threshold}%"
+    
+    # Filtre sur la tension cavité (Ucav)  
+    if cfg.get("check_ucav_healthy", True):
+        dt_us = np.mean(np.diff(time))
+        ucav_min = cfg.get("ucav_min_healthy", 0.1)
+        max_duration_us = cfg.get("ucav_low_max_duration_us", 200.0)
+
+        Ucav_before_t0 = Ucav.iloc[:zero_idx]
+
+        # Cas A : Tension presque nulle en moyenne avant le défaut
+        if np.mean(Ucav_before_t0) < ucav_min:
+            return f"Filtered;Tension moyenne < {ucav_min}"
+
+        # Cas B : Tension qui tombe trop bas pendant un certain temps avant t0
+        required_points = max(2, int(max_duration_us / dt_us))
+        drop_mask = Ucav_before_t0 < ucav_min
+        
+        if drop_mask.rolling(window=required_points).sum().max() >= required_points:
+            return f"Filtered;Tension < {ucav_min} avant t0"
+
 @chrono
-def classify_file(file_name):
+def classify_file(file_name,filter = True):
     """
     Classifie le fichier
     """
@@ -559,65 +617,14 @@ def classify_file(file_name):
         primary_fault = ""
     #print(f"Defaut : {detected_faults}")
 
-    cfg = CONFIG.get("filters", {})
-
-    # Filtre Faisceau (BEAM) ou Boucle (LOOP) désactivés
-    beam = parameters.get("BEAM")
-    loop = parameters.get("LOOP")
-
-    if cfg.get("check_beam", True) and beam == "NON":
-        return f"{primary_fault};Filtered;Beam NON"
-        
-    if cfg.get("check_loop", True) and loop == "OFF":
-        return f"{primary_fault};Filtered;Loop OFF"
-
-    # Filtre sur KPI
-    if cfg.get("check_kpi", True):
-        kpi = float(parameters.get("KPI", 0))
-        kpi_threshold = cfg.get("min_kpi", 10.0)
-        if kpi < kpi_threshold:
-            return f"{primary_fault};Filtered;KPI < {kpi_threshold}"
-
-    # Filtre sur le Masque
-    mask = parameters.get("MASK")
-    file_name_str = str(file_name)
-
-    if cfg.get("check_mask", True):
-        mask = parameters.get("MASK")
-        file_name_str = str(file_name)
-        if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
-            return f"{primary_fault};Filtered;Mask problem"
-        if "CMB" in file_name_str and mask != "0x007F":
-            return f"{primary_fault};Filtered;Mask problem"
-
-    #Filtre sur l'amplitude (AMPT)
-    ampt = float(parameters.get("AMPT", 3.0))
-    if cfg.get("check_ampt", True):
-        ampt_threshold = cfg.get("max_ampt", 10.0)
-        if ampt > ampt_threshold:
-            return f"{primary_fault};Filtered;AMPT > {ampt_threshold}%"
-    
-    # Filtre sur la tension cavité (Ucav)  
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
-    
-    if cfg.get("check_ucav_healthy", True):
-        dt_us = np.mean(np.diff(time))
-        ucav_min = cfg.get("ucav_min_healthy", 0.1)
-        max_duration_us = cfg.get("ucav_low_max_duration_us", 200.0)
+    ampt = float(parameters.get("AMPT", 3.0))
 
-        Ucav_before_t0 = Ucav.iloc[:zero_idx]
-
-        # Cas A : Tension presque nulle en moyenne avant le défaut
-        if np.mean(Ucav_before_t0) < ucav_min:
-            return f'{primary_fault};Filtered;Tension moyenne < {ucav_min}'
-
-        # Cas B : Tension qui tombe trop bas pendant un certain temps avant t0
-        required_points = max(2, int(max_duration_us / dt_us))
-        drop_mask = Ucav_before_t0 < ucav_min
-        
-        if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-            return f"{primary_fault};Filtered;Tension < {ucav_min} avant t0" 
+    # Vérification de l'état des filtres
+    filter_result = _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt)
+    if filter and not filter_result is None: 
+        return f"{primary_fault};{filter_result}"
 
     # Préparation du temps de départ
     t0_ampt_idx, _ = find_true_t0_with_ampt(Ucav,zero_idx, ampt)
@@ -625,22 +632,22 @@ def classify_file(file_name):
     # Aiguillage vers les sous-classificateurs
     match primary_fault:
         case "Seuil pick-up" | "Coupure externe rapide" | "Absence autorisation RF":
-            return primary_fault
+            final_label = primary_fault
         
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
             void = df_signals.get("vide")
             label = classify_void(pickup, void, t0_ampt_idx)
-            return f"{primary_fault};{label}"
+            final_label = f"{primary_fault};{label}"
         
         case "Claquage ou quench cavité":
-            label = classify_quench(Ucav,t0_ampt_idx)
-            return f"{primary_fault};{label}" 
+            label = classify_quench(Ucav, t0_ampt_idx)
+            final_label = f"{primary_fault};{label}" 
 
         case "Dép seuil de sécurité RF":
             Ucat = parameters.get("UCAT")
             label = classify_RF_protections(time, Ucav, Ucat)
-            return f"{primary_fault};{label}"
+            final_label = f"{primary_fault};{label}"
 
         case "Rég signal RF hors tolérance":
             Uci = df_signals.get("Uci")
@@ -648,7 +655,13 @@ def classify_file(file_name):
             modIQ = df_signals.get("IQ")
             beam_presence = df_signals.get("Presence faisceau")
             label = classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx)
-            return f"{primary_fault};{label}"
+            final_label = f"{primary_fault};{label}"
 
         case _:
-            return "Other"
+            final_label = "Other"
+
+    if not filter and filter_result is not None:
+        filter_reason = filter_result.split(";")[-1]
+        return f"{final_label}|{filter_reason}"
+
+    return final_label
