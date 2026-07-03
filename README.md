@@ -25,7 +25,6 @@ Avant toute utilisation, assurez-vous que les chemins d'accès d'entrée et de s
 Ensuite, placez-vous dans le répertoire source et lancez le script principal :
 
 ```Bash
-
 cd src/
 python3 main.py
 

@@ -9,8 +9,8 @@
 execution:
   input_path: "../../LLRF/"
   output_path: "../resultat/"
-  combine_csvs: false   # true : résultat dans un seul csv, false : résultat dans un csv par année
-  years:                # Année à analyser
+  combine_csvs: false               # true : résultat dans un seul csv, false : résultat dans un csv par année
+  years:                            # Année à analyser
     - 2020
     - 2021
     - 2022
@@ -44,26 +44,26 @@ thresholds:
   ecav_instability:
 
     # oscillations
-    taconis_max_hz: 100                # Seuil maximun pour qu'une oscillation soit un taconis
+    taconis_max_hz: 100                 # Seuil maximun pour qu'une oscillation soit un taconis
     
-    min_physical_amp_modiq: 0.1        # Amplitude minimum accepté pour que modIQ oscille
-    min_physical_amp_uci: 0.002        # Amplitude minimum accepté pour que Uci oscille
-    min_physical_amp_ucav: 0.0001      # Amplitude minimum accepté pour que Ucav oscille
+    min_physical_amp_modiq: 0.1         # Amplitude minimum accepté pour que modIQ oscille
+    min_physical_amp_uci: 0.002         # Amplitude minimum accepté pour que Uci oscille
+    min_physical_amp_ucav: 0.0001       # Amplitude minimum accepté pour que Ucav oscille
 
     # Quench 
-    fall_target_pct: 1.0            # Objectif de chute (99%)
-    min_false_alarm_us: 10000.0     # Limite basse en µs pour une chute normal
+    fall_target_pct: 1.0                # Objectif de chute (99%)
+    min_false_alarm_us: 10000.0         # Limite basse en µs pour une chute normal
 
     # Peak
-    threshold_noise_pct : 10.0     # Pourcentage minimum pour que le pic sorte du bruit
-    threshold_peak_pct: 90.0       # Pourcentage pour qu'un pic soit classé "Gain anormal" (Power chain gain)
+    threshold_noise_pct : 10.0          # Pourcentage minimum pour que le pic sorte du bruit
+    threshold_peak_pct: 90.0            # Pourcentage pour qu'un pic soit classé "Gain anormal" (Power chain gain)
   
   quench:
     min_false_alarm_us: 1000.0          # Limite basse en µs pour une fausse alarme
     fall_target_pct: 50.0               # Objectif de chute (50%)
   
   rf_protection:
-    threshold_ucav_max: 8.5      # Au-delà de ce ratio Ucav/Ucat, c'est un "Ucav max"
+    threshold_ucav_max: 8.5             # Au-delà de ce ratio Ucav/Ucat, c'est un "Ucav max"
     
   vacuum:
-    pickup_threshold: 50.0   # En uA
+    pickup_threshold: 50.0              # En uA
