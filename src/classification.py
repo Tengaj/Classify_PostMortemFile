@@ -545,7 +545,7 @@ def classify_quench(Ucav, t0_ampt_idx):
 
 def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
     """
-    Vérifie si les conditions d'exploitation du signal sont valides avant de procéderà son analyse complète. 
+    [Sous-fonction] Vérifie si les conditions d'exploitation du signal sont valides avant de procéderà son analyse complète. 
     S'appuie sur les paramètres définis dans le fichier de configuration.
     """
     cfg = CONFIG.get("filters", {})
@@ -603,7 +603,7 @@ def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
 
 def classify_signals(file_name, parameters, time, df_signals, df_defaults, filter=True):
     """
-    Classifie un fichier post mortem RF à partir de signaux déjà chargés en mémoire.
+    Classifie un fichier post mortem à partir de signaux déjà chargés en mémoire.
     """
     # Identification du premier défaut déclenché
     faulty_rows = (df_defaults == 0).any(axis=1)
@@ -657,7 +657,7 @@ def classify_signals(file_name, parameters, time, df_signals, df_defaults, filte
             final_label = f"{primary_fault};{label}"
 
         case _:
-            final_label = "Other"
+            final_label = "Pas de défaut"
 
     if not filter and filter_result is not None:
         filter_reason = filter_result.split(";")[-1]
