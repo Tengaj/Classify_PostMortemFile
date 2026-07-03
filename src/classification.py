@@ -590,22 +590,10 @@ def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
         if drop_mask.rolling(window=required_points).sum().max() >= required_points:
             return f"Filtered;Tension < {ucav_min} avant t0"
 
-@chrono
-def classify_file(file_name,filter = True):
+def classify_signals(file_name, parameters, time, df_signals, df_defaults, filter=True):
     """
-    Classifie le fichier
+    Classifie un fichier post mortem RF à partir de signaux déjà chargés en mémoire.
     """
-    with open(file_name, 'rb') as f:
-        file_content = f.read()
-
-    parameters, time, df_signals, df_defaults, _, _ = Read_Signals(
-        file_content, 
-        compute_defauts=True, 
-        compute_etats=True, 
-        plot_signaux=False, 
-        show_header=False
-    )
-     
     # Identification du premier défaut déclenché
     faulty_rows = (df_defaults == 0).any(axis=1)
     if faulty_rows.any():
@@ -665,3 +653,22 @@ def classify_file(file_name,filter = True):
         return f"{final_label}|{filter_reason}"
 
     return final_label
+
+
+@chrono
+def classify_file(file_name,filter=True):
+    """
+    Lit un fichier brut post-mortem depuis son chemin physique, puis le classifie.
+    """
+    with open(file_name, 'rb') as f:
+        file_content = f.read()
+
+    parameters, time, df_signals, df_defaults, _, _ = Read_Signals(
+        file_content, 
+        compute_defauts=True, 
+        compute_etats=True, 
+        plot_signaux=False, 
+        show_header=False
+    )
+     
+    return classify_signals(file_name, parameters, time, df_signals, df_defaults, filter)
