@@ -73,7 +73,7 @@ def _verify_oscillation_survival(sig_zcross, period_points, min_physical_amp):
             
     return is_touching_end
 
-def analyze_oscillation(signal, dt, snr_threshold=6.5, min_physical_amp=0.005):
+def analyze_oscillation(signal, dt, snr_threshold=8.5, min_physical_amp=0.005):
     """
     Détermine si le signal oscille et renvoie la fréquence
     - snr_threshold : Rapport signal/bruit dans le spectre (relatif).
