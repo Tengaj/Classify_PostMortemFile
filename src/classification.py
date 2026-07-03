@@ -190,7 +190,7 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
             
     return None
     
-def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx):
+def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_idx, t0_zscore_idx):
     """
     [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Power chain gain).
     """
@@ -262,9 +262,20 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_id
         if pct_modIQ > threshold_peak_pct and pct_Uci < -threshold_noise_pct:
             return "Power chain gain"
 
-        # Beam loss (Pic modIQ et Uci, chute de Ucav)
+        # Beam loss (Pic modIQ et Uci, chute de Ucav et presence du faisceau)
         elif pct_Uci > threshold_noise_pct and is_real_peak and trend_Ucav_short == -1:
-            return "Beam loss"
+            start_idx = max(0, t0_zscore_idx - 20)
+            end_idx = max(1, t0_zscore_idx + 10)
+            
+            beam_window = beam_presence.iloc[start_idx:end_idx]
+            
+            if len(beam_window) > 0:
+                # On compte le nombre exact de points où le faisceau est présent (état = 1)
+                points_on = beam_window.sum()
+                
+                # Le faisceau est présent au moins 2 points
+                if points_on >= 2:
+                    return "Beam loss"
 
         # Beam loss mais montée de Ucav
         #elif pct_Uci > threshold_noise_pct and trend_Ucav_short == 1:
@@ -393,7 +404,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
         t0_zscore_idx, _ = detect_t0_zscore(Ucav)
 
     # Affichage t0 zcore et ampt
-    print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]}')
+    #print(f't0_zscore_idx : {t0_zscore_idx}, t0 zscore valeur : {time[t0_zscore_idx]}, t0_ampt_idx : {t0_ampt_idx}, t0 ampt valeur : {time[t0_ampt_idx]}')
 
     # Test des Oscillations
     oscillation_label = _check_instability_oscillations(
@@ -421,7 +432,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
 
     # Test des anomalies de pics
     peaks_label = _check_amplitude_anomalies(
-        time, Uci, Ucav, modIQ, t0_ampt_idx, t0_zscore_idx
+        time, Uci, Ucav, modIQ, beam_presence, t0_ampt_idx, t0_zscore_idx
     )
     if peaks_label:
         return peaks_label
