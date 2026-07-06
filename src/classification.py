@@ -489,21 +489,28 @@ def classify_RF_protections(time, Ucav, Ucat):
     else:
         return "Pr max"
 
-def classify_void(pickup, void, t0_ampt_idx, threshold_pickup=50):
+def classify_vacuum(pickup, void, zero_idx):
     """
-    Classifie le défaut "Seuil de vide" en mesurant la quantité de courant pickup par rapport au seuil. 
+    Classifie le défaut "Seuil de vide"
+    Pour le moment, indique la valeur moyenne du courant pickup avant t0 et la valeur du vide à t0. 
     """
-    pickup_win = pickup.iloc[0:t0_ampt_idx] #+ 38
-    mean_pickup = pickup_win.mean() #+ 38
-    void_win = void.iloc[0:t0_ampt_idx] * 10000000
-    mean_void = void_win.mean()
-    #print(f'moyenne pickup : {mean_pickup}')
-    #print(f'moyenne void : {mean_void}')
+    pickup_win = pickup.iloc[0:zero_idx]
+    mean_pickup = pickup_win.mean()
 
+    vacuum_at_fault = void.iloc[zero_idx]
+
+    text_pickup = f"Courant pickup moyen avant t0 : {mean_pickup:.3f} μA"
+    text_vacuum = f"Vide à t0 : {vacuum_at_fault:.3e} mbar"
+
+    return f";{text_pickup}, {text_vacuum}"
+    
+    '''
+    threshold_pickup = 50
     if mean_pickup > threshold_pickup:
         return f"Ipu;{mean_pickup:.2f}uA,{mean_void:.2f}"
     else:
         return f"Leak/outgassing;{mean_pickup:.2f}uA,{mean_void:.2f}"
+    '''
 
 def classify_quench(Ucav, t0_ampt_idx):
     """
@@ -636,7 +643,7 @@ def classify_signals(file_name, parameters, time, df_signals, df_defaults, filte
         case "Seuil de vide":
             pickup = df_signals.get("courant pickup")
             void = df_signals.get("vide")
-            label = classify_void(pickup, void, t0_ampt_idx)
+            label = classify_vacuum(pickup, void, zero_idx)
             final_label = f"{primary_fault};{label}"
         
         case "Claquage ou quench cavité":

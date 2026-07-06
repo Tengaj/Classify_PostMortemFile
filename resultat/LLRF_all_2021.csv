@@ -187,7 +187,7 @@ Fichier;Defaut;Label;Détails
 2021 09 03 CMA07_0004;Rég signal RF hors tolérance;Filtered;Beam NON
 2021 09 03 CMA07_0006;Rég signal RF hors tolérance;Filtered;Beam NON
 2021 09 09 CMA07_0002;Rég signal RF hors tolérance;Filtered;Beam NON
-2021 11 12 CMA07_0001;Seuil de vide;Leak/outgassing;-0.97uA,48.45
+2021 11 12 CMA07_0001;Seuil de vide;;Courant pickup moyen avant t0 : -0.968 μA, Vide à t0 : 6.602e-06 mbar
 2021 11 16 CMA07_0001 SRFHT avec kp=75+ FF;Rég signal RF hors tolérance;Other;Beam anomaly
 2021 11 16 CMA07_0013;Rég signal RF hors tolérance;Beam loss
 2021 04 07 CMA08_0001;Seuil de vide;Filtered;Beam NON
@@ -281,11 +281,11 @@ Fichier;Defaut;Label;Détails
 2021 07 15 CMA10_0006;Rég signal RF hors tolérance;Filtered;Beam NON
 2021 07 21 CMA10avecff_0004;Rég signal RF hors tolérance;Other;Wrong alarm
 2021 07 21 CMA10avecff_0005;Rég signal RF hors tolérance;Loop instability
-2021 07 21 CMA10avecff_0006;Seuil de vide;Leak/outgassing;-14.91uA,18.70
+2021 07 21 CMA10avecff_0006;Seuil de vide;;Courant pickup moyen avant t0 : -14.909 μA, Vide à t0 : 2.333e-06 mbar
 2021 07 21 CMA10avecff_0007;Seuil de vide;Filtered;Loop OFF
 2021 07 21 CMA10avecff_0008;Rég signal RF hors tolérance;Other;Wrong alarm
 2021 07 21 CMA10avecff_0009;Rég signal RF hors tolérance;Other;Wrong alarm
-2021 07 21 CMA10avecff_0010;Seuil de vide;Leak/outgassing;-8.59uA,21.27
+2021 07 21 CMA10avecff_0010;Seuil de vide;;Courant pickup moyen avant t0 : -8.587 μA, Vide à t0 : 2.311e-06 mbar
 2021 07 21 CMA10avecff_0011;Seuil de vide;Filtered;Loop OFF
 2021 07 21 CMA10avecff_0012;Seuil de vide;Filtered;Loop OFF
 2021 07 21 CMA10avecff_0013;Rég signal RF hors tolérance;Loop instability
