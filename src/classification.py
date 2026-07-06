@@ -299,7 +299,7 @@ def _check_beam_anomalies(beam_presence, t0_zscore_idx):
         
         # Le faisceau est présent au moins 2 points mais il n'est pas parfaitement stable
         if points_on >= 2 and points_on < total_points:
-            return "Other;Beam anomaly"
+            return "Beam related anomaly"
             
     return None
 
@@ -330,7 +330,7 @@ def _check_detuning_anomalies(time, Uci, Ucr, start_idx_Uci_rise, t0_ampt_idx):
 
     # Si les deux signaux montent
     if trend_Uci == 1 and trend_Ucr == 1:
-        return "Other;Detuning control error"
+        return "Detuning control error"
         
     return None
 
@@ -378,7 +378,7 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
 
     # Verdict
     if is_uci_zero and is_iq_zero and is_ucr_spike:
-        return "Other;Wrong alarm"
+        return "Wrong alarm"
 
     return None
 
@@ -503,7 +503,7 @@ def classify_vacuum(pickup, void, zero_idx):
     text_vacuum = f"Vide à t0 : {vacuum_at_fault:.3e} mbar"
 
     return f";{text_pickup}, {text_vacuum}"
-    
+
     '''
     threshold_pickup = 50
     if mean_pickup > threshold_pickup:

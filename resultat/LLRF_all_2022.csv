@@ -11,10 +11,10 @@ Fichier;Defaut;Label;Détails
 2022 10 12 CMA01_0001;Rég signal RF hors tolérance;Loop instability
 2022 10 12 CMA01_0002;Rég signal RF hors tolérance;Loop instability
 2022 10 12 CMA01_0003;Rég signal RF hors tolérance;Loop instability
-2022 10 12 CMA01_0004;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 12 CMA01_0004;Rég signal RF hors tolérance;Wrong alarm
 2022 10 12 CMA01_0005;Rég signal RF hors tolérance;Loop instability
-2022 10 12 CMA01_0006;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 12 CMA01_0007;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 12 CMA01_0006;Rég signal RF hors tolérance;Wrong alarm
+2022 10 12 CMA01_0007;Rég signal RF hors tolérance;Wrong alarm
 2022 10 21 CMA01_0004;Seuil de vide;Filtered;Loop OFF
 2022 10 21 CMA01_0005;Seuil de vide;Filtered;Loop OFF
 2022 10 21 CMA01_0006;Seuil de vide;Filtered;Loop OFF
@@ -62,8 +62,8 @@ Fichier;Defaut;Label;Détails
 2022 09 14 CMA05_0004;Rég signal RF hors tolérance;Loop instability
 2022 09 15 CMA05_0001;Rég signal RF hors tolérance;Loop instability
 2022 09 15 CMA05_0002;Rég signal RF hors tolérance;Loop instability
-2022 09 15 CMA05_0003;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 09 15 CMA05_0004;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 09 15 CMA05_0003;Rég signal RF hors tolérance;Beam related anomaly
+2022 09 15 CMA05_0004;Rég signal RF hors tolérance;Beam related anomaly
 2022 09 15 CMA05_0005;Rég signal RF hors tolérance;Filtered;Tension moyenne < 0.1
 2022 09 15 CMA05_0006;Rég signal RF hors tolérance;Filtered;Tension moyenne < 0.1
 2022 09 15 CMA05_0007;Rég signal RF hors tolérance;Filtered;Tension < 0.1 avant t0
@@ -114,10 +114,10 @@ Fichier;Defaut;Label;Détails
 2022 09 06 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2022 09 09 CMA07_0001;Rég signal RF hors tolérance;Power chain gain
 2022 09 14 CMA07_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
-2022 09 30 CMA07_0001;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 09 30 CMA07_0002;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 30 CMA07_0001;Rég signal RF hors tolérance;Wrong alarm
+2022 09 30 CMA07_0002;Rég signal RF hors tolérance;Wrong alarm
 2022 09 30 CMA07_0003;Rég signal RF hors tolérance;Loop instability
-2022 09 30 CMA07_0004;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 30 CMA07_0004;Rég signal RF hors tolérance;Wrong alarm
 2022 11 29 CMA07_0001;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 29 CMA07_0005;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 29 CMA07_0006;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
@@ -139,8 +139,8 @@ Fichier;Defaut;Label;Détails
 2022 09 09 CMA09_0001;Rég signal RF hors tolérance;Power chain gain
 2022 09 14 CMA09_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2022 09 16 CMA09_0001;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
-2022 09 16 CMA09_0002;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 09 16 CMA09_0003;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 09 16 CMA09_0002;Rég signal RF hors tolérance;Beam related anomaly
+2022 09 16 CMA09_0003;Rég signal RF hors tolérance;Beam related anomaly
 2022 09 30 CMA09_0001;Rég signal RF hors tolérance;Power chain gain
 2022 11 24 CMA09_0001;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 24 CMA09_0002;Rég signal RF hors tolérance;Filtered;Beam NON
@@ -260,13 +260,13 @@ Fichier;Defaut;Label;Détails
 2022 09 23 CMA12_0003;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 09 25 CMA12_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 25 CMA12_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 09 30 CMA12_0003;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 30 CMA12_0003;Rég signal RF hors tolérance;Wrong alarm
 2022 09 30 CMA12_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 30 CMA12_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 30 CMA12_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 14 CMA12_0002;Rég signal RF hors tolérance;Power chain gain
-2022 10 14 CMA12_0003;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 14 CMA12_0004;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 14 CMA12_0003;Rég signal RF hors tolérance;Wrong alarm
+2022 10 14 CMA12_0004;Rég signal RF hors tolérance;Wrong alarm
 2022 10 14 CMA12_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 14 CMA12_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 14 CMA12_0008;Rég signal RF hors tolérance;Power chain gain
@@ -370,15 +370,15 @@ Fichier;Defaut;Label;Détails
 2022 09 17 CMB01-CAV1_0003;Rég signal RF hors tolérance;Loop instability
 2022 09 20 CMB01-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB01-CAV1_0003;Rég signal RF hors tolérance;Quench aside
-2022 10 18 CMB01-CAV1 Test3 PM_0001;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1 Test3 PM_0002;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1 Test3 PM_0003;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1 Test3 PM_0004;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1_0001;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1_0002;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1_0003;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1_0004;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV1_0005;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 18 CMB01-CAV1 Test3 PM_0001;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1 Test3 PM_0002;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1 Test3 PM_0003;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1 Test3 PM_0004;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1_0001;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1_0002;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1_0003;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1_0004;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV1_0005;Rég signal RF hors tolérance;Wrong alarm
 2022 11 03 CMB01-CAV1_0009;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 09 CMB01-CAV1_0004;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 09 CMB01-CAV1_0005;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
@@ -482,10 +482,10 @@ Fichier;Defaut;Label;Détails
 2022 08 30 CMB01-CAV2_0002;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 09 01 CMB01-CAV2_0001;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 09 01 CMB01-CAV2_0002;Rég signal RF hors tolérance;Filtered;Beam NON
-2022 09 06 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 09 07 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 06 CMB01-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
+2022 09 07 CMB01-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 09 09 CMB01-CAV2_0001;Rég signal RF hors tolérance;Power chain gain
-2022 09 13 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 13 CMB01-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 09 13 CMB01-CAV2_0002;Rég signal RF hors tolérance;Power chain gain
 2022 09 14 CMB01-CAV2_0002;Rég signal RF hors tolérance;Loop instability
 2022 09 14 CMB01-CAV2_0003;Rég signal RF hors tolérance;Loop instability
@@ -499,9 +499,9 @@ Fichier;Defaut;Label;Détails
 2022 09 14 CMB01-CAV2_0011;Rég signal RF hors tolérance;Loop instability
 2022 09 14 CMB01-CAV2_0012;Rég signal RF hors tolérance;Loop instability
 2022 09 15 CMB01-CAV2_0001;Rég signal RF hors tolérance;Loop instability
-2022 09 15 CMB01-CAV2_0002;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 09 15 CMB01-CAV2_0003;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 09 15 CMB01-CAV2_0004;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 09 15 CMB01-CAV2_0002;Rég signal RF hors tolérance;Beam related anomaly
+2022 09 15 CMB01-CAV2_0003;Rég signal RF hors tolérance;Beam related anomaly
+2022 09 15 CMB01-CAV2_0004;Rég signal RF hors tolérance;Beam related anomaly
 2022 09 17 CMB01-CAV2_0001;Rég signal RF hors tolérance;Loop instability
 2022 09 20 CMB01-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 20 CMB01-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -517,81 +517,81 @@ Fichier;Defaut;Label;Détails
 2022 10 04 CMB01-CAV2_0002;Claquage ou quench cavité;Filtered;AMPT > 10.0%
 2022 10 04 CMB01-CAV2_0003;Claquage ou quench cavité;Filtered;KPI < 10.0
 2022 10 04 CMB01-CAV2_0004;Claquage ou quench cavité;Filtered;KPI < 10.0
-2022 10 04 CMB01-CAV2_0006;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 04 CMB01-CAV2_0011;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 04 CMB01-CAV2_0006;Rég signal RF hors tolérance;Wrong alarm
+2022 10 04 CMB01-CAV2_0011;Rég signal RF hors tolérance;Wrong alarm
 2022 10 04 CMB01-CAV2_0012;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 04 CMB01-CAV2_0013;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 07 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0003;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0004;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0003;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0004;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB01-CAV2_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB01-CAV2_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB01-CAV2_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB01-CAV2_0009;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB01-CAV2_0010;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 07 CMB01-CAV2_0011;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0012;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0013;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0014;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 10 07 CMB01-CAV2_0015;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0016;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0017;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0018;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0011;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0012;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0013;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0014;Rég signal RF hors tolérance;Beam related anomaly
+2022 10 07 CMB01-CAV2_0015;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0016;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0017;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0018;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0019;Rég signal RF hors tolérance;Power chain gain
-2022 10 07 CMB01-CAV2_0020;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0021;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0022;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0020;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0021;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0022;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0023;Rég signal RF hors tolérance;Power chain gain
-2022 10 07 CMB01-CAV2_0024;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0025;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0024;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0025;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0026 defaut quench;Claquage ou quench cavité;False alarm;Temps de chute : 1976.09 us
-2022 10 07 CMB01-CAV2_0027;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0028;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0029;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0030;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0031;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0032;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0033;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0034;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0035;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0036;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0037;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0038;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0039;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0027;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0028;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0029;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0030;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0031;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0032;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0033;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0034;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0035;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0036;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0037;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0038;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0039;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0040;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0041;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0042;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0043;Rég signal RF hors tolérance;Power chain gain
-2022 10 07 CMB01-CAV2_0044;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0044;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0045;Claquage ou quench cavité;False alarm;Temps de chute : 1976.09 us
-2022 10 07 CMB01-CAV2_0046;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0047;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0048;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0046;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0047;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0048;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0049;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0050;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0051;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0052;Rég signal RF hors tolérance;Loop instability
-2022 10 07 CMB01-CAV2_0053;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0054;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0055;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0056;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0057;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0058;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0053;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0054;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0055;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0056;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0057;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0058;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0059 defaut quench;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2022 10 07 CMB01-CAV2_0060;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
-2022 10 07 CMB01-CAV2_0061;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0061;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0062;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0063;Rég signal RF hors tolérance;Loop instability
-2022 10 07 CMB01-CAV2_0064;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0064;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0065;Rég signal RF hors tolérance;Loop instability
 2022 10 07 CMB01-CAV2_0066;Rég signal RF hors tolérance;Loop instability
-2022 10 07 CMB01-CAV2_0067;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0068;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0069;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0070;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0071;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0072;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0067;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0068;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0069;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0070;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0071;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0072;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB01-CAV2_0074;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 07 CMB01-CAV2_0076;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 07 CMB01-CAV2_0077;Rég signal RF hors tolérance;Filtered;Beam NON
@@ -600,23 +600,23 @@ Fichier;Defaut;Label;Détails
 2022 10 07 CMB01-CAV2_0080;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 07 CMB01-CAV2_0083;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 07 CMB01-CAV2_0084;Rég signal RF hors tolérance;Filtered;Beam NON
-2022 10 07 CMB01-CAV2_0085;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0086;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 10 07 CMB01-CAV2_0085;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0086;Rég signal RF hors tolérance;Beam related anomaly
 2022 10 07 CMB01-CAV2_0087;Rég signal RF hors tolérance;Power chain gain
-2022 10 07 CMB01-CAV2_0088;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0089;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0090;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0091;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0092;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0093;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0094;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0095;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0096;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0097;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 10 07 CMB01-CAV2_0098;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0099;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0100;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 07 CMB01-CAV2_0101;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB01-CAV2_0088;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0089;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0090;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0091;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0092;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0093;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0094;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0095;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0096;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0097;Rég signal RF hors tolérance;Beam related anomaly
+2022 10 07 CMB01-CAV2_0098;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0099;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0100;Rég signal RF hors tolérance;Wrong alarm
+2022 10 07 CMB01-CAV2_0101;Rég signal RF hors tolérance;Wrong alarm
 2022 10 12 CMB01-CAV2_0008;Claquage ou quench cavité;Filtered;Beam NON
 2022 10 12 CMB01-CAV2_0010;Dép seuil de sécurité RF;Filtered;Beam NON
 2022 10 12 CMB01-CAV2_0011;Dép seuil de sécurité RF;Filtered;Beam NON
@@ -625,23 +625,23 @@ Fichier;Defaut;Label;Détails
 2022 10 12 CMB01-CAV2_0018;Claquage ou quench cavité;Filtered;Beam NON
 2022 10 12 CMB01-CAV2_0022;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 12 CMB01-CAV2_0023;Rég signal RF hors tolérance;Filtered;Beam NON
-2022 10 12 CMB01-CAV2_0027;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 12 CMB01-CAV2_0027;Rég signal RF hors tolérance;Wrong alarm
 2022 10 14 CMB01-CAV2_0002;Claquage ou quench cavité;Filtered;Loop OFF
-2022 10 17 CMB01-CAV2_0002;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 18 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 17 CMB01-CAV2_0002;Rég signal RF hors tolérance;Wrong alarm
+2022 10 18 CMB01-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 10 19 CMB01-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 19 CMB01-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 19 CMB01-CAV2_0006;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 19 CMB01-CAV2_0007;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 19 CMB01-CAV2_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 19 CMB01-CAV2_0009;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 19 CMB01-CAV2_0010;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 20 CMB01-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 20 CMB01-CAV2_0002;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 10 20 CMB01-CAV2_0003;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 10 20 CMB01-CAV2_0004;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 10 20 CMB01-CAV2_0005;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 10 20 CMB01-CAV2_0006;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 10 19 CMB01-CAV2_0010;Rég signal RF hors tolérance;Wrong alarm
+2022 10 20 CMB01-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
+2022 10 20 CMB01-CAV2_0002;Rég signal RF hors tolérance;Beam related anomaly
+2022 10 20 CMB01-CAV2_0003;Rég signal RF hors tolérance;Beam related anomaly
+2022 10 20 CMB01-CAV2_0004;Rég signal RF hors tolérance;Beam related anomaly
+2022 10 20 CMB01-CAV2_0005;Rég signal RF hors tolérance;Beam related anomaly
+2022 10 20 CMB01-CAV2_0006;Rég signal RF hors tolérance;Beam related anomaly
 2022 10 20 CMB01-CAV2_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 20 CMB01-CAV2_0008;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 20 CMB01-CAV2_0010;Rég signal RF hors tolérance;Power chain gain
@@ -793,7 +793,7 @@ Fichier;Defaut;Label;Détails
 2022 09 15 CMB02-CAV2_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 20 CMB02-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 23 CMB02-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 18 CMB02-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 18 CMB02-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 10 31 CMB02-CAV2_0002;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 10 31 CMB02-CAV2_0003;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 10 31 CMB02-CAV2_0004;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
@@ -854,7 +854,7 @@ Fichier;Defaut;Label;Détails
 2022 09 30 CMB03-CAV1_0001;Rég signal RF hors tolérance;Loop instability
 2022 09 30 CMB03-CAV1_0002;Rég signal RF hors tolérance;Loop instability
 2022 09 30 CMB03-CAV1_0003;Rég signal RF hors tolérance;Loop instability
-2022 09 30 CMB03-CAV1_0004;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 09 30 CMB03-CAV1_0004;Rég signal RF hors tolérance;Beam related anomaly
 2022 09 30 CMB03-CAV1_0005;Rég signal RF hors tolérance;Loop instability
 2022 09 30 CMB03-CAV1_0006;Rég signal RF hors tolérance;Loop instability
 2022 09 30 CMB03-CAV1_0007;Rég signal RF hors tolérance;Loop instability
@@ -1151,8 +1151,8 @@ Fichier;Defaut;Label;Détails
 2022 09 25 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 25 CMB06-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 30 CMB06-CAV2_0001;Dép seuil de sécurité RF;Ucav max
-2022 09 30 CMB06-CAV2_0002;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 09 30 CMB06-CAV2_0003;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 09 30 CMB06-CAV2_0002;Rég signal RF hors tolérance;Beam related anomaly
+2022 09 30 CMB06-CAV2_0003;Rég signal RF hors tolérance;Beam related anomaly
 2022 09 30 CMB06-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 30 CMB06-CAV2_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 30 CMB06-CAV2_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -1219,15 +1219,15 @@ Fichier;Defaut;Label;Détails
 2022 09 29 CMB07-CAV1_0026;Rég signal RF hors tolérance;Filtered;Loop OFF
 2022 09 29 CMB07-CAV1_0027;Rég signal RF hors tolérance;Filtered;Loop OFF
 2022 09 29 CMB07-CAV1_0032;Rég signal RF hors tolérance;Filtered;Loop OFF
-2022 09 29 CMB07-CAV1_0038;Rég signal RF hors tolérance;Other;Beam anomaly
-2022 09 29 CMB07-CAV1_0039;Rég signal RF hors tolérance;Other;Beam anomaly
+2022 09 29 CMB07-CAV1_0038;Rég signal RF hors tolérance;Beam related anomaly
+2022 09 29 CMB07-CAV1_0039;Rég signal RF hors tolérance;Beam related anomaly
 2022 09 29 CMB07-CAV1_0040;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 29 CMB07-CAV1_0041;Rég signal RF hors tolérance;Loop instability
 2022 09 29 CMB07-CAV1_0043;Rég signal RF hors tolérance;Loop instability
 2022 09 29 CMB07-CAV1_0044;Rég signal RF hors tolérance;Loop instability
 2022 09 29 CMB07-CAV1_0045;Rég signal RF hors tolérance;Loop instability
 2022 09 29 CMB07-CAV1_0046;Rég signal RF hors tolérance;Loop instability
-2022 09 30 CMB07-CAV1_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 30 CMB07-CAV1_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 09 30 CMB07-CAV1_0004;Rég signal RF hors tolérance;Loop instability
 2022 09 30 CMB07-CAV1_0005;Rég signal RF hors tolérance;Loop instability
 2022 09 30 CMB07-CAV1_0006;Rég signal RF hors tolérance;Loop instability
@@ -1261,29 +1261,29 @@ Fichier;Defaut;Label;Détails
 2022 09 29 CMB07-CAV2_0005;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 09 29 CMB07-CAV2_0006;Rég signal RF hors tolérance;Loop instability
 2022 09 29 CMB07-CAV2_0007;Rég signal RF hors tolérance;Loop instability
-2022 09 29 CMB07-CAV2_0008;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 09 30 CMB07-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 09 29 CMB07-CAV2_0008;Rég signal RF hors tolérance;Wrong alarm
+2022 09 30 CMB07-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 09 30 CMB07-CAV2_0002;Claquage ou quench cavité;False alarm;Temps de chute : 2203.23 us
 2022 09 30 CMB07-CAV2_0003;Rég signal RF hors tolérance;Quench aside
 2022 09 30 CMB07-CAV2_0004;Rég signal RF hors tolérance;Loop instability
 2022 10 04 CMB07-CAV2_0001;Claquage ou quench cavité;False alarm;Temps de chute : 2203.23 us
-2022 10 04 CMB07-CAV2_0002;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 04 CMB07-CAV2_0003;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 04 CMB07-CAV2_0002;Rég signal RF hors tolérance;Wrong alarm
+2022 10 04 CMB07-CAV2_0003;Rég signal RF hors tolérance;Wrong alarm
 2022 10 04 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 04 CMB07-CAV2_0005;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 04 CMB07-CAV2_0006;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 04 CMB07-CAV2_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 07 CMB07-CAV2_0001;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 07 CMB07-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
 2022 10 07 CMB07-CAV2_0002;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2022 10 07 CMB07-CAV2_0003;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2022 10 07 CMB07-CAV2_0005;Claquage ou quench cavité;False alarm;Temps de chute : 2180.52 us
 2022 10 07 CMB07-CAV2_0006;Claquage ou quench cavité;Filtered;KPI < 10.0
 2022 10 12 CMB07-CAV2_0001;Rég signal RF hors tolérance;Loop instability
 2022 10 12 CMB07-CAV2_0002;Rég signal RF hors tolérance;Loop instability
-2022 10 12 CMB07-CAV2_0004;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 14 CMB07-CAV2_0002;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 14 CMB07-CAV2_0003;Rég signal RF hors tolérance;Other;Wrong alarm
-2022 10 14 CMB07-CAV2_0004;Rég signal RF hors tolérance;Other;Wrong alarm
+2022 10 12 CMB07-CAV2_0004;Rég signal RF hors tolérance;Wrong alarm
+2022 10 14 CMB07-CAV2_0002;Rég signal RF hors tolérance;Wrong alarm
+2022 10 14 CMB07-CAV2_0003;Rég signal RF hors tolérance;Wrong alarm
+2022 10 14 CMB07-CAV2_0004;Rég signal RF hors tolérance;Wrong alarm
 2022 10 14 CMB07-CAV2_0005;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2022 10 14 CMB07-CAV2_0006;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2022 10 14 CMB07-CAV2_0007;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
