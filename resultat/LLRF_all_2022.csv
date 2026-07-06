@@ -117,7 +117,7 @@ Fichier;Defaut;Label;Détails
 2022 09 30 CMA07_0001;Rég signal RF hors tolérance;Other;Wrong alarm
 2022 09 30 CMA07_0002;Rég signal RF hors tolérance;Other;Wrong alarm
 2022 09 30 CMA07_0003;Rég signal RF hors tolérance;Loop instability
-2022 09 30 CMA07_0004;Rég signal RF hors tolérance;Loop instability
+2022 09 30 CMA07_0004;Rég signal RF hors tolérance;Other;Wrong alarm
 2022 11 29 CMA07_0001;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 29 CMA07_0005;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 11 29 CMA07_0006;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
