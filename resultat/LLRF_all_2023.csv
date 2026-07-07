@@ -54,7 +54,7 @@ Fichier;Defaut;Label;Détails
 2023 11 09 CMA03_0022;Rég signal RF hors tolérance;Filtered;Beam NON
 2023 11 09 CMA03_0023;Rég signal RF hors tolérance;Filtered;Beam NON
 2023 11 09 CMA03_0024;Rég signal RF hors tolérance;Filtered;Beam NON
-2023 11 09 CMA03_0025;Rég signal RF hors tolérance;Other
+2023 11 09 CMA03_0025;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
 2023 11 13 CMA03_0001;Rég signal RF hors tolérance;Filtered;Beam NON
 2023 11 13 CMA03_0002;Rég signal RF hors tolérance;Filtered;Beam NON
 2023 11 13 CMA03_0003;Rég signal RF hors tolérance;Filtered;Beam NON
@@ -156,7 +156,7 @@ Fichier;Defaut;Label;Détails
 2023 09 05 CMB04-CAV1_0001;Rég signal RF hors tolérance;Quench aside
 2023 09 05 CMB04-CAV1_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
 2023 09 22 CMB04-CAV1_0001;Rég signal RF hors tolérance;Quench
-2023 10 19 CMB04-CAV1_0006;Rég signal RF hors tolérance;Wrong alarm
+2023 10 19 CMB04-CAV1_0006;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
 2023 10 19 CMB04-CAV1_0007;Rég signal RF hors tolérance;Filtered;Beam NON
 2023 10 19 CMB04-CAV1_0008;Rég signal RF hors tolérance;Filtered;Beam NON
 2023 11 16 CMB04-CAV1_0007;Rég signal RF hors tolérance;Filtered;Beam NON

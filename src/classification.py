@@ -334,6 +334,52 @@ def _check_detuning_anomalies(time, Uci, Ucr, start_idx_Uci_rise, t0_ampt_idx):
         
     return None
 
+def _check_other_peak(Uci, modIQ, t0_ampt_idx):
+    """
+    [Sous fonction] Vérifie la présence de pic autour du moment du défaut sur les signaux Uci et modIQ.
+    """
+    # Zone du calcul du bruit de fond
+    idx_base_start = max(0, t0_ampt_idx - 1000)
+    idx_base_end = max(1, t0_ampt_idx - 100)
+
+    # Zone de recherche du pic
+    zone_start = t0_ampt_idx - 30
+    zone_end   = t0_ampt_idx + 30
+    
+    # Calcul du bruit de fond
+    base_window_modIQ = modIQ.iloc[idx_base_start:idx_base_end]
+    base_window_Uci   = Uci.iloc[idx_base_start:idx_base_end]
+    
+    base_modIQ = np.median(base_window_modIQ)
+    base_Uci   = np.median(base_window_Uci)
+
+    # Épaisseur robuste du bruit de fond (entre le 5e et 95e percentile)
+    noise_thickness = np.percentile(base_window_Uci, 95) - np.percentile(base_window_Uci, 5)
+    
+    # Mesure des êxtremes dans la zone de défaut
+    max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
+    max_Uci_zone = Uci.iloc[zone_start:zone_end].max()
+    
+    # Deltas absolus
+    delta_modIQ = max_modIQ_zone - base_modIQ
+    delta_Uci = max_Uci_zone - base_Uci
+    
+    # Protection division par zéro  
+    EPSILON = 0.01
+    base_modIQ_safe = max(abs(base_modIQ), EPSILON)
+    base_Uci_safe = max(abs(base_Uci), EPSILON)
+
+    pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
+    pct_Uci = (delta_Uci / base_Uci_safe) * 100.0
+
+    modIQ_is_real_peak = delta_modIQ > (noise_thickness) and pct_modIQ > 10.0
+    Uci_is_real_peak = delta_Uci > (noise_thickness) and pct_Uci > 10.0
+
+    if modIQ_is_real_peak or Uci_is_real_peak:
+        return "Other;Peak modIQ or Uci"
+
+    return None
+
 def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     """
     [Sous-fonction] Vérifie le comportement "Wrong alarm" (Chute standard).
@@ -448,6 +494,12 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
     )
     if detuning_label:
         return detuning_label
+
+    # Test si des pics sur Uci et modIQ sont présent autour du moment du défaut
+    other_peak = _check_other_peak(Uci, modIQ, t0_ampt_idx) 
+
+    if other_peak:
+        return other_peak
 
     # Test de chute standard (Wrong alarm)
     wrong_alarm_label = _check_wrong_alarm_anomalies(
