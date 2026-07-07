@@ -45,8 +45,6 @@ def Read_Header(filename,show_header=False):
                     break
 
                 line = line.decode('utf-8').strip()
-                # if show_header:
-                #     print(line)
 
                 if line == "END":
                     break
@@ -104,8 +102,6 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
                 break
 
             line = line.decode('utf-8').strip()
-            # if show_header:
-            #     print(line)
 
             if line == "END":
                 end_found = True
@@ -256,27 +252,6 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
     typeCavite = Header["CAVITE"]["Valeur"]
     LOOP = Header["LOOP"]["Valeur"]
     MASK = Header["MASK"]["Valeur"]
-    UCAT = Header["UCAT"]["Valeur"]
-
-    parameters={
-        "NDEC":NDEC,
-        "NROW":NROW,
-        "POSTROW":POSTROW,
-        "DATE":DATE,
-        "ALM":ALM,
-        "DBNAME":DBNAME,
-        "KPI":KPI,
-        "KII":KII,
-        "KPUCI":KPUCI,
-        "KIUCI":KIUCI,
-        "AMPT":AMPT,
-        "PHIT":PHIT,
-        "BEAM":BEAM,
-        "CAVITE":typeCavite,
-        "LOOP":LOOP,
-        "MASK":MASK,
-        "UCAT":UCAT,
-    }
 
     # Attention : POSTROW fait référence au nombre de ligne AVANT t=0 et non après, ce n'est pas égal au postrow de l'interface post-mortem (ihm) (un calcul est effectué : postrow_fichier = nrow - postrow_ihm)
 
@@ -358,25 +333,20 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
     if "A Ucr binary" in df_signaux.columns:
         ADO1 = float(Header["ADO1"]["Valeur"])
         ADA1 = float(Header["ADA1"]["Valeur"])
-        # print(df_signaux._is_copy)
         df_signaux.loc[:,"A Ucr"] = 10**(((ADO1+(df_signaux["A Ucr binary"]*2.5/4095)/ADA1)+coefUcr)/10)
 
     if "A Uamp binary" in df_signaux.columns:
         ADO2 = float(Header["ADO2"]["Valeur"])
         ADA2 = float(Header["ADA2"]["Valeur"])
-        # print(ADO2,ADA2)
         df_signaux.loc[:,"A Uamp"] = ADO2+(df_signaux["A Uamp binary"]*2.5/4095)/ADA2
 
     if "I modulateur binary" in df_signaux.columns:
-        # df_signaux["I modulateur binary"]=df_signaux["I modulateur"]
         df_signaux.loc[:,"I modulateur"]= df_signaux["I modulateur binary"]/32767*300
 
     if "Q modulateur binary" in df_signaux.columns:
-        # df_signaux["Q modulateur binary"]=df_signaux["Q modulateur"]
         df_signaux.loc[:,"Q modulateur"]= df_signaux["Q modulateur binary"]/32767*300
 
     if "vide binary" in df_signaux.columns:
-        #v1      =
         df_signaux.loc[:,"vide"]= 1.332*10**(((df_signaux["vide binary"]*10.0)/4095)/0.6-12)
 
     if "courant pickup binary" in df_signaux.columns:
@@ -439,4 +409,4 @@ def Read_Signals(file_content,compute_defauts=False,compute_etats=False,plot_sig
     if compute_etats:
         df_states = df_states.astype(bool)
 
-    return parameters,time, df_signaux, df_defaut, df_states,Header
+    return time, df_signaux, df_defaut, df_states, Header

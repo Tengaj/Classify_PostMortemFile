@@ -602,7 +602,7 @@ def classify_quench(Ucav, t0_ampt_idx):
         # N'est pas sensé arriver
         return f"Quench{fall_time_str}"
 
-def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
+def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
     """
     [Sous-fonction] Vérifie si les conditions d'exploitation du signal sont valides avant de procéderà son analyse complète. 
     S'appuie sur les paramètres définis dans le fichier de configuration.
@@ -610,8 +610,8 @@ def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
     cfg = CONFIG.get("filters", {})
 
     # Filtre Faisceau (BEAM) ou Boucle (LOOP) désactivés
-    beam = parameters.get("BEAM")
-    loop = parameters.get("LOOP")
+    beam = header.get("BEAM").get("Valeur")
+    loop = header.get("LOOP").get("Valeur")
 
     if cfg.get("check_beam", True) and beam == "NON":
         return f"Filtered;Beam NON"
@@ -621,14 +621,14 @@ def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
 
     # Filtre sur KPI
     if cfg.get("check_kpi", True):
-        kpi = float(parameters.get("KPI", 0))
+        kpi = float(header.get("KPI").get("Valeur"))
         kpi_threshold = cfg.get("min_kpi", 10.0)
         if kpi < kpi_threshold:
             return f"Filtered;KPI < {kpi_threshold}"
 
     # Filtre sur le Masque
     if cfg.get("check_mask", True):
-        mask = parameters.get("MASK")
+        mask = header.get("MASK").get("Valeur")
         file_name_str = str(file_name)
         if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
             return f"Filtered;Mask problem"
@@ -660,7 +660,7 @@ def _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt):
         if drop_mask.rolling(window=required_points).sum().max() >= required_points:
             return f"Filtered;Tension < {ucav_min} avant t0"
 
-def classify_signals(file_name, parameters, time, df_signals, df_defaults, filter=True):
+def classify_signals(file_name, header, time, df_signals, df_defaults, filter=True):
     """
     Classifie un fichier post mortem à partir de signaux déjà chargés en mémoire.
     """
@@ -677,10 +677,10 @@ def classify_signals(file_name, parameters, time, df_signals, df_defaults, filte
 
     Ucav = df_signals.get("Ucav")
     zero_idx = np.argmin(np.abs(time))
-    ampt = float(parameters.get("AMPT", 3.0))
+    ampt = float(header.get("AMPT").get("Valeur"))
 
     # Vérification de l'état des filtres
-    filter_result = _check_filters(file_name, parameters, time, Ucav, zero_idx, ampt)
+    filter_result = _check_filters(file_name, header, time, Ucav, zero_idx, ampt)
     if filter and not filter_result is None: 
         return f"{primary_fault};{filter_result}"
 
@@ -703,7 +703,7 @@ def classify_signals(file_name, parameters, time, df_signals, df_defaults, filte
             final_label = f"{primary_fault};{label}" 
 
         case "Dép seuil de sécurité RF":
-            Ucat = parameters.get("UCAT")
+            Ucat = header.get("UCAT").get("Valeur")
             label = classify_RF_protections(time, Ucav, Ucat)
             final_label = f"{primary_fault};{label}"
 
@@ -733,7 +733,7 @@ def classify_file(file_name,filter=True):
     with open(file_name, 'rb') as f:
         file_content = f.read()
 
-    parameters, time, df_signals, df_defaults, _, _ = Read_Signals(
+    time, df_signals, df_defaults, _, header = Read_Signals(
         file_content, 
         compute_defauts=True, 
         compute_etats=True, 
@@ -741,4 +741,4 @@ def classify_file(file_name,filter=True):
         show_header=False
     )
      
-    return classify_signals(file_name, parameters, time, df_signals, df_defaults, filter)
+    return classify_signals(file_name, header, time, df_signals, df_defaults, filter)
