@@ -45,10 +45,8 @@ thresholds:
 
     # oscillations
     taconis_max_hz: 100                 # Seuil maximun pour qu'une oscillation soit un taconis
-    
-    min_physical_amp_modiq: 0.1         # Amplitude minimum accepté pour que modIQ oscille
-    min_physical_amp_uci: 0.002         # Amplitude minimum accepté pour que Uci oscille
-    min_physical_amp_ucav: 0.0001       # Amplitude minimum accepté pour que Ucav oscille
+
+    min_physical_amp_percentage : 0.5   # Amplitude minimum accepté pour qu'un signal oscille
 
     # Quench 
     fall_target_pct: 1.0                # Objectif de chute (99%)

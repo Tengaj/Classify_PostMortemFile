@@ -17,10 +17,6 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     [Sous-fonction] Vérifie la présence d'oscillations cohérentes pour classifier les défauts de type "Taconis" ou "Loop instability".
     """
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
-    
-    amp_uci = cfg.get("min_physical_amp_uci", 0.002)
-    amp_modiq = cfg.get("min_physical_amp_modiq", 0.1)
-    amp_ucav = cfg.get("min_physical_amp_ucav", 0.0001)
     taconis_max_hz = cfg.get("taconis_max_hz", 100)
     
     # Définition de la fenêtre d'analyse
@@ -44,6 +40,21 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
         return None
 
     # print(f'Osci window : {Ucav.index[start_osci]}, {Ucav.index[end_osci]}')
+
+    # Calcul des seuils d'amplitude
+    idx_stable = max(1, t0_ampt_idx)
+    nom_Uci   = np.abs(np.median(Uci.iloc[end_stair_idx:idx_stable]))
+    nom_modIQ = np.abs(np.median(modIQ.iloc[end_stair_idx:idx_stable]))
+    nom_Ucav  = np.abs(np.median(Ucav.iloc[end_stair_idx:idx_stable]))
+    #print(f"nom_Ucav : {nom_Ucav}")
+
+    min_percentage = cfg.get("min_physical_amp_percentage") / 100
+
+    amp_uci   = max(min_percentage * nom_Uci, 1e-5)
+    amp_modiq = max(min_percentage * nom_modIQ, 1e-5)
+    amp_ucav  = max(min_percentage * nom_Ucav, 1e-5)
+
+    #print(f"amp_uci : {amp_uci}, amp_modiq : {amp_modiq}, amp_ucav : {amp_ucav}")
 
     # Analyse des oscillations pour chaque signal
     osc_Uci, f_Uci     = analyze_oscillation(

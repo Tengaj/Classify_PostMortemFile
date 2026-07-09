@@ -89,6 +89,8 @@ def analyze_oscillation(signal, dt, snr_threshold=8.5, min_physical_amp=0.005):
     baseline = pd.Series(sig_array).rolling(window=dyn_window, center=True, min_periods=1).median().to_numpy()
     sig_detrended = sig_array - baseline
 
+    temporal_amp = np.percentile(np.abs(sig_detrended), 99)
+
     # Fenêtrage
     window = np.hanning(n)
     sig_windowed = sig_detrended * window
@@ -120,7 +122,7 @@ def analyze_oscillation(signal, dt, snr_threshold=8.5, min_physical_amp=0.005):
     # Vérification d'amplitude
     noise_level = snr_threshold * np.median(yf_pos)
     is_above_noise = peak_amp > noise_level
-    is_physically_significant = peak_amp > min_physical_amp
+    is_physically_significant = temporal_amp > min_physical_amp
 
     # Verification zero crossing
     is_crossing_valid, act_cross, exp_cross, sig_zcross, period_points = _verify_zero_crossings(signal, dominant_freq, dt, peak_amp)
@@ -134,7 +136,7 @@ def analyze_oscillation(signal, dt, snr_threshold=8.5, min_physical_amp=0.005):
     # Affichage
     #print(f'snr threshold : {snr_threshold}, min physical amp : {min_physical_amp}')
     #print(f'is_above_noise : {is_above_noise} | is_physically_significant : {is_physically_significant} | is_crossing_valid : {is_crossing_valid} | is_touching_end: {is_touching_end}')
-    #print(f"{signal.name} Freq: {dominant_freq:.0f}Hz | Amp: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {act_cross}/{int(exp_cross)} | is_oscillating: {is_oscillating}")
+    #print(f"{signal.name} Freq: {dominant_freq:.0f}Hz | Amp: {temporal_amp:.5f} | Amp fft: {peak_amp:.5f} | Spectral noise: {noise_level:.5f} | Z-Cross: {act_cross}/{int(exp_cross)} | is_oscillating: {is_oscillating}")
     
     return is_oscillating, dominant_freq
 
