@@ -156,7 +156,7 @@ Fichier;Defaut;Label;Détails
 2024 10 11 CMA10_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 11 CMA10_0003;Seuil de vide;Filtered;Beam NON
 2024 10 11 CMA10_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 10 24 CMA10_0002;Rég signal RF hors tolérance;Loop instability
+2024 10 24 CMA10_0002;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3603 Hz
 2024 10 24 CMA10_0005;Rég signal RF hors tolérance;Filtered;Beam NON
 2024 10 24 CMA10_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 10 24 CMA10_0007;Rég signal RF hors tolérance;Filtered;Loop OFF

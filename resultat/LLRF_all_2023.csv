@@ -1,6 +1,6 @@
 Fichier;Defaut;Label;Détails
 2023 07 28 CMA01_0008;Rég signal RF hors tolérance;Filtered;Beam NON
-2023 07 28 CMA01_0009;Rég signal RF hors tolérance;Loop instability
+2023 07 28 CMA01_0009;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 423 Hz
 2023 08 07 CMA01_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2023 11 09 CMA01_0002;Rég signal RF hors tolérance;Wrong alarm
 2023 11 09 CMA01_0003;Rég signal RF hors tolérance;Filtered;Beam NON
@@ -118,9 +118,9 @@ Fichier;Defaut;Label;Détails
 2023 08 11 CMA11_0009;Rég signal RF hors tolérance;Wrong alarm
 2023 08 11 CMA11_0012;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2023 11 09 CMA11_0002;Seuil de vide;;Courant pickup moyen avant t0 : -33.056 μA, Vide à t0 : 6.984e-06 mbar
-2023 07 28 CMA12_0005_D Signal RF hors tolérance;Rég signal RF hors tolérance;Loop instability
-2023 07 28 CMA12_0006_D Signal RF hors tolérance;Rég signal RF hors tolérance;Loop instability
-2023 07 28 CMA12_0007_D Signal RF hors tolérance;Rég signal RF hors tolérance;Loop instability
+2023 07 28 CMA12_0005_D Signal RF hors tolérance;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4454 Hz
+2023 07 28 CMA12_0006_D Signal RF hors tolérance;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 5364 Hz
+2023 07 28 CMA12_0007_D Signal RF hors tolérance;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 5381 Hz
 2023 09 27 CMB01-CAV1_0002;Dép seuil de sécurité RF;Filtered;Beam NON
 2023 08 07 CMB01-CAV2_0002;Dép seuil de sécurité RF;Filtered;Beam NON
 2023 08 07 CMB01-CAV2_0003;Dép seuil de sécurité RF;Filtered;Beam NON

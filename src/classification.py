@@ -17,7 +17,6 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     [Sous-fonction] Vérifie la présence d'oscillations cohérentes pour classifier les défauts de type "Taconis" ou "Loop instability".
     """
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
-    taconis_max_hz = cfg.get("taconis_max_hz", 100)
     
     # Définition de la fenêtre d'analyse
     # Si le décrochage (z-score) est détecté APRÈS le défaut (ampt), cela signifie que le signal oscillait potentiellement depuis le début.
@@ -67,38 +66,11 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     	Ucav.iloc[start_osci:end_osci],  dt_seconds, min_physical_amp=amp_ucav
     )
     
-    # Verdict de cohérence et classification
-    # Il faut que les trois signaux oscillent de manière significative
     if osc_Uci and osc_modIQ and osc_Ucav:
-        frequencies = [f_Uci, f_modIQ, f_Ucav]
-        f_max = max(frequencies)
-        f_min = max(min(frequencies), 1e-6)  # Sécurité division par zéro
-        
-        ratio = f_max / f_min
-        # print(f'Ratio : {ratio}')
-        
-        is_coherent = False
-        
-        # Cas A : Fondamentale (les fréquences sont quasi-identiques)
-        if ratio <= 1.5:
-            is_coherent = True
-            
-        # Cas B : Harmonique (Le ratio correspond à la 2ème, 3ème, 4ème ou 5ème harmonique)
-        else:
-            closest_integer = round(ratio)
-            if 2 <= closest_integer <= 5 and abs(ratio - closest_integer) <= 0.2:
-                is_coherent = True
-        
-        # Classification finale si les oscillations sont liées physiquement
-        if is_coherent:
-            if f_Ucav > taconis_max_hz:
-                return "Loop instability" # f"Loop instability;{f_Ucav:.0f}Hz"
-            else:
-                return "Taconis"          # f"Taconis;{f_Ucav:.0f}Hz"
-        else:
-            return "Oscillation"
-            
-    return None
+
+        return f"Ucav oscillation;Fréquence : {f_Ucav:.0f} Hz"
+
+    return None 
 
 def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair, t0_ampt_idx):
     """
