@@ -12,9 +12,11 @@ from signal_processing import (
     detect_uci_rise_start
 )
 
-def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx):
+def _check_instability_oscillations(Uci, modIQ, Ucav, file_name, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx):
     """
-    [Sous-fonction] Vérifie la présence d'oscillations cohérentes pour classifier les défauts de type "Taconis" ou "Loop instability".
+    [Sous-fonction] Vérifie la présence d'oscillations sur les trois signaux.
+    Dans se cas, retourne la classification "Ucav oscillation" avec sa fréquence dominante, 
+    et indique s'il y a un excès de puissance Uci par rapport à la théorie.
     """
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
     
@@ -45,7 +47,6 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     nom_Uci   = np.abs(np.median(Uci.iloc[end_stair_idx:idx_stable]))
     nom_modIQ = np.abs(np.median(modIQ.iloc[end_stair_idx:idx_stable]))
     nom_Ucav  = np.abs(np.median(Ucav.iloc[end_stair_idx:idx_stable]))
-    #print(f"nom_Ucav : {nom_Ucav}")
 
     min_percentage = cfg.get("min_physical_amp_percentage") / 100
 
@@ -56,19 +57,50 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx,
     #print(f"amp_uci : {amp_uci}, amp_modiq : {amp_modiq}, amp_ucav : {amp_ucav}")
 
     # Analyse des oscillations pour chaque signal
-    osc_Uci, f_Uci     = analyze_oscillation(
+    osc_Uci, _         = analyze_oscillation(
     	Uci.iloc[start_osci:end_osci],   dt_seconds, min_physical_amp=amp_uci
     )
-    osc_modIQ, f_modIQ = analyze_oscillation(
+    osc_modIQ, _       = analyze_oscillation(
     	modIQ.iloc[start_osci:end_osci], dt_seconds, min_physical_amp=amp_modiq
     )
     osc_Ucav, f_Ucav   = analyze_oscillation(
     	Ucav.iloc[start_osci:end_osci],  dt_seconds, min_physical_amp=amp_ucav
     )
     
+    #Verdict et calcul de la puissance
     if osc_Uci and osc_modIQ and osc_Ucav:
 
-        return f"Ucav oscillation;Fréquence : {f_Ucav:.0f} Hz"
+        # Calcul de la moyenne de puissance observée pendant l'oscillation
+        end_Uci = Uci.iloc[start_osci:end_osci]
+        end_Uci_value = np.mean(end_Uci)
+
+        # Détermination de la puissance nominale (Cavité A vs B)
+        file_name_str = str(file_name)
+        cav_power = 0.0
+        
+        if "CMA" in file_name_str:
+            cav_power =  1.8
+        if "CMB" in file_name_str:
+            cav_power = 3.8
+        
+        # Calcul de l'Uci théorique attendu
+        theorical_Uci = 1.5 * cav_power * ((nom_Ucav / 6.5) ** 2)
+
+        power_excess = ""
+
+        #print(f"nom_Ucav : {nom_Ucav}")
+        #print(f"theorical_Uci : {theorical_Uci}")
+        #print(f"end_Uci_value : {end_Uci_value}")
+
+        if theorical_Uci > 0 and end_Uci_value > theorical_Uci:
+            delta_Uci = end_Uci_value - theorical_Uci
+            pct_Uci = (delta_Uci / theorical_Uci) * 100
+
+            # Tolérance de 10% avant de signaler l'anomalie
+            if pct_Uci > 10.0:
+                power_excess = f", Excès de puissance ({pct_Uci:.0f}%)"
+
+        return f"Ucav oscillation;Fréquence : {f_Ucav:.0f} Hz{power_excess}"
 
     return None 
 
@@ -411,7 +443,7 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
 
     return None
 
-def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx):
+def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, file_name, t0_ampt_idx):
     """
     Classifie le défaut "Rég signal RF hors tolérance". 
     """
@@ -437,7 +469,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_amp
 
     # Test des Oscillations
     oscillation_label = _check_instability_oscillations(
-        Uci, modIQ, Ucav, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx
+        Uci, modIQ, Ucav, file_name, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx
     )
     
     if oscillation_label: 
@@ -695,7 +727,7 @@ def classify_signals(file_name, header, time, df_signals, df_defaults, filter=Tr
             Ucr = df_signals.get("A Ucr") 
             modIQ = df_signals.get("IQ")
             beam_presence = df_signals.get("Presence faisceau")
-            label = classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, t0_ampt_idx)
+            label = classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, file_name, t0_ampt_idx)
             final_label = f"{primary_fault};{label}"
 
         case _:

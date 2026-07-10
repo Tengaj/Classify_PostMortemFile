@@ -290,7 +290,7 @@ Fichier;Defaut;Label;Détails
 2021 07 21 CMA10avecff_0012;Seuil de vide;Filtered;Loop OFF
 2021 07 21 CMA10avecff_0013;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1704 Hz
 2021 07 21 CMA10avecff_0015;Rég signal RF hors tolérance;Wrong alarm
-2021 07 21 CMA10avecff_0016;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1854 Hz
+2021 07 21 CMA10avecff_0016;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1854 Hz, Excès de puissance (17%)
 2021 07 21 CMA10avecff_0017;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1948 Hz
 2021 07 21 CMA10avecff_0018;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1854 Hz
 2021 07 21 CMA10avecff_0019;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 2029 Hz
@@ -368,7 +368,7 @@ Fichier;Defaut;Label;Détails
 2021 06 24 CMA11_0003;Rég signal RF hors tolérance;Filtered;Beam NON
 2021 07 07 CMA11_0001;Rég signal RF hors tolérance;Filtered;Beam NON
 2021 07 07 CMA11_0003;Rég signal RF hors tolérance;Filtered;Beam NON
-2021 07 21 CMA11_0002;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1593 Hz
+2021 07 21 CMA11_0002;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 1593 Hz, Excès de puissance (366%)
 2021 07 21 CMA11_0003;Rég signal RF hors tolérance;Wrong alarm
 2021 07 21 CMA11_0009;Rég signal RF hors tolérance;Other
 2021 07 21 CMA11_0010;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
@@ -921,11 +921,11 @@ Fichier;Defaut;Label;Détails
 2021 09 21 CMB05-CAV1_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 09 21 CMB05-CAV1_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 10 22 CMB05-CAV1_0004;Rég signal RF hors tolérance;Other
-2021 10 22 CMB05-CAV1_0008;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4330 Hz
-2021 10 22 CMB05-CAV1_0009;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3824 Hz
-2021 10 22 CMB05-CAV1_0010;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3695 Hz
-2021 10 22 CMB05-CAV1_0011;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3856 Hz
-2021 10 22 CMB05-CAV1_0012;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3632 Hz
+2021 10 22 CMB05-CAV1_0008;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4330 Hz, Excès de puissance (240%)
+2021 10 22 CMB05-CAV1_0009;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3824 Hz, Excès de puissance (1593%)
+2021 10 22 CMB05-CAV1_0010;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3695 Hz, Excès de puissance (316%)
+2021 10 22 CMB05-CAV1_0011;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3856 Hz, Excès de puissance (128%)
+2021 10 22 CMB05-CAV1_0012;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 3632 Hz, Excès de puissance (142%)
 2021 10 26 CMB05-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 11 26 CMB05-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 11 26 CMB05-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
