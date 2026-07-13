@@ -932,7 +932,7 @@ Fichier;Defaut;Label;Détails
 2021 11 26 CMB05-CAV1_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 11 26 CMB05-CAV1_0004;Rég signal RF hors tolérance;Filtered;Beam NON
 2021 11 26 CMB05-CAV1_0005;Rég signal RF hors tolérance;Filtered;Beam NON
-2021 11 30 CMB05-CAV1_0001;Rég signal RF hors tolérance;Quench
+2021 11 30 CMB05-CAV1_0001;Rég signal RF hors tolérance;Quench;Temps de chute : 7506.89 us
 2021 11 30 CMB05-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 12 01 CMB05-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 12 01 CMB05-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0

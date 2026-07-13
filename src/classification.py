@@ -199,7 +199,8 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
         if is_sudden_spike:
             return None 
         if quench:
-            return "Quench"
+            fall_time_str = f";Temps de chute : {delta_t:.2f} us"
+            return f"Quench{fall_time_str}"
         elif trend_Ucr == 1:
             return "Quench aside"
             

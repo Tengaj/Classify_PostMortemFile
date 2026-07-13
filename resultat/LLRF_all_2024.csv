@@ -164,7 +164,7 @@ Fichier;Defaut;Label;Détails
 2024 10 28 CMA10_0001;Claquage ou quench cavité;Filtered;Loop OFF
 2024 10 28 CMA10_0002;Claquage ou quench cavité;Filtered;Loop OFF
 2024 11 04 CMA10_0003 quench rapide;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
-2024 11 04 CMA10_0004;Rég signal RF hors tolérance;Quench
+2024 11 04 CMA10_0004;Rég signal RF hors tolérance;Quench;Temps de chute : 6825.47 us
 2024 11 08 CMA10_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +326%
 2024 11 08 CMA10_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +307%
 2024 11 08 CMA10_0003;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +326%
@@ -230,14 +230,14 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMB02-CAV1_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 24 CMB02-CAV1_0003_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 24 CMB02-CAV1_0006_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 04 CMB02-CAV1_0001;Rég signal RF hors tolérance;Quench
-2024 11 04 CMB02-CAV1_0002;Rég signal RF hors tolérance;Quench
-2024 11 04 CMB02-CAV1_0003;Rég signal RF hors tolérance;Quench
+2024 11 04 CMB02-CAV1_0001;Rég signal RF hors tolérance;Quench;Temps de chute : 7404.67 us
+2024 11 04 CMB02-CAV1_0002;Rég signal RF hors tolérance;Quench;Temps de chute : 7949.80 us
+2024 11 04 CMB02-CAV1_0003;Rég signal RF hors tolérance;Quench;Temps de chute : 7506.89 us
 2024 11 04 CMB02-CAV1_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 08 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 14 CMB02-CAV1_0001 0749;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +44%
 2024 11 25 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 27 CMB02-CAV1_0001;Rég signal RF hors tolérance;Quench
+2024 11 27 CMB02-CAV1_0001;Rég signal RF hors tolérance;Quench;Temps de chute : 7643.17 us
 2024 11 29 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 09 27 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 09 27 CMB02-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
@@ -248,7 +248,7 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMB02-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 24 CMB02-CAV2_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 04 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 08 CMB02-CAV2_0001;Rég signal RF hors tolérance;Quench
+2024 11 08 CMB02-CAV2_0001;Rég signal RF hors tolérance;Quench;Temps de chute : 7302.46 us
 2024 11 08 CMB02-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMB02-CAV2_0004;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +106%
 2024 11 08 CMB02-CAV2_0005;Rég signal RF hors tolérance;Filtered;Loop OFF

@@ -1005,17 +1005,17 @@ Fichier;Defaut;Label;Détails
 2022 09 30 CMB04-CAV2_0008;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 09 30 CMB04-CAV2_0009;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
 2022 09 30 CMB04-CAV2_0010;Rég signal RF hors tolérance;Filtered;AMPT > 10.0%
-2022 10 04 CMB04-CAV2_0001;Rég signal RF hors tolérance;Quench
+2022 10 04 CMB04-CAV2_0001;Rég signal RF hors tolérance;Quench;Temps de chute : 7245.68 us
 2022 10 04 CMB04-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 04 CMB04-CAV2_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 04 CMB04-CAV2_0004;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0002;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0004;Rég signal RF hors tolérance;Quench
+2022 10 04 CMB04-CAV2_0004;Rég signal RF hors tolérance;Quench;Temps de chute : 7188.89 us
+2022 10 07 CMB04-CAV2_0002;Rég signal RF hors tolérance;Quench;Temps de chute : 7177.54 us
+2022 10 07 CMB04-CAV2_0004;Rég signal RF hors tolérance;Quench;Temps de chute : 7132.11 us
 2022 10 07 CMB04-CAV2_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB04-CAV2_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB04-CAV2_0007;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB04-CAV2_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 10 07 CMB04-CAV2_0009;Rég signal RF hors tolérance;Quench
+2022 10 07 CMB04-CAV2_0009;Rég signal RF hors tolérance;Quench;Temps de chute : 7098.04 us
 2022 10 07 CMB04-CAV2_0010;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB04-CAV2_0011;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 10 07 CMB04-CAV2_0012;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -1060,24 +1060,24 @@ Fichier;Defaut;Label;Détails
 2022 10 07 CMB04-CAV2_0051;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 07 CMB04-CAV2_0052;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 10 07 CMB04-CAV2_0053;Rég signal RF hors tolérance;Filtered;Beam NON
-2022 10 07 CMB04-CAV2_0054;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0055;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0056;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0057;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0058;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0059;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0060;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0061;Rég signal RF hors tolérance;Quench
+2022 10 07 CMB04-CAV2_0054;Rég signal RF hors tolérance;Quench;Temps de chute : 7313.82 us
+2022 10 07 CMB04-CAV2_0055;Rég signal RF hors tolérance;Quench;Temps de chute : 7381.96 us
+2022 10 07 CMB04-CAV2_0056;Rég signal RF hors tolérance;Quench;Temps de chute : 6939.04 us
+2022 10 07 CMB04-CAV2_0057;Rég signal RF hors tolérance;Quench;Temps de chute : 7120.75 us
+2022 10 07 CMB04-CAV2_0058;Rég signal RF hors tolérance;Quench;Temps de chute : 7268.39 us
+2022 10 07 CMB04-CAV2_0059;Rég signal RF hors tolérance;Quench;Temps de chute : 7461.46 us
+2022 10 07 CMB04-CAV2_0060;Rég signal RF hors tolérance;Quench;Temps de chute : 7245.68 us
+2022 10 07 CMB04-CAV2_0061;Rég signal RF hors tolérance;Quench;Temps de chute : 7257.03 us
 2022 10 07 CMB04-CAV2_0062;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4129 Hz, Excès de puissance (125%)
 2022 10 07 CMB04-CAV2_0063;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4153 Hz, Excès de puissance (130%)
 2022 10 07 CMB04-CAV2_0064;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4149 Hz, Excès de puissance (142%)
 2022 10 07 CMB04-CAV2_0065;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4090 Hz, Excès de puissance (112%)
 2022 10 07 CMB04-CAV2_0066;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4133 Hz, Excès de puissance (121%)
-2022 10 07 CMB04-CAV2_0067;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0068;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0069;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0070;Rég signal RF hors tolérance;Quench
-2022 10 07 CMB04-CAV2_0071;Rég signal RF hors tolérance;Quench
+2022 10 07 CMB04-CAV2_0067;Rég signal RF hors tolérance;Quench;Temps de chute : 6859.54 us
+2022 10 07 CMB04-CAV2_0068;Rég signal RF hors tolérance;Quench;Temps de chute : 7086.68 us
+2022 10 07 CMB04-CAV2_0069;Rég signal RF hors tolérance;Quench;Temps de chute : 7188.89 us
+2022 10 07 CMB04-CAV2_0070;Rég signal RF hors tolérance;Quench;Temps de chute : 7200.25 us
+2022 10 07 CMB04-CAV2_0071;Rég signal RF hors tolérance;Quench;Temps de chute : 7188.89 us
 2022 10 14 CMB04-CAV2_0002;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 11 03 CMB04-CAV2_0009;Dép seuil de sécurité RF;Filtered;AMPT > 10.0%
 2022 09 09 CMB05-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
