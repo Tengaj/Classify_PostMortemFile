@@ -9,7 +9,7 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMA01_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 24 CMA01_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 04 CMA01_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
-2024 11 08 CMA01_0001;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA01_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +174%
 2024 11 08 CMA01_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 18 CMA01_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 18 CMA01_0002;Rég signal RF hors tolérance;Filtered;Tension < 0.1 avant t0
@@ -109,8 +109,8 @@ Fichier;Defaut;Label;Détails
 2024 11 08 CMA05_0007;Rég signal RF hors tolérance;Beam loss
 2024 11 08 CMA05_0008;Rég signal RF hors tolérance;Beam loss
 2024 11 08 CMA05_0009;Rég signal RF hors tolérance;Beam loss
-2024 11 08 CMA05_0010;Rég signal RF hors tolérance;Power chain gain
-2024 11 20 CMA05_0001;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA05_0010;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +219%
+2024 11 20 CMA05_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +235%
 2024 09 19 CMA06_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 09 23 CMA06_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 11 CMA06_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -149,7 +149,7 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMA09_0004;Claquage ou quench cavité;Filtered;Beam NON
 2024 10 24 CMA09_0005;Claquage ou quench cavité;Filtered;Beam NON
 2024 10 24 CMA09_0006;Claquage ou quench cavité;Filtered;Beam NON
-2024 11 08 CMA09_0002;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA09_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +276%
 2024 11 20 CMA09_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 09 19 CMA10_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 02 CMA10_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -165,13 +165,13 @@ Fichier;Defaut;Label;Détails
 2024 10 28 CMA10_0002;Claquage ou quench cavité;Filtered;Loop OFF
 2024 11 04 CMA10_0003 quench rapide;Claquage ou quench cavité;Breakdown;Temps de chute : 11.36 us
 2024 11 04 CMA10_0004;Rég signal RF hors tolérance;Quench
-2024 11 08 CMA10_0001;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA10_0002;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA10_0003;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA10_0004;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA10_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +326%
+2024 11 08 CMA10_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +307%
+2024 11 08 CMA10_0003;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +326%
+2024 11 08 CMA10_0004;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +257%
 2024 11 08 CMA10_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 08 CMA10_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 20 CMA10_0001;Rég signal RF hors tolérance;Power chain gain
+2024 11 20 CMA10_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +224%
 2024 11 25 CMA10_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 29 CMA10_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 02 CMA11_0001;Seuil de vide;Filtered;Beam NON
@@ -180,46 +180,46 @@ Fichier;Defaut;Label;Détails
 2024 10 28 CMA11_0004;Claquage ou quench cavité;Filtered;Beam NON
 2024 11 08 CMA11_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 08 CMA11_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 08 CMA11_0006;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA11_0006;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +276%
 2024 11 29 CMA11_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 29 CMA11_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 08 CMA12_0001;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0002;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0006;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0007;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0009;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA12_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +311%
+2024 11 08 CMA12_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +289%
+2024 11 08 CMA12_0006;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +231%
+2024 11 08 CMA12_0007;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +263%
+2024 11 08 CMA12_0009;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +252%
 2024 11 08 CMA12_0016;Rég signal RF hors tolérance;Filtered;Beam NON
-2024 11 08 CMA12_0017;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0020;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0022;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA12_0017;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +289%
+2024 11 08 CMA12_0020;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +163%
+2024 11 08 CMA12_0022;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +165%
 2024 11 08 CMA12_0023;Rég signal RF hors tolérance;Filtered;Loop OFF
-2024 11 08 CMA12_0025;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0026;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0027;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0028;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA12_0025;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +252%
+2024 11 08 CMA12_0026;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +270%
+2024 11 08 CMA12_0027;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +282%
+2024 11 08 CMA12_0028;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +262%
 2024 11 08 CMA12_0030;Rég signal RF hors tolérance;Filtered;Beam NON
-2024 11 08 CMA12_0031;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0033;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0034;Rég signal RF hors tolérance;Power chain gain
-2024 11 08 CMA12_0035;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA12_0031;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +166%
+2024 11 08 CMA12_0033;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +168%
+2024 11 08 CMA12_0034;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +176%
+2024 11 08 CMA12_0035;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +192%
 2024 11 08 CMA12_0037;Rég signal RF hors tolérance;Filtered;Loop OFF
-2024 11 08 CMA12_0038;Rég signal RF hors tolérance;Power chain gain
-2024 11 20 CMA12_0001;Rég signal RF hors tolérance;Power chain gain
-2024 11 20 CMA12_0002;Rég signal RF hors tolérance;Power chain gain
-2024 11 20 CMA12_0003;Rég signal RF hors tolérance;Power chain gain
-2024 11 20 CMA12_0005;Rég signal RF hors tolérance;Power chain gain
-2024 11 20 CMA12_0006;Rég signal RF hors tolérance;Power chain gain
-2024 11 26 CMA12_0001;Rég signal RF hors tolérance;Power chain gain
-2024 11 27 CMA12_0001;Rég signal RF hors tolérance;Power chain gain
-2024 11 27 CMA12_0002;Rég signal RF hors tolérance;Power chain gain
-2024 11 27 CMA12_0003;Rég signal RF hors tolérance;Power chain gain
-2024 11 27 CMA12_0005;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMA12_0038;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +141%
+2024 11 20 CMA12_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +126%
+2024 11 20 CMA12_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +119%
+2024 11 20 CMA12_0003;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +120%
+2024 11 20 CMA12_0005;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +116%
+2024 11 20 CMA12_0006;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +118%
+2024 11 26 CMA12_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +237%
+2024 11 27 CMA12_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +100%
+2024 11 27 CMA12_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +103%
+2024 11 27 CMA12_0003;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +103%
+2024 11 27 CMA12_0005;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +104%
 2024 11 29 CMA12_0002;Rég signal RF hors tolérance;Filtered;Beam NON
 2024 11 29 CMA12_0003;Rég signal RF hors tolérance;Filtered;Beam NON
 2024 09 27 CMB01-CAV1_0001;Dép seuil de sécurité RF;Filtered;Beam NON
 2024 10 24 CMB01-CAV1_0004 faux quench rapide cavité OFF;Claquage ou quench cavité;Filtered;Beam NON
 2024 10 24 CMB01-CAV1_0005;Claquage ou quench cavité;Filtered;Beam NON
-2024 11 08 CMB01-CAV1_0001;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMB01-CAV1_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +137%
 2024 11 25 CMB01-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 09 19 CMB02-CAV1_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 09 23 CMB02-CAV1_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Loop OFF
@@ -235,7 +235,7 @@ Fichier;Defaut;Label;Détails
 2024 11 04 CMB02-CAV1_0003;Rég signal RF hors tolérance;Quench
 2024 11 04 CMB02-CAV1_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 08 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 11 14 CMB02-CAV1_0001 0749;Rég signal RF hors tolérance;Power chain gain
+2024 11 14 CMB02-CAV1_0001 0749;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +44%
 2024 11 25 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 27 CMB02-CAV1_0001;Rég signal RF hors tolérance;Quench
 2024 11 29 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -250,7 +250,7 @@ Fichier;Defaut;Label;Détails
 2024 11 04 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 08 CMB02-CAV2_0001;Rég signal RF hors tolérance;Quench
 2024 11 08 CMB02-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
-2024 11 08 CMB02-CAV2_0004;Rég signal RF hors tolérance;Power chain gain
+2024 11 08 CMB02-CAV2_0004;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +106%
 2024 11 08 CMB02-CAV2_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 11 29 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 29 CMB02-CAV2_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
@@ -288,10 +288,10 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMB06-CAV2_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 11 04 CMB06-CAV2_0001;Rég signal RF hors tolérance;Quench aside
 2024 09 27 CMB07-CAV1_0003 oui et 0.5;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 10 01  CMB07-CAV1_0002 oui et 25;Rég signal RF hors tolérance;Power chain gain
+2024 10 01  CMB07-CAV1_0002 oui et 25;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +243%
 2024 10 02 CMB07-CAV1_0002;Rég signal RF hors tolérance;Detuning control error
 2024 10 11 CMB07-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2024 10 17 CMB07-CAV1_0001;Rég signal RF hors tolérance;Power chain gain
+2024 10 17 CMB07-CAV1_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +175%
 2024 10 24 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2024 10 24 CMB07-CAV1_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
 2024 10 24 CMB07-CAV1_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0

@@ -274,9 +274,9 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
    
     if pct_modIQ > threshold_noise_pct:
 
-        # Power chain gain, gros pic modIQ, suivit d'une chute de Uci
+        # Power chain gain, gros pic modIQ, suivi d'une chute de Uci
         if pct_Uci < -threshold_noise_pct:
-            return "Power chain gain"
+            return f"Power chain gain;Pic modIQ : +{pct_modIQ:.0f}%"
 
         # Beam loss (Pic modIQ et Uci, chute de Ucav et presence du faisceau)
         elif pct_Uci > threshold_noise_pct and is_real_peak and trend_Ucav_short == -1:

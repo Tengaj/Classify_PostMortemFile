@@ -239,13 +239,13 @@ Fichier;Defaut;Label;Détails
 2021 09 21 CMA09_0010_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 09 21 CMA09_0011_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2021 09 21 CMA09_0012_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2021 11 19 CMA09_0002_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain
-2021 11 19 CMA09_0004_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain
+2021 11 19 CMA09_0002_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +448%
+2021 11 19 CMA09_0004_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +829%
 2021 11 26 CMA09_0002_D Seuil de sécurité RF;Dép seuil de sécurité RF;Filtered;Beam NON
 2021 11 26 CMA09_0003_D Signal RF hors tolérance;Rég signal RF hors tolérance;Filtered;Beam NON
-2021 12 01 CMA09_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain
-2021 12 02 CMA09_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain
-2021 12 03 CMA09_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain
+2021 12 01 CMA09_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +693%
+2021 12 02 CMA09_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +759%
+2021 12 03 CMA09_0001_D Signal RF hors tolérance;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +689%
 2021 04 07 CMA10_0002;Seuil de vide;Filtered;Beam NON
 2021 04 07 CMA10_0003;Seuil de vide;Filtered;Beam NON
 2021 04 07 CMA10_0004;Seuil de vide;Filtered;Beam NON

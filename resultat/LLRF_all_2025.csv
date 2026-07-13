@@ -43,7 +43,7 @@ Fichier;Defaut;Label;Détails
 2025 10 23 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 10 18 CMB03-CAV1_0001;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 317 Hz, Excès de puissance (151%)
 2025 10 20 CMB03-CAV1_0001;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 247 Hz, Excès de puissance (123%)
-2025 10 20 CMB03-CAV1_0002;Rég signal RF hors tolérance;Power chain gain
+2025 10 20 CMB03-CAV1_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +11%
 2025 10 20 CMB03-CAV1_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 10 23 CMB03-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2025 10 18 CMB03-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
