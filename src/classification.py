@@ -225,7 +225,8 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
     base_Uci   = np.median(base_window_Uci)
 
     # Épaisseur robuste du bruit de fond (entre le 5e et 95e percentile)
-    noise_thickness = np.percentile(base_window_Uci, 95) - np.percentile(base_window_Uci, 5)
+    noise_window_Uci = Uci.iloc[t0_ampt_idx - 1000:t0_ampt_idx - 100]
+    noise_thickness = np.percentile(noise_window_Uci, 95) - np.percentile(noise_window_Uci, 5)
     
     # Mesure des êxtremes dans la zone de défaut
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
@@ -274,7 +275,7 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
     if pct_modIQ > threshold_noise_pct:
 
         # Power chain gain, gros pic modIQ, suivit d'une chute de Uci
-        if pct_modIQ > threshold_peak_pct and pct_Uci < -threshold_noise_pct:
+        if pct_Uci < -threshold_noise_pct:
             return "Power chain gain"
 
         # Beam loss (Pic modIQ et Uci, chute de Ucav et presence du faisceau)
