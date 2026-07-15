@@ -233,3 +233,127 @@ Fichier;Defaut;Label;Détails
 2026 07 01 CMB05-CAV1_0014;Rég signal RF hors tolérance;Beam loss
 2026 07 01 CMB05-CAV1_0015;Rég signal RF hors tolérance;Beam loss
 2026 07 03 CMB05-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 04 CMB05-CAV1_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +80%
+2026 07 05 CMB05-CAV1_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB05-CAV1_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 08 CMB05-CAV1_0003;Rég signal RF hors tolérance;Wrong alarm
+2026 07 09 CMB05-CAV1_0002;Rég signal RF hors tolérance;Beam related anomaly
+2026 07 09 CMB05-CAV1_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV1_0004;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +260%
+2026 07 09 CMB05-CAV1_0005;Rég signal RF hors tolérance;Wrong alarm
+2026 07 09 CMB05-CAV1_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV1_0007;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV1_0009;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV1_0010;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 06 18 CMB05-CAV2_0002;Rég signal RF hors tolérance;Detuning control error
+2026 06 26 CMB05-CAV2_0001;Rég signal RF hors tolérance;Wrong alarm
+2026 06 26 CMB05-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 03 CMB05-CAV2_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 04 CMB05-CAV2_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +99%
+2026 07 05 CMB05-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB05-CAV2_0003;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 08 CMB05-CAV2_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV2_0002;Rég signal RF hors tolérance;Beam related anomaly
+2026 07 09 CMB05-CAV2_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV2_0004;Rég signal RF hors tolérance;Wrong alarm
+2026 07 09 CMB05-CAV2_0005;Rég signal RF hors tolérance;Filtered;Beam NON
+2026 07 09 CMB05-CAV2_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV2_0007;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 09 CMB05-CAV2_0009;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB05-CAV2_0010;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 09 CMB05-CAV2_0011;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 16 CMB06-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 18 CMB06-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 18 CMB06-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 26 CMB06-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 26 CMB06-CAV1_0002;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +110%
+2026 06 26 CMB06-CAV1_0004;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 176 Hz
+2026 06 26 CMB06-CAV1_0005;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 176 Hz
+2026 07 01 CMB06-CAV1_0003;Rég signal RF hors tolérance;Beam loss
+2026 07 01 CMB06-CAV1_0006;Rég signal RF hors tolérance;Beam loss
+2026 07 03 CMB06-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 04 CMB06-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB06-CAV1_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB06-CAV1_0003;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 08 CMB06-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 08 CMB06-CAV1_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0003;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +236%
+2026 07 09 CMB06-CAV1_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0007;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0009;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 09 CMB06-CAV1_0010;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV1_0011;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 18 CMB06-CAV2_0002;Rég signal RF hors tolérance;Detuning control error
+2026 06 26 CMB06-CAV2_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 26 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 01 CMB06-CAV2_0002;Rég signal RF hors tolérance;Beam loss
+2026 07 02 CMB06-CAV2_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 03 CMB06-CAV2_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +162%
+2026 07 04 CMB06-CAV2_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB06-CAV2_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 08 CMB06-CAV2_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0007;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 09 CMB06-CAV2_0009;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB06-CAV2_0010;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 12 CMB07-CAV1_0001;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +205%
+2026 06 16 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 18 CMB07-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 26 CMB07-CAV1_0001;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 06 26 CMB07-CAV1_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 02 CMB07-CAV1_0004;Rég signal RF hors tolérance;Wrong alarm
+2026 07 03 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 04 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB07-CAV1_0002;Rég signal RF hors tolérance;Wrong alarm
+2026 07 05 CMB07-CAV1_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 08 CMB07-CAV1_0002;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 08 CMB07-CAV1_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 09 CMB07-CAV1_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0006;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0007;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0008;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 09 CMB07-CAV1_0009;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0011;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0012;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV1_0013;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 16 CMB07-CAV2_0001;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 18 CMB07-CAV2_0001;Rég signal RF hors tolérance;Filtered;Tension < 0.1 avant t0
+2026 06 18 CMB07-CAV2_0003;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 18 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 26 CMB07-CAV2_0001;Claquage ou quench cavité;False alarm;Temps de chute : 2180.52 us
+2026 06 26 CMB07-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 06 26 CMB07-CAV2_0003;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 06 26 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 06 26 CMB07-CAV2_0006;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 02 CMB07-CAV2_0003;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 02 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
+2026 07 03 CMB07-CAV2_0001;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 04 CMB07-CAV2_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB07-CAV2_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB07-CAV2_0003;Rég signal RF hors tolérance;Wrong alarm
+2026 07 05 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 05 CMB07-CAV2_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 08 CMB07-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 08 CMB07-CAV2_0004;Rég signal RF hors tolérance;Other;Peak modIQ or Uci
+2026 07 09 CMB07-CAV2_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV2_0002;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV2_0003;Rég signal RF hors tolérance;Wrong alarm
+2026 07 09 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV2_0005;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV2_0006;Rég signal RF hors tolérance;Wrong alarm
+2026 07 09 CMB07-CAV2_0007;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV2_0008;Rég signal RF hors tolérance;Filtered;Loop OFF
+2026 07 09 CMB07-CAV2_0010;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +36%
+2026 07 09 CMB07-CAV2_0011;Rég signal RF hors tolérance;Power chain gain;Pic modIQ : +222%
