@@ -230,3 +230,6 @@ Fichier;Defaut;Label;Détails
 2026 06 26 CMB05-CAV1_0010;Rég signal RF hors tolérance;Beam loss
 2026 07 01 CMB05-CAV1_0004;Rég signal RF hors tolérance;Beam loss
 2026 07 01 CMB05-CAV1_0008;Rég signal RF hors tolérance;Filtered;Beam NON
+2026 07 01 CMB05-CAV1_0014;Rég signal RF hors tolérance;Beam loss
+2026 07 01 CMB05-CAV1_0015;Rég signal RF hors tolérance;Beam loss
+2026 07 03 CMB05-CAV1_0001;Rég signal RF hors tolérance;Filtered;Loop OFF
