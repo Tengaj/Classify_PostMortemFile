@@ -229,7 +229,7 @@ def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
         is_healthy = (is_zscore_ok & is_amplitude_ok).astype(int)
         
         # Un vrai calme c'est quand le signal est sain sur au moins 200 points consécutifs.
-        true_calm = is_healthy.rolling(window=200, min_periods=1).min() == 1.0
+        true_calm = is_healthy.rolling(window=80, min_periods=1).min() == 1.0
         last_calm_times = true_calm[true_calm]
         
         if not last_calm_times.empty:
