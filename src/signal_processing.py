@@ -308,7 +308,7 @@ def find_true_t0_with_ampt(Ucav, zero_idx, ampt):
 
 def detect_end_of_staircase(signal, zero_idx, dt_us):
     """
-    Détecte la fin d'une forme en escalier dans un signal avant une chute.
+    Détecte la fin d'une forme en escalier (montante) dans un signal avant une chute.
     Retourne l'index numérique de la fin de l'escalier, ou None si aucun n'est détecté.
     """
     safety_margin_pts = int(10000 / dt_us)
@@ -322,60 +322,54 @@ def detect_end_of_staircase(signal, zero_idx, dt_us):
     if n_points < 100:
         return None
 
-    # Vérification de l'épaisseur du bruit (Filtre anti-oscillation)
-    check_pts = max(5, int(2000 / dt_us))
-    local_max = signal_before_drop.rolling(window=check_pts).max()
-    local_min = signal_before_drop.rolling(window=check_pts).min()
-    local_thickness = local_max - local_min
-
-    # Si l'épaisseur médiane dépasse le seuil, ce n'est pas plat : c'est une oscillation
-    if local_thickness.median() > 0.10:
-        return None
-
-    # Lissage du signal
+    # Lissage du signal pour filtrer le bruit haute fréquence
     window_us = 5000 
     window_pts = max(3, int(window_us / dt_us))
     smoothed_series = signal_before_drop.rolling(window=window_pts, center=True, min_periods=1).mean()
 
-    # Conversion en tableau NumPy pur pour éviter les plantages avec SciPy
-    smoothed_array = smoothed_series.to_numpy()
-
-    # Détection des creux (Valleys)
-    wave_amplitude_threshold = 0.3
-
-    # On cherche les creux sur le signal inversé
-    valleys, _ = find_peaks(-smoothed_array, prominence=wave_amplitude_threshold)
-    if len(valleys) >= 2:
-        return None 
-
-    # Analyse de la dérivé (Marche de l'escalier)
+    # Analyse de la dérivée pour identifier les montées de marches
     step = max(1, int(5000 / dt_us))
     derivative = smoothed_series.diff(periods=step).fillna(0).to_numpy()
 
     min_step_height = 0.04
     min_dist_pts = int(20000 / dt_us)
 
-    # Recherche des pics de la dérivée (les montées de marches)
+    # Recherche des pics de dérivée (impulsions de montée)
     rising_peaks, _ = find_peaks(derivative, height=min_step_height, distance=min_dist_pts)
 
-    min_fall_height = 0.20 
-
-    # Recherche des descentes (pics sur la dérivée inversée)
-    falling_peaks, _ = find_peaks(-derivative, height=min_fall_height, distance=min_dist_pts)
-
-    # Si on trouve plusieurs vraies grandes descentes, c'est de l'oscillation
-    if len(falling_peaks) >= 2:
-        return None
-
-    # Conclusion et positionnement
     min_steps_required = 3
 
-    if len(rising_peaks) > min_steps_required:
+    if len(rising_peaks) >= min_steps_required:
+        first_peak_idx = rising_peaks[0]
         last_peak_idx = rising_peaks[-1]
 
-        # On se place juste un peu après la fin de la dernière montée (sur le plat)
+        # Filtre anti-oscillation (Bilan de croissance)
+        eval_window_us = 50000 
+        eval_window_pts = max(5, int(eval_window_us / dt_us))
+        
+        idx_start_zone = max(0, first_peak_idx - eval_window_pts)
+        idx_end_zone = min(n_points, last_peak_idx + eval_window_pts)
+        
+        start_zone = signal_before_drop.iloc[idx_start_zone : first_peak_idx]
+        end_zone = signal_before_drop.iloc[last_peak_idx : idx_end_zone]
+        
+        if start_zone.empty or end_zone.empty:
+            return None
+            
+        start_val = start_zone.median()
+        end_val = end_zone.median()
+        
+        net_growth = end_val - start_val
+        expected_min_growth = len(rising_peaks) * min_step_height * 0.5
+        
+        # Rejet si le signal global n'a pas grandi (caractéristique d'une oscillation)
+        if net_growth < expected_min_growth:
+            return None
+
+        # Positionnement final
+        # Placement de l'index juste après l'impulsion de la dernière marche validée
         end_stair_idx = last_peak_idx + int(window_pts / 2)
-        end_stair_idx = min(end_stair_idx, len(signal_before_drop) - 1)
+        end_stair_idx = min(end_stair_idx, n_points - 1)
 
         return end_stair_idx
         
