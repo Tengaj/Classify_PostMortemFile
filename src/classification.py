@@ -226,7 +226,7 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
     base_Uci   = np.median(base_window_Uci)
 
     # Épaisseur robuste du bruit de fond (entre le 5e et 95e percentile)
-    noise_window_Uci = Uci.iloc[t0_ampt_idx - 1000:t0_ampt_idx - 100]
+    noise_window_Uci = Uci.iloc[t0_ampt_idx - 5000:t0_ampt_idx - 100]
     noise_thickness = np.percentile(noise_window_Uci, 95) - np.percentile(noise_window_Uci, 5)
     
     # Mesure des êxtremes dans la zone de défaut
@@ -272,27 +272,32 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
     trend_end   = t0_zscore_idx + 5
     trend_Ucav_short = get_trend(time[trend_start:trend_end], Ucav.iloc[trend_start:trend_end], tolerance=1e-6)
     #print(f'pct_Uci : {pct_Uci}, is_real_peak : {is_real_peak}, trend_Ucav_short : {trend_Ucav_short}')
+
+    # Vérification faisceau
+    beam_is_here = False
+    start_idx = max(0, t0_zscore_idx - 20)
+    end_idx = max(1, t0_zscore_idx + 10)
+    
+    beam_window = beam_presence.iloc[start_idx:end_idx]
+    
+    if len(beam_window) > 0:
+        # On compte le nombre exact de points où le faisceau est présent (état = 1)
+        points_on = beam_window.sum()
+        total_points = len(beam_window)
+        
+        # Le faisceau est présent au moins 2 points mais il n'est pas parfaitement stable
+        if points_on >= 2 and points_on < total_points:
+            beam_is_here = True
    
     if pct_modIQ > threshold_noise_pct:
 
         # Power chain gain, gros pic modIQ, suivi d'une chute de Uci
-        if pct_Uci < -threshold_noise_pct:
+        if pct_Uci < -threshold_noise_pct and not beam_is_here:
             return f"Power chain gain;Pic modIQ : +{pct_modIQ:.0f}%"
 
         # Beam loss (Pic modIQ et Uci, chute de Ucav et presence du faisceau)
-        elif pct_Uci > threshold_noise_pct and is_real_peak and trend_Ucav_short == -1:
-            start_idx = max(0, t0_zscore_idx - 20)
-            end_idx = max(1, t0_zscore_idx + 10)
-            
-            beam_window = beam_presence.iloc[start_idx:end_idx]
-            
-            if len(beam_window) > 0:
-                # On compte le nombre exact de points où le faisceau est présent (état = 1)
-                points_on = beam_window.sum()
-                
-                # Le faisceau est présent au moins 2 points
-                if points_on >= 2:
-                    return "Beam loss"
+        elif pct_Uci > threshold_noise_pct and is_real_peak and trend_Ucav_short == -1 and beam_is_here:
+            return "Beam loss"
 
         # Beam loss mais montée de Ucav
         #elif pct_Uci > threshold_noise_pct and trend_Ucav_short == 1:
