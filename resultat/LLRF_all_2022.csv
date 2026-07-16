@@ -850,7 +850,7 @@ Fichier;Defaut;Label;Détails
 2022 09 25 CMB03-CAV1_0013;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 25 CMB03-CAV1_0014;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 25 CMB03-CAV1_0015;Rég signal RF hors tolérance;Filtered;KPI < 10.0
-2022 09 29 CMB03-CAV1_0001;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 277 Hz, Excès de puissance (52%)
+2022 09 29 CMB03-CAV1_0001;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 237 Hz, Excès de puissance (50%)
 2022 09 30 CMB03-CAV1_0001;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4577 Hz, Excès de puissance (87%)
 2022 09 30 CMB03-CAV1_0002;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4563 Hz, Excès de puissance (93%)
 2022 09 30 CMB03-CAV1_0003;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 4550 Hz, Excès de puissance (101%)
@@ -1255,7 +1255,7 @@ Fichier;Defaut;Label;Détails
 2022 09 25 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 25 CMB07-CAV2_0005;Rég signal RF hors tolérance;Filtered;KPI < 10.0
 2022 09 25 CMB07-CAV2_0007 faux quench;Claquage ou quench cavité;False alarm;Temps de chute : 2203.23 us
-2022 09 25 CMB07-CAV2_0008;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 181 Hz, Excès de puissance (221%)
+2022 09 25 CMB07-CAV2_0008;Rég signal RF hors tolérance;Ucav oscillation;Fréquence : 187 Hz, Excès de puissance (221%)
 2022 09 29 CMB07-CAV2_0003;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 09 29 CMB07-CAV2_0004;Rég signal RF hors tolérance;Filtered;Beam NON
 2022 09 29 CMB07-CAV2_0005;Rég signal RF hors tolérance;Filtered;Beam NON
