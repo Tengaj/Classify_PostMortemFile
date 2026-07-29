@@ -404,7 +404,8 @@ def _check_other_peak(Uci, modIQ, t0_ampt_idx):
 
 def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     """
-    [Sous-fonction] Vérifie le comportement "Wrong alarm" (Chute standard).
+    [Sous-fonction] Vérifie la chute de Uci et modIQ ainsi que la présence d'un pic sur Ucr
+    pour détecter les comportements "Wrong alarm" (Chute standard).
     """
     zero_idx = np.argmin(np.abs(time))
     dt_us = np.mean(np.diff(time))
@@ -464,7 +465,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, file_n
     # Détection du décrochage (t0_zscore)
     if end_stair_idx is not None:
         # On cherche le décrochage uniquement après l'escalier
-        print(f"end_stair_idx : {end_stair_idx} end_stair time : {time[end_stair_idx]}")
+        #print(f"end_stair_idx : {end_stair_idx} end_stair time : {time[end_stair_idx]}")
         t0_zscore_idx, _ = detect_t0_zscore(Ucav.iloc[end_stair_idx:])
         t0_zscore_idx += end_stair_idx
     else:
@@ -579,6 +580,7 @@ def classify_vacuum(pickup, void, zero_idx):
     return f";{text_pickup}, {text_vacuum}"
 
     '''
+    # Ancienne classification basé sur le courant pickup (Non fonctionnel à cause d'un changement d'échelle)
     threshold_pickup = 50
     if mean_pickup > threshold_pickup:
         return f"Ipu;{mean_pickup:.2f}uA,{mean_void:.2f}"
@@ -746,11 +748,9 @@ def classify_signals(file_name, header, time, df_signals, df_defaults, filter=Tr
 
     return final_label
 
-
-@chrono
 def classify_file(file_name,filter=True):
     """
-    Lit un fichier brut post-mortem depuis son chemin physique, puis le classifie.
+    Lit un fichier brut post-mortem depuis son chemin physique, puis lance la classification.
     """
     with open(file_name, 'rb') as f:
         file_content = f.read()
