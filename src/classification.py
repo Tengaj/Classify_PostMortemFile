@@ -96,8 +96,9 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, file_name, dt_seconds, t0_
             delta_Uci = end_Uci_value - theorical_Uci
             pct_Uci = (delta_Uci / theorical_Uci) * 100
 
-            # Tolérance de 10% avant de signaler l'anomalie
-            if pct_Uci > 10.0:
+            # Tolérance avant de signaler l'anomalie
+            threshold_noise_pct = cfg.get("threshold_noise_pct", 10.0)
+            if pct_Uci > threshold_noise_pct:
                 power_excess = f", Excès de puissance ({pct_Uci:.0f}%)"
 
         return f"Ucav oscillation;Fréquence : {f_Ucav:.0f} Hz{power_excess}"
@@ -140,7 +141,8 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     base_Uci_safe = max(abs(base_Uci), 0.01)
     ratio_Uci = (delta_Uci / base_Uci_safe) * 100
 
-    if ratio_Uci < 10.0:
+    threshold_noise_pct = cfg.get("threshold_noise_pct", 10.0)
+    if ratio_Uci < threshold_noise_pct:
         # print(f"Ratio d'augmentation Uci trop bas ({ratio_Uci:.1f}%). Pas de quench.")
         return None
 
@@ -256,7 +258,6 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
     # Analyse et désicion
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
     threshold_noise_pct = cfg.get("threshold_noise_pct", 10.0)
-    threshold_peak_pct  = cfg.get("threshold_peak_pct", 90.0)
 
     # Un vrai pic doit dépasser significativement le bruit ambiant
     is_real_peak = delta_pos_Uci > (noise_thickness)
@@ -360,6 +361,8 @@ def _check_other_peak(Uci, modIQ, t0_ampt_idx):
     """
     [Sous fonction] Vérifie la présence de pic autour du moment du défaut sur les signaux Uci et modIQ.
     """
+    cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
+
     # Zone du calcul du bruit de fond
     idx_base_start = max(0, t0_ampt_idx - 1000)
     idx_base_end = max(1, t0_ampt_idx - 100)
@@ -394,8 +397,9 @@ def _check_other_peak(Uci, modIQ, t0_ampt_idx):
     pct_modIQ = (delta_modIQ / base_modIQ_safe) * 100.0
     pct_Uci = (delta_Uci / base_Uci_safe) * 100.0
 
-    modIQ_is_real_peak = delta_modIQ > (noise_thickness) and pct_modIQ > 10.0
-    Uci_is_real_peak = delta_Uci > (noise_thickness) and pct_Uci > 10.0
+    threshold_noise_pct = cfg.get("threshold_noise_pct", 10.0)
+    modIQ_is_real_peak = delta_modIQ > (noise_thickness) and pct_modIQ > threshold_noise_pct
+    Uci_is_real_peak = delta_Uci > (noise_thickness) and pct_Uci > threshold_noise_pct
 
     if modIQ_is_real_peak or Uci_is_real_peak:
         return "Other;Peak modIQ or Uci"
@@ -407,6 +411,8 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     [Sous-fonction] Vérifie la chute de Uci et modIQ ainsi que la présence d'un pic sur Ucr
     pour détecter les comportements "Wrong alarm" (Chute standard).
     """
+    cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
+
     zero_idx = np.argmin(np.abs(time))
     dt_us = np.mean(np.diff(time))
 
@@ -443,7 +449,8 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     is_iq_zero = iq_after < 0.5
 
     # Ucr monte très vite
-    is_ucr_spike = pct_pos_Ucr > 10.0
+    threshold_noise_pct = cfg.get("threshold_noise_pct", 10.0)
+    is_ucr_spike = pct_pos_Ucr > threshold_noise_pct
 
     # Verdict
     if is_uci_zero and is_iq_zero and is_ucr_spike:
