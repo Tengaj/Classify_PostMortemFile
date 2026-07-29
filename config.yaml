@@ -10,6 +10,7 @@ execution:
   input_path: "../../LLRF/"
   output_path: "../resultat/"
   combine_csvs: false               # true : résultat dans un seul csv, false : résultat dans un csv par année
+  use_parallel: true                # true : exécution rapide, false : exécution séquentielle
   years:                            # Année à analyser
     - 2020
     - 2021
@@ -67,6 +68,3 @@ thresholds:
   
   rf_protection:
     threshold_ucav_max: 8.5             # Au-delà de ce ratio Ucav/Ucat, c'est un "Ucav max"
-    
-  vacuum:
-    pickup_threshold: 50.0              # En uA
