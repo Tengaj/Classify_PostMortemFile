@@ -17,7 +17,15 @@ execution:
     - 2023
     - 2024
     - 2025
-    # - 2026
+    #- 2026
+  target_faults:                    # Défauts à conserver et exporter dans le CSV
+    #- Seuil pick-up
+    #- Coupure externe rapide
+    #- Absence autorisation RF
+    - Claquage ou quench cavité
+    - Seuil de vide
+    - Dép seuil de sécurité RF
+    - Rég signal RF hors tolérance
 
 
 # ----------------------------------
@@ -44,8 +52,6 @@ thresholds:
   ecav_instability:
 
     # oscillations
-    taconis_max_hz: 100                 # Seuil maximun pour qu'une oscillation soit un taconis
-
     min_physical_amp_percentage : 0.5   # Amplitude minimum accepté pour qu'un signal oscille
 
     # Quench 
@@ -54,7 +60,6 @@ thresholds:
 
     # Peak
     threshold_noise_pct : 10.0          # Pourcentage minimum pour que le pic sorte du bruit
-    threshold_peak_pct: 90.0            # Pourcentage pour qu'un pic soit classé "Gain anormal" (Power chain gain)
   
   quench:
     min_false_alarm_us: 1000.0          # Limite basse en µs pour une fausse alarme

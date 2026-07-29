@@ -7,7 +7,13 @@ EXEC_CFG = CONFIG.get("execution", {})
 DEFAULT_INPUT_PATH = EXEC_CFG.get("input_path", "../../LLRF/")
 DEFAULT_OUTPUT_PATH = EXEC_CFG.get("output_path", "../resultat/")
 
-@chrono
+TARGET_FAULTS = EXEC_CFG.get("target_faults", [
+    "Rég signal RF hors tolérance", 
+    "Dép seuil de sécurité RF", 
+    "Seuil de vide", 
+    "Claquage ou quench cavité"
+])
+
 def classify_folder(folder_name):
     """
     Classifie tous les fichiers d'un dossiers. 
@@ -24,12 +30,10 @@ def classify_folder(folder_name):
             continue
         try:
             label = classify_file(file_path)
-            if "Rég signal RF hors tolérance" in label or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
-            #if "Rég signal RF hors tolérance" in label:
-            #if "Seuil de vide" in label:
+            fault = label.split(";")[0]
+            if fault in TARGET_FAULTS:
                 folder_results[file_path] = label
-            #file_default[file] = label
-            print(f'Nom du fichier : {file_path}, Défaut : {label}')
+            #print(f'Nom du fichier : {file_path}, Défaut : {label}')
 
         except Exception as e:
             print(f'Fichier ignoré ({file_path}) - Fichier imcomplet ou erreur : {e}')
@@ -37,7 +41,6 @@ def classify_folder(folder_name):
 
     return folder_results
 
-@chrono
 def classify_cav_folder(cavity_folder_name):
     """
     Classifie tous les fichiers des sous dossiers dun type de cavité.
@@ -62,7 +65,6 @@ def classify_year_folder(year_folder_name, export_prefix='', save_csv=True, outp
     year_results = {}
     
     for cavity_folder in cavity_folders:
-        print(cavity_folder)
         if "CMA" in cavity_folder.parts or "CMB" in cavity_folder.parts:
             year_results.update(classify_cav_folder(cavity_folder))
             
@@ -97,9 +99,6 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
 
     for year in years:
         folder_path = Path(base_path) / str(year)
-        print(f"\n{'='*50}")
-        print(f" Démarrage de l'analyse (SÉQUENTIELLE) pour l'année {year}")
-        print(f"{'='*50}")
         
         # On passe save_csv=False si on veut tout combiner à la fin
         results, year_str = classify_year_folder(folder_path, prefix, save_csv=not combine_all, output_path=output_path)
@@ -110,7 +109,6 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
 
     # Création du fichier combiné final si demandé
     if combine_all and all_combined_results:
-        print("\n--- Création du fichier CSV global unique ---")
         
         out_dir = Path(output_path)
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -123,4 +121,4 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
                 label, year_str = all_combined_results[file_path]
                 f.write(f'{file_path.name};{year_str};{label}\n')
                 
-        print(f"Fichier unique créé avec succès ! -> {combined_filepath.name}")
+        print(f"Fichier résultat créé avec succès ! -> {combined_filepath.name}")

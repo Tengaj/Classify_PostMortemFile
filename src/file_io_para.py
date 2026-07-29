@@ -10,6 +10,13 @@ EXEC_CFG = CONFIG.get("execution", {})
 DEFAULT_INPUT_PATH = EXEC_CFG.get("input_path", "../../LLRF/")
 DEFAULT_OUTPUT_PATH = EXEC_CFG.get("output_path", "../resultat/")
 
+TARGET_FAULTS = EXEC_CFG.get("target_faults", [
+    "Rég signal RF hors tolérance", 
+    "Dép seuil de sécurité RF", 
+    "Seuil de vide", 
+    "Claquage ou quench cavité"
+])
+
 def _process_file_worker(file_path):
     """
     Fonction 'ouvrier' exécutée en parallèle. 
@@ -20,12 +27,9 @@ def _process_file_worker(file_path):
 
     try:
         label = classify_file(file_path)
+        fault = label.split(";")[0]
         
-        # On ne garde que le défaut ciblé pour l'export
-        if "Rég signal RF hors tolérance" in label or "Dép seuil de sécurité RF" in label or "Seuil de vide" in label or "Claquage ou quench cavité" in label:
-        #if "Rég signal RF hors tolérance" in label:
-        #if label.split(";")[1] in ["Loop instability","Taconis"]:
-        #if "Seuil de vide" in label:
+        if fault in TARGET_FAULTS:
             msg = f"Nom : {file_path.name} | Défaut : {label}"
             return file_path, label, msg
         else:
@@ -50,14 +54,13 @@ def _run_parallel(files_list):
         for future in as_completed(future_to_file):
             file_path, label, msg = future.result()
             
-            print(msg) 
+            #print(msg) 
             
             if label is not None:
                 results[file_path] = label
                 
     return results
 
-@chrono
 def classify_folder(folder_name):
     """
     Classifie tous les fichiers d'un dossier en parallèle.
@@ -67,7 +70,6 @@ def classify_folder(folder_name):
     
     return _run_parallel(files_list)
 
-@chrono
 def classify_cav_folder(cavity_folder_name):
     """
     Classifie tous les fichiers des sous-dossiers d'un type de cavité en parallèle.
@@ -97,7 +99,6 @@ def classify_year_folder(year_folder_name, export_prefix='', save_csv=True, outp
             for sub in subfolders:
                 files_list.extend([p for p in sub.iterdir() if p.is_file()])
                 
-    print(f"\n Lancement de l'analyse parallèle pour {len(files_list)} fichiers...")
     year_results = _run_parallel(files_list)
     
     year_str = folder_path.parts[-1]
@@ -131,9 +132,6 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
 
     for year in years:
         folder_path = Path(base_path) / str(year)
-        print(f"\n{'='*50}")
-        print(f" Démarrage de l'analyse pour l'année {year}")
-        print(f"{'='*50}")
         
         results, year_str = classify_year_folder(folder_path, prefix, save_csv=not combine_all, output_path=output_path)
 
@@ -144,7 +142,6 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
 
     # À la toute fin, si on est en mode "combiné", on crée notre fichier unique
     if combine_all and all_combined_results:
-        print("\n--- Création du fichier CSV global unique ---")
         combined_filepath = Path(f"{output_path}LLRF_{prefix}.csv")
         
         out_dir = Path(output_path)
@@ -157,4 +154,4 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
                 label, year_str = all_combined_results[file_path]
                 f.write(f'{file_path.name};{year_str};{label}\n')
                 
-        print(f"Fichier unique créé avec succès ! -> {combined_filepath.name}")
+        print(f"Fichier résultat créé avec succès ! -> {combined_filepath.name}")
