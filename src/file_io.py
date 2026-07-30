@@ -8,7 +8,8 @@ from classification import classify_file
 # --- CONFIGURATION ---
 EXEC_CFG = CONFIG.get("execution", {})
 DEFAULT_INPUT_PATH = EXEC_CFG.get("input_path", "../../LLRF/")
-DEFAULT_OUTPUT_PATH = EXEC_CFG.get("output_path", "../resultat/")
+DEFAULT_OUTPUT_PATH = EXEC_CFG.get("output_path", "../result/")
+DEFAULT_OUTPUT_FILENAME = EXEC_CFG.get("output_filename", "LLRF_result")
 USE_PARALLEL = EXEC_CFG.get("use_parallel", True)
 
 TARGET_FAULTS = EXEC_CFG.get("target_faults", [
@@ -88,7 +89,7 @@ def classify_cav_folder(cavity_folder_name):
     return _run_analysis_engine(files_list)
 
 @chrono
-def classify_year_folder(year_folder_name, export_prefix='', save_csv=True, output_path=DEFAULT_OUTPUT_PATH):
+def classify_year_folder(year_folder_name, save_csv=True, output_path=DEFAULT_OUTPUT_PATH):
     """
     Extrait tous les fichiers d'une année et les classifie.
     """
@@ -109,18 +110,20 @@ def classify_year_folder(year_folder_name, export_prefix='', save_csv=True, outp
     if save_csv:
         out_dir = Path(output_path)
         out_dir.mkdir(parents=True, exist_ok=True)
-        export_filepath = out_dir / f"LLRF_{export_prefix}{year_str}.csv"
+        export_filepath = out_dir / f"{DEFAULT_OUTPUT_FILENAME}_{year_str}.csv"
 
         with open(export_filepath, "w", encoding="utf-8") as f:
             f.write("Fichier;Defaut;Label;Détails\n")
             for file_path in sorted(year_results.keys()):
                 label = year_results[file_path]
                 f.write(f'{file_path.name};{label}\n')
+        
+        print(f"Fichier résultat créé avec succès ! -> {export_filepath.name}")
 
     return year_results, year_str
 
 @chrono
-def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_PATH, years=None, prefix="", combine_all=False):
+def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_PATH, years=None, combine_all=False):
     """
     Superviseur : Lance l'analyse sur plusieurs années l'une après l'autre.
     """
@@ -132,7 +135,7 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
     for year in years:
         folder_path = Path(base_path) / str(year)
         
-        results, year_str = classify_year_folder(folder_path, prefix, save_csv=not combine_all, output_path=output_path)
+        results, year_str = classify_year_folder(folder_path, save_csv=not combine_all, output_path=output_path)
 
         if combine_all:
             for file_path, label in results.items():
@@ -142,7 +145,7 @@ def run_full_analysis(base_path=DEFAULT_INPUT_PATH, output_path=DEFAULT_OUTPUT_P
     if combine_all and all_combined_results:
         out_dir = Path(output_path)
         out_dir.mkdir(parents=True, exist_ok=True)
-        combined_filepath = out_dir / f"LLRF_{prefix}.csv"
+        combined_filepath = out_dir / f"{DEFAULT_OUTPUT_FILENAME}.csv"
         
         with open(combined_filepath, "w", encoding="utf-8") as f:
             f.write("Fichier;Annee;Defaut;Label;Détails\n")

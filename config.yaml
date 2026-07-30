@@ -8,10 +8,11 @@
 # ----------------------------------
 execution:
   input_path: "../../LLRF/"
-  output_path: "../resultat/"
-  combine_csvs: false               # true : résultat dans un seul csv, false : résultat dans un csv par année
-  use_parallel: true                # true : exécution rapide, false : exécution séquentielle
-  years:                            # Année à analyser
+  output_path: "../result/"
+  output_filename: "LLRF_result"           # Nom de base du fichier de sortie (L'année sera automatiquement ajouté au nom en cas d'enregistrement par année)
+  combine_csvs: true                       # true : résultat dans un seul csv, false : résultat dans un csv par année
+  use_parallel: true                       # true : exécution rapide, false : exécution séquentielle
+  years:                                   # Année à analyser
     - 2020
     - 2021
     - 2022

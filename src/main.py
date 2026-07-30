@@ -16,7 +16,6 @@ def main():
         base_path=input_path,
         output_path=output_path,
         years=years_str,
-        prefix="all_",
         combine_all=combine
     )
 
