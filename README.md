@@ -18,6 +18,12 @@ Pour installer rapidement toutes les dépendances publiques, vous pouvez exécut
 pip install numpy pandas scipy pyyaml
 ```
 
+Pour garantir une reproductibilité totale, nous vous recommandons d'installer les versions exactes des bibliothèques utilisées lors du développement à l'aide du fichier requirements.txt :
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Utilisation et lancement 
 
 Avant toute utilisation, assurez-vous que les chemins d'accès d'entrée et de sortie sont corrects. Ils sont modifiables dans le fichier `config.yaml`, au sein de la section execution. La valeur `input_path` correspond au chemin d'accès vers les fichiers post-mortem, et `output_path` indique le dossier où seront enregistrés les résultats.
@@ -39,18 +45,18 @@ Le fichier généré contient les colonnes suivantes :
  - **Fichier** : Le nom exact du fichier de données brutes analysé.
  - **Annee** : L'année de l'événement *(colonne présente uniquement si l'option de fichier combiné global est activée)*.
  - **Defaut** : La catégorie majeure du défaut renseignée par la machine (ex: "Rég signal RF hors tolérance").
- - **Label** : La classification physique précise trouvée par l'algorithme (ex: "Quench", "Taconis", "Other").
+ - **Label** : La classification physique précise trouvée par l'algorithme (ex: "Quench", "Beam loss", "Other").
  - **Détails** : Informations supplémentaires sur le fichier (ex: temps de chute pour un "Quench" ou la raison de filtrage).
 
 ## Configuration 
 
 Cette classification est entièrement paramétrable via le fichier config.yaml.
 
- - execution : Vous y trouverez tout ce qui est relatif à l'exécution du programme (chemins d'accès, années à analyser, options de compilation des CSV, etc.).
+ - **execution** : Vous y trouverez tout ce qui est relatif à l'exécution du programme (chemins d'accès, années à analyser, défauts à classifier, options de compilation des CSV, etc.).
 
- - filters : Vous permet d'activer ou de désactiver chaque filtre de validité, ainsi que de modifier leurs valeurs de seuil.
+ - **filters** : Vous permet d'activer ou de désactiver chaque filtre de validité, ainsi que de modifier leurs valeurs de seuil.
 
- - thresholds : Liste les seuils physiques principaux relatifs à la classification algorithmique, regroupés par défaut majeur.
+ - **thresholds** : Liste les seuils physiques principaux relatifs à la classification algorithmique, regroupés par défaut majeur.
 
 ## Architecture du code
 
@@ -58,19 +64,16 @@ Cette classification est entièrement paramétrable via le fichier config.yaml.
 
 `signal_processing.py` : Regroupe toutes les fonctions relatives à l'analyse mathématique directe des signaux.
 
-`file_io.py` et `file_io_para.py` : Gèrent les entrées/sorties (lecture des dossiers et enregistrement des résultats). La variante _para utilise le traitement parallélisé multi-cœurs.
+`file_io.py` : Gère les entrées/sorties (lecture des dossiers et enregistrement des résultats), avec une bascule automatique entre un traitement séquentiel ou un traitement parallélisé multi-cœurs.
 
 `utils.py` : Méthodes utilitaires.
 
 `PyPostMortem.py` : Gère la lecture brute des fichiers post-mortem pour leur exploitation (Fichier issu des travaux de Charly LASSALLE : [Lien GitLab](https://gitlab.in2p3.fr/charly-lassalle-phd-thesis/programmes)).
 
-## Liste des anomalies classifiés
+## Liste des anomalies classifiées
 
 Voici la liste des anomalies détectées et classifiées par le programme, regroupées par défaut principal :
 
- - Seuil de vide :
-    - Ipu
-    - Leak/Outgassing
  - Claquage ou quench cavité :
     - Breakdown
     - False alarm
@@ -78,14 +81,19 @@ Voici la liste des anomalies détectées et classifiées par le programme, regro
     - Ucav max
     - Pr max
  - Rég signal RF hors tolérance :
-    - Loop instability
-    - Taconis
+    - Ucav Oscillation
     - Quench
     - Quench aside
     - Power chain gain
     - Beam loss
-    - Beam anomaly
+    - Beam related anomaly
     - Detuning control error
     - Wrong alarm
 
-Note : Si un fichier ne remplit aucune des conditions pour être classé parmi les catégories ci-dessus, il sera étiqueté comme Other.
+*Note : Si un fichier ne remplit aucune des conditions pour être classé parmi les catégories ci-dessus, il sera étiqueté comme **Other**.*
+
+**Autres défauts pris en charge :**
+Si vous activez la classification pour les défauts **Seuil pick-up**, **Coupure externe rapide**, **Absence autorisation RF** et **Seuil de vide**, sachez que ceux-ci ne possèdent pas de sous-catégories. 
+- Si le fichier ne passe pas les conditions de validité, le seul label attribué sera **Filtered**. 
+- S'il est valide, la classification conservera simplement le nom du défaut principal. 
+- **Exception pour le Seuil de vide :** Des métriques physiques spécifiques (courant pickup moyen et valeur du vide) sont calculées par l'algorithme et reportées directement dans la colonne *Détails* du fichier de résultats.
