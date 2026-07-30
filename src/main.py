@@ -1,4 +1,4 @@
-from file_io_para import classify_folder, classify_cav_folder, classify_year_folder, run_full_analysis
+from file_io import classify_folder, classify_cav_folder, classify_year_folder, run_full_analysis
 from classification import classify_file
 from utils import CONFIG
 
@@ -25,11 +25,3 @@ if __name__ == "__main__":
     
 
     main()
-
-#Seuil pick-up,
-#Coupure externe rapide,    
-#Absence autorisation RF,
-#Seuil de vide,
-#Claquage ou quench cavité,
-#Dép seuil de sécurité RF,
-#Rég signal RF hors tolérance
