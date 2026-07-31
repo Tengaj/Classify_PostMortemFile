@@ -15,7 +15,7 @@ from signal_processing import (
 def _check_instability_oscillations(Uci, modIQ, Ucav, file_name, dt_seconds, t0_zscore_idx, t0_ampt_idx, end_stair_idx):
     """
     [Sous-fonction] Vérifie la présence d'oscillations sur les trois signaux.
-    Dans se cas, retourne la classification "Ucav oscillation" avec sa fréquence dominante, 
+    Dans se cas, retourne la classification "Oscillation Ucav" avec sa fréquence dominante, 
     et indique s'il y a un excès de puissance Uci par rapport à la théorie.
     """
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
@@ -101,14 +101,14 @@ def _check_instability_oscillations(Uci, modIQ, Ucav, file_name, dt_seconds, t0_
             if pct_Uci > threshold_noise_pct:
                 power_excess = f", Excès de puissance ({pct_Uci:.0f}%)"
 
-        return f"Ucav oscillation;Fréquence : {f_Ucav:.0f} Hz{power_excess}"
+        return f"Oscillation Ucav;Fréquence : {f_Ucav:.0f} Hz{power_excess}"
 
     return None 
 
 def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_rise, end_stair, t0_ampt_idx):
     """
     [Sous-fonction] Analyse les tendances de Uci, Ucr et le temps de chute de Ucav
-    pour détecter un Quench ou un Quench aside.
+    pour détecter un Quench ou un Quench adjacent.
     """
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
     
@@ -204,13 +204,13 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
             fall_time_str = f";Temps de chute : {delta_t:.2f} us"
             return f"Quench{fall_time_str}"
         elif trend_Ucr == 1:
-            return "Quench aside"
+            return "Quench adjacent"
             
     return None
     
 def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_idx, t0_zscore_idx):
     """
-    [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Beam loss, Power chain gain).
+    [Sous-fonction] Analyse les pics anormaux par rapport au bruit de fond (Perte faisceau, Gain chaîne de puissance).
     """
     # Zone du calcul du bruit de fond
     idx_base_start = max(0, t0_ampt_idx - 1000)
@@ -292,15 +292,15 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
    
     if pct_modIQ > threshold_noise_pct:
 
-        # Power chain gain, gros pic modIQ, suivi d'une chute de Uci
+        # Gain chaîne de puissance, gros pic modIQ, suivi d'une chute de Uci
         if pct_Uci < -threshold_noise_pct and not beam_is_here:
-            return f"Power chain gain;Pic modIQ : +{pct_modIQ:.0f}%"
+            return f"Gain chaîne de puissance;Pic modIQ : +{pct_modIQ:.0f}%"
 
-        # Beam loss (Pic modIQ et Uci, chute de Ucav et presence du faisceau)
+        # Perte faisceau (Pic modIQ et Uci, chute de Ucav et presence du faisceau)
         elif pct_Uci > threshold_noise_pct and is_real_peak and trend_Ucav_short == -1 and beam_is_here:
-            return "Beam loss"
+            return "Perte faisceau"
 
-        # Beam loss mais montée de Ucav
+        # Perte faisceau mais montée de Ucav
         #elif pct_Uci > threshold_noise_pct and trend_Ucav_short == 1:
             #return "Other,Faulty beam presence"
     
@@ -322,7 +322,7 @@ def _check_beam_anomalies(beam_presence, t0_zscore_idx):
         
         # Le faisceau est présent au moins 2 points mais il n'est pas parfaitement stable
         if points_on >= 2 and points_on < total_points:
-            return "Beam related anomaly"
+            return "Anomalie liée au faisceau"
             
     return None
 
@@ -353,7 +353,7 @@ def _check_detuning_anomalies(time, Uci, Ucr, start_idx_Uci_rise, t0_ampt_idx):
 
     # Si les deux signaux montent
     if trend_Uci == 1 and trend_Ucr == 1:
-        return "Detuning control error"
+        return "Erreur de contrôle d'accord"
         
     return None
 
@@ -402,14 +402,14 @@ def _check_other_peak(Uci, modIQ, t0_ampt_idx):
     Uci_is_real_peak = delta_Uci > (noise_thickness) and pct_Uci > threshold_noise_pct
 
     if modIQ_is_real_peak or Uci_is_real_peak:
-        return "Other;Peak modIQ or Uci"
+        return "Autre;Pic modIQ ou Uci"
 
     return None
 
 def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
     """
     [Sous-fonction] Vérifie la chute de Uci et modIQ ainsi que la présence d'un pic sur Ucr
-    pour détecter les comportements "Wrong alarm" (Chute standard).
+    pour détecter les comportements "Fausse alarme" (Chute standard).
     """
     cfg = CONFIG.get("thresholds", {}).get("ecav_instability", {})
 
@@ -454,7 +454,7 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
 
     # Verdict
     if is_uci_zero and is_iq_zero and is_ucr_spike:
-        return "Wrong alarm"
+        return "Fausse alerte"
 
     return None
 
@@ -539,7 +539,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, file_n
         return wrong_alarm_label
             
     # Si aucune condition n'est remplie
-    return "Other"
+    return "Autre"
 
 def classify_RF_protections(time, Ucav, Ucat):
     """
@@ -592,7 +592,7 @@ def classify_vacuum(pickup, void, zero_idx):
     if mean_pickup > threshold_pickup:
         return f"Ipu;{mean_pickup:.2f}uA,{mean_void:.2f}"
     else:
-        return f"Leak/outgassing;{mean_pickup:.2f}uA,{mean_void:.2f}"
+        return f"Fuite/dégazage;{mean_pickup:.2f}uA,{mean_void:.2f}"
     '''
 
 def classify_quench(Ucav, t0_ampt_idx):
@@ -610,7 +610,7 @@ def classify_quench(Ucav, t0_ampt_idx):
     
     if result is None:
         # print(f"Alerte : Le signal ne descend jamais à {target_pct*100}% dans ce fichier.")
-        return f"Other;Incomplet (Pas de chute à {target_pct*100:.0f}%)"
+        return f"Autre;Incomplet (Pas de chute à {target_pct*100:.0f}%)"
         
     delta_t, u_max, t0_time, t_50 = result
     
@@ -626,9 +626,9 @@ def classify_quench(Ucav, t0_ampt_idx):
     fall_time_str = f";Temps de chute : {delta_t:.2f} us"
 
     if delta_t <= threshold_breakdown:
-        return f"Breakdown{fall_time_str}"
+        return f"Claquage{fall_time_str}"
     elif delta_t > threshold_false_alarm:
-        return f"False alarm{fall_time_str}"
+        return f"Fausse alarme{fall_time_str}"
     else:
         # N'est pas sensé arriver
         return f"Quench{fall_time_str}"
@@ -645,32 +645,32 @@ def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
     loop = header.get("LOOP").get("Valeur")
 
     if cfg.get("check_beam", True) and beam == "NON":
-        return f"Filtered;Beam NON"
+        return f"Filtré;Beam NON"
         
     if cfg.get("check_loop", True) and loop == "OFF":
-        return f"Filtered;Loop OFF"
+        return f"Filtré;Loop OFF"
 
     # Filtre sur KPI
     if cfg.get("check_kpi", True):
         kpi = float(header.get("KPI").get("Valeur"))
         kpi_threshold = cfg.get("min_kpi", 10.0)
         if kpi < kpi_threshold:
-            return f"Filtered;KPI < {kpi_threshold}"
+            return f"Filtré;KPI < {kpi_threshold}"
 
     # Filtre sur le Masque
     if cfg.get("check_mask", True):
         mask = header.get("MASK").get("Valeur")
         file_name_str = str(file_name)
         if "CMA" in file_name_str and mask not in ['0x007D', '0x007F']:
-            return f"Filtered;Mask problem"
+            return f"Filtré;Problème de masque"
         if "CMB" in file_name_str and mask != "0x007F":
-            return f"Filtered;Mask problem"
+            return f"Filtré;Problème de masque"
 
     #Filtre sur l'amplitude (AMPT)
     if cfg.get("check_ampt", True):
         ampt_threshold = cfg.get("max_ampt", 10.0)
         if ampt > ampt_threshold:
-            return f"Filtered;AMPT > {ampt_threshold}%"
+            return f"Filtré;AMPT > {ampt_threshold}%"
     
     # Filtre sur la tension cavité (Ucav)  
     if cfg.get("check_ucav_healthy", True):
@@ -682,14 +682,14 @@ def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
 
         # Cas A : Tension presque nulle en moyenne avant le défaut
         if np.mean(Ucav_before_t0) < ucav_min:
-            return f"Filtered;Tension moyenne < {ucav_min}"
+            return f"Filtré;Tension moyenne < {ucav_min}"
 
         # Cas B : Tension qui tombe trop bas pendant un certain temps avant t0
         required_points = max(2, int(max_duration_us / dt_us))
         drop_mask = Ucav_before_t0 < ucav_min
         
         if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-            return f"Filtered;Tension < {ucav_min} avant t0"
+            return f"Filtré;Tension < {ucav_min} avant t0"
 
 def classify_signals(file_name, header, time, df_signals, df_defaults, filter=True):
     """
