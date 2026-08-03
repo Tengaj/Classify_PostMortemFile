@@ -94,6 +94,10 @@ def classify_year_folder(year_folder_name, save_csv=True, output_path=DEFAULT_OU
     Extrait tous les fichiers d'une année et les classifie.
     """
     folder_path = Path(year_folder_name)
+
+    year_str = folder_path.parts[-1]
+    print(f"\nDémarrage de l'analyse pour l'année {year_str}")
+
     cavity_folders = [path for path in folder_path.iterdir() if path.is_dir()]
     
     files_list = []

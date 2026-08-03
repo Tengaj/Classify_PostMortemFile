@@ -51,6 +51,7 @@ filters:
 # ----------------------------------
 thresholds:
   
+  # Régulation signal RF hors tolérance
   ecav_instability:
 
     # oscillations
@@ -63,9 +64,11 @@ thresholds:
     # Peak
     threshold_noise_pct : 10.0          # Pourcentage minimum pour que le pic sorte du bruit
   
+  # Claquage ou quench cavité
   quench:
     min_false_alarm_us: 1000.0          # Limite basse en µs pour une fausse alarme
     fall_target_pct: 50.0               # Objectif de chute (50%)
   
+  # Dépassement seuil de sécurité RF
   rf_protection:
     threshold_ucav_max: 8.5             # Au-delà de ce ratio Ucav/Ucat, c'est un "Ucav max"
