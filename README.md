@@ -75,25 +75,25 @@ Cette classification est entièrement paramétrable via le fichier config.yaml.
 Voici la liste des anomalies détectées et classifiées par le programme, regroupées par défaut principal :
 
  - Claquage ou quench cavité :
-    - Breakdown
-    - False alarm
+    - Claquage
+    - Fausse alarme
  - Dép seuil de sécurité RF :
     - Ucav max
     - Pr max
  - Rég signal RF hors tolérance :
-    - Ucav Oscillation
+    - Oscillation Ucav
     - Quench
-    - Quench aside
-    - Power chain gain
-    - Beam loss
-    - Beam related anomaly
-    - Detuning control error
-    - Wrong alarm
+    - Quench adjacent
+    - Gain chaîne de puissance
+    - Perte faisceau
+    - Anomalie liée au faisceau
+    - Erreur de contrôle d'accord
+    - Fausse alerte
 
-*Note : Si un fichier ne remplit aucune des conditions pour être classé parmi les catégories ci-dessus, il sera étiqueté comme **Other**.*
+*Note : Si un fichier ne remplit aucune des conditions pour être classé parmi les catégories ci-dessus, il sera étiqueté comme **Autre**.*
 
 **Autres défauts pris en charge :**
 Si vous activez la classification pour les défauts **Seuil pick-up**, **Coupure externe rapide**, **Absence autorisation RF** et **Seuil de vide**, sachez que ceux-ci ne possèdent pas de sous-catégories. 
-- Si le fichier ne passe pas les conditions de validité, le seul label attribué sera **Filtered**. 
+- Si le fichier ne passe pas les conditions de validité, le seul label attribué sera **Filtré**. 
 - S'il est valide, la classification conservera simplement le nom du défaut principal. 
 - **Exception pour le Seuil de vide :** Des métriques physiques spécifiques (courant pickup moyen et valeur du vide) sont calculées par l'algorithme et reportées directement dans la colonne *Détails* du fichier de résultats.
