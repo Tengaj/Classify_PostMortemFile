@@ -403,7 +403,7 @@ def _check_other_peak(Uci, modIQ, t0_ampt_idx):
         base_Uci   = np.median(base_window_Uci)
     
     # Protection percentiles
-    if len(noise_window_Uci) < 2:
+    if len(base_window_Uci) < 2:
         noise_thickness = 0.01  # Valeur par défaut si pas d'historique
     else:
         noise_thickness = np.percentile(base_window_Uci, 95) - np.percentile(base_window_Uci, 5)
@@ -704,7 +704,7 @@ def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
 
     #Filtre sur l'amplitude (AMPT)
     if cfg.get("check_ampt", True):
-        ampt_threshold = cfg.get("max_ampt", 10.0)
+        ampt_threshold = cfg.get("max_ampt")
         if ampt > ampt_threshold:
             return f"Filtré;AMPT > {ampt_threshold}%"
     
