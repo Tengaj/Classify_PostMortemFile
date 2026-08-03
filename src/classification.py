@@ -180,24 +180,28 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     max_jump_Uci   = diff_50.max()
     
     is_sudden_spike = False
+
+    # Protection contre les tableaux NaN
+    if len(Uci_win_large) > step_points and not diff_50.isna().all():
+        max_jump_Uci = diff_50.max()
     
-    if total_rise_Uci > 0.5:
-        if max_jump_Uci > 0.65 * total_rise_Uci:
-            
-            jump_idx = np.nanargmax(diff_50)
-            
-            idx_before = max(0, jump_idx - pts_150)
-            idx_after  = min(len(Uci_win_large) - 1, jump_idx + pts_150)
-            
-            val_before = Uci_win_large.iloc[idx_before]
-            val_after  = Uci_win_large.iloc[idx_after]
-            
-            true_shift = val_after - val_before
-            
-            # Si le décalage durable représente au moins 40% du saut
-            if true_shift > 0.40 * max_jump_Uci:
-                is_sudden_spike = True
-                # print(f"Pic brutal, Hauteur: {total_rise_Uci:.2f} | Saut: {max_jump_Uci:.2f} | Décalage durable: {true_shift:.2f}")
+        if total_rise_Uci > 0.5:
+            if max_jump_Uci > 0.65 * total_rise_Uci:
+                
+                jump_idx = np.nanargmax(diff_50)
+                
+                idx_before = max(0, jump_idx - pts_150)
+                idx_after  = min(len(Uci_win_large) - 1, jump_idx + pts_150)
+                
+                val_before = Uci_win_large.iloc[idx_before]
+                val_after  = Uci_win_large.iloc[idx_after]
+                
+                true_shift = val_after - val_before
+                
+                # Si le décalage durable représente au moins 40% du saut
+                if true_shift > 0.40 * max_jump_Uci:
+                    is_sudden_spike = True
+                    # print(f"Pic brutal, Hauteur: {total_rise_Uci:.2f} | Saut: {max_jump_Uci:.2f} | Décalage durable: {true_shift:.2f}")
 
     # Verdict final
     if trend_Uci == 1:
@@ -223,16 +227,28 @@ def _check_amplitude_anomalies(time, Uci, Ucav, modIQ, beam_presence, t0_ampt_id
     zone_start = t0_ampt_idx - 20
     zone_end   = t0_ampt_idx + 30
     
-    # Calcul du bruit de fond
+        # Calcul du bruit de fond
     base_window_modIQ = modIQ.iloc[idx_base_start:idx_base_end]
     base_window_Uci   = Uci.iloc[idx_base_start:idx_base_end]
     
-    base_modIQ = np.median(base_window_modIQ)
-    base_Uci   = np.median(base_window_Uci)
+    # Protection fenêtre vide
+    if base_window_modIQ.empty or base_window_Uci.empty:
+        base_modIQ = modIQ.iloc[t0_ampt_idx]
+        base_Uci   = Uci.iloc[t0_ampt_idx]
+    else:
+        base_modIQ = np.median(base_window_modIQ)
+        base_Uci   = np.median(base_window_Uci)
 
-    # Épaisseur robuste du bruit de fond (entre le 5e et 95e percentile)
-    noise_window_Uci = Uci.iloc[t0_ampt_idx - 5000:t0_ampt_idx - 100]
-    noise_thickness = np.percentile(noise_window_Uci, 95) - np.percentile(noise_window_Uci, 5)
+    # Épaisseur robuste du bruit de fond
+    noise_start = max(0, t0_ampt_idx - 5000)
+    noise_end = max(1, t0_ampt_idx - 100)
+    noise_window_Uci = Uci.iloc[noise_start:noise_end]
+    
+    # Protection percentiles
+    if len(noise_window_Uci) < 2:
+        noise_thickness = 0.01  # Valeur par défaut si pas d'historique
+    else:
+        noise_thickness = np.percentile(noise_window_Uci, 95) - np.percentile(noise_window_Uci, 5)
     
     # Mesure des êxtremes dans la zone de défaut
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
@@ -374,15 +390,23 @@ def _check_other_peak(Uci, modIQ, t0_ampt_idx):
     zone_start = t0_ampt_idx - 30
     zone_end   = t0_ampt_idx + 30
     
-    # Calcul du bruit de fond
+        # Calcul du bruit de fond
     base_window_modIQ = modIQ.iloc[idx_base_start:idx_base_end]
     base_window_Uci   = Uci.iloc[idx_base_start:idx_base_end]
     
-    base_modIQ = np.median(base_window_modIQ)
-    base_Uci   = np.median(base_window_Uci)
-
-    # Épaisseur robuste du bruit de fond (entre le 5e et 95e percentile)
-    noise_thickness = np.percentile(base_window_Uci, 95) - np.percentile(base_window_Uci, 5)
+    # Protection fenêtre vide
+    if base_window_modIQ.empty or base_window_Uci.empty:
+        base_modIQ = modIQ.iloc[t0_ampt_idx]
+        base_Uci   = Uci.iloc[t0_ampt_idx]
+    else:
+        base_modIQ = np.median(base_window_modIQ)
+        base_Uci   = np.median(base_window_Uci)
+    
+    # Protection percentiles
+    if len(noise_window_Uci) < 2:
+        noise_thickness = 0.01  # Valeur par défaut si pas d'historique
+    else:
+        noise_thickness = np.percentile(base_window_Uci, 95) - np.percentile(base_window_Uci, 5)
     
     # Mesure des êxtremes dans la zone de défaut
     max_modIQ_zone = modIQ.iloc[zone_start:zone_end].max()
@@ -584,7 +608,12 @@ def classify_vacuum(pickup, void, zero_idx):
     Pour le moment, indique la valeur moyenne du courant pickup avant t0 et la valeur du vide à t0. 
     """
     pickup_win = pickup.iloc[0:zero_idx]
-    mean_pickup = pickup_win.mean()
+    
+    # Protection moyenne
+    if pickup_win.empty:
+        mean_pickup = pickup.iloc[0]
+    else:
+        mean_pickup = pickup_win.mean()
 
     vacuum_at_fault = void.iloc[zero_idx]
 
