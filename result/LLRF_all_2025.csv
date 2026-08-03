@@ -3,7 +3,7 @@ Fichier;Defaut;Label;Détails
 2025 09 03 CMA01_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2025 09 03 CMA01_0003;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2025 09 03 CMA01_0004;Rég signal RF hors tolérance;Filtré;Beam NON
-2025 10 23 CMA01_0001;Dép seuil de sécurité RF;Ucav max
+2025 10 23 CMA01_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 1.28 MV/m
 2025 09 03 CMA03_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2025 09 03 CMA03_0002;Rég signal RF hors tolérance;Filtré;Beam NON
 2025 09 26 CMA04_0002;Seuil de vide;Filtré;Beam NON

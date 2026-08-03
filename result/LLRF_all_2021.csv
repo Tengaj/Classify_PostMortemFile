@@ -474,8 +474,8 @@ Fichier;Defaut;Label;Détails
 2021 10 06 CMA12_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2021 10 06 CMA12_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2021 10 26 CMA12_0001;Dép seuil de sécurité RF;Filtré;KPI < 10.0
-2021 11 16 CMA12_0003;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMA12_0004;Dép seuil de sécurité RF;Ucav max
+2021 11 16 CMA12_0003;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.91 MV/m
+2021 11 16 CMA12_0004;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.91 MV/m
 2021 11 26 CMA12_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 11 30 CMA12_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2021 12 02 CMA12_0003;Dép seuil de sécurité RF;Filtré;Loop OFF
@@ -499,21 +499,21 @@ Fichier;Defaut;Label;Détails
 2021 09 03 CMB01-CAV1_0008;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 09 13 CMB01-CAV1_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 09 21 CMB01-CAV1_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0
-2021 10 25 CMB01-CAV1_0001;Dép seuil de sécurité RF;Ucav max
+2021 10 25 CMB01-CAV1_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
 2021 10 26 CMB01-CAV1_0001;Dép seuil de sécurité RF;Filtré;KPI < 10.0
 2021 11 05 CMB01-CAV1_0001;Seuil de vide;Filtré;Beam NON
-2021 11 16 CMB01-CAV1_0003;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0004;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0005;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0006;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0008;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0009;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0010;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0011;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0012;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0013;Dép seuil de sécurité RF;Ucav max
-2021 11 16 CMB01-CAV1_0014;Dép seuil de sécurité RF;Ucav max
-2021 11 30 CMB01-CAV1_0001;Dép seuil de sécurité RF;Ucav max
+2021 11 16 CMB01-CAV1_0003;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.69 MV/m
+2021 11 16 CMB01-CAV1_0004;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0005;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0006;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0008;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0009;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.69 MV/m
+2021 11 16 CMB01-CAV1_0010;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0011;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0012;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0013;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 16 CMB01-CAV1_0014;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.69 MV/m
+2021 11 30 CMB01-CAV1_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
 2021 12 01 CMB01-CAV1_0004;Dép seuil de sécurité RF;Filtré;KPI < 10.0
 2021 06 17 CMB01-CAV2_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 06 28 CMB01-CAV2_0001;Rég signal RF hors tolérance;Filtré;Beam NON
@@ -585,9 +585,9 @@ Fichier;Defaut;Label;Détails
 2021 10 08 CMB01-CAV2_0006;Dép seuil de sécurité RF;Filtré;Beam NON
 2021 10 08 CMB01-CAV2_0007;Dép seuil de sécurité RF;Filtré;Beam NON
 2021 10 08 CMB01-CAV2_0009;Dép seuil de sécurité RF;Filtré;Beam NON
-2021 10 25 CMB01-CAV2_0001;Dép seuil de sécurité RF;Ucav max
-2021 10 25 CMB01-CAV2_0002;Dép seuil de sécurité RF;Ucav max
-2021 10 25 CMB01-CAV2_0003;Dép seuil de sécurité RF;Ucav max
+2021 10 25 CMB01-CAV2_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.69 MV/m
+2021 10 25 CMB01-CAV2_0002;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 10 25 CMB01-CAV2_0003;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
 2021 10 26 CMB01-CAV2_0001;Dép seuil de sécurité RF;Filtré;KPI < 10.0
 2021 11 05 CMB01-CAV2_0001;Dép seuil de sécurité RF;Filtré;Beam NON
 2021 11 05 CMB01-CAV2_0007;Dép seuil de sécurité RF;Filtré;Beam NON
@@ -599,9 +599,9 @@ Fichier;Defaut;Label;Détails
 2021 11 05 CMB01-CAV2_0016;Dép seuil de sécurité RF;Filtré;Beam NON
 2021 11 05 CMB01-CAV2_0018;Dép seuil de sécurité RF;Filtré;Beam NON
 2021 11 05 CMB01-CAV2_0022;Dép seuil de sécurité RF;Filtré;Beam NON
-2021 11 17 CMB01-CAV2_0002;Dép seuil de sécurité RF;Ucav max
-2021 11 17 CMB01-CAV2_0003;Dép seuil de sécurité RF;Ucav max
-2021 11 17 CMB01-CAV2_0004;Dép seuil de sécurité RF;Ucav max
+2021 11 17 CMB01-CAV2_0002;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 17 CMB01-CAV2_0003;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
+2021 11 17 CMB01-CAV2_0004;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.70 MV/m
 2021 06 17 CMB02-CAV1_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 07 20 CMB02-CAV1_0002;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 07 20 CMB02-CAV1_0003;Rég signal RF hors tolérance;Filtré;Beam NON
@@ -670,54 +670,54 @@ Fichier;Defaut;Label;Détails
 2021 09 28 CMB02-CAV1_0001;Rég signal RF hors tolérance;Oscillation Ucav;Fréquence : 73 Hz
 2021 09 28 CMB02-CAV1_0002;Rég signal RF hors tolérance;Anomalie liée au faisceau
 2021 09 28 CMB02-CAV1_0003;Rég signal RF hors tolérance;Filtré;KPI < 10.0
-2021 11 26 CMB02-CAV1_0001;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0002;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0003;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0004;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0005;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0006;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0007;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0008;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0009;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0010;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0011;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0012;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0013;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0014;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0015;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0016;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0017;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0018;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0019;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0020;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0021;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0022;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0023;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0024;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0025;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0026;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0027;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0028;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0029;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0030;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0031;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0032;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0033;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0034;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0035;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0036;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0037;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0038;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0039;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0040;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0041;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0042;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0043;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0044;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0045;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0046;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0047;Dép seuil de sécurité RF;Ucav max
-2021 11 26 CMB02-CAV1_0048;Dép seuil de sécurité RF;Ucav max
+2021 11 26 CMB02-CAV1_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0002;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0003;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0004;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0005;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0006;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0007;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0008;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0009;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0010;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0011;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0012;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0013;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0014;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0015;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0016;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0017;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0018;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0019;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0020;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0021;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0022;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0023;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0024;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0025;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0026;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0027;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0028;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0029;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0030;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0031;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0032;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0033;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0034;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0035;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0036;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0037;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0038;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0039;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0040;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0041;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0042;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0043;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0044;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0045;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
+2021 11 26 CMB02-CAV1_0046;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0047;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
+2021 11 26 CMB02-CAV1_0048;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.52 MV/m
 2021 06 17 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 07 16 CMB02-CAV2_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 07 21 CMB02-CAV2_0003;Rég signal RF hors tolérance;Filtré;Beam NON
@@ -781,7 +781,7 @@ Fichier;Defaut;Label;Détails
 2021 09 21 CMB03-CAV1_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2021 09 21 CMB03-CAV1_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2021 09 29 CMB03-CAV1_0002;Dép seuil de sécurité RF;Filtré;KPI < 10.0
-2021 11 26 CMB03-CAV1_0001;Dép seuil de sécurité RF;Ucav max
+2021 11 26 CMB03-CAV1_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 8.53 MV/m
 2021 11 30 CMB03-CAV1_0001;Dép seuil de sécurité RF;Filtré;KPI < 10.0
 2021 06 17 CMB03-CAV2_0001;Rég signal RF hors tolérance;Filtré;Beam NON
 2021 06 28 CMB03-CAV2_0002;Rég signal RF hors tolérance;Filtré;Beam NON

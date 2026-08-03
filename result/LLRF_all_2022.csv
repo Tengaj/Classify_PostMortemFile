@@ -1150,7 +1150,7 @@ Fichier;Defaut;Label;Détails
 2022 09 25 CMB06-CAV2_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2022 09 25 CMB06-CAV2_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2022 09 25 CMB06-CAV2_0004;Rég signal RF hors tolérance;Filtré;KPI < 10.0
-2022 09 30 CMB06-CAV2_0001;Dép seuil de sécurité RF;Ucav max
+2022 09 30 CMB06-CAV2_0001;Dép seuil de sécurité RF;Ucav max;Valeur de Ucav : 6.52 MV/m
 2022 09 30 CMB06-CAV2_0002;Rég signal RF hors tolérance;Anomalie liée au faisceau
 2022 09 30 CMB06-CAV2_0003;Rég signal RF hors tolérance;Anomalie liée au faisceau
 2022 09 30 CMB06-CAV2_0004;Rég signal RF hors tolérance;Filtré;KPI < 10.0

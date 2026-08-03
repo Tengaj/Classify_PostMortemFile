@@ -126,6 +126,9 @@ def _check_quench_signatures(time, Ucav, Uci, Ucr, t0_zscore_idx, start_idx_Uci_
     # Définitions des fenêtres
     start_idx_large = start_idx_Uci_rise
 
+    if (t0_ampt_idx - start_idx_large) < 2:
+        return None
+        
     t_win_large   = time[start_idx_large:t0_ampt_idx]
     Uci_win_large = Uci.iloc[start_idx_large:t0_ampt_idx]
     Ucr_win_large = Ucr.iloc[start_idx_large:t0_ampt_idx]
@@ -541,7 +544,7 @@ def classify_Ecav_Instability(time, Uci, Ucr, Ucav, modIQ, beam_presence, file_n
     # Si aucune condition n'est remplie
     return "Autre"
 
-def classify_RF_protections(time, Ucav, Ucat):
+def classify_RF_protections(time, Ucav, Ucr, Ucat):
     """
     Classifie le défaut "Dép seuil de sécurité RF" en comparant la valeur de la tension (Ucav) par rapport au seuil maximal (Ucat). 
     """
@@ -567,9 +570,13 @@ def classify_RF_protections(time, Ucav, Ucat):
     threshold_ucav_max = CONFIG.get("thresholds", {}).get("rf_protection", {}).get("threshold_ucav_max", 8.5)
     
     if max_ratio > threshold_ucav_max:
-        return "Ucav max"
+        text_Ucav = f";Valeur de Ucav : {max_Ucav:.2f} MV/m"
+        return f"Ucav max{text_Ucav}"
     else:
-        return "Pr max"
+        search_window = Ucr.iloc[start_idx:end_idx]
+        max_Ucr = search_window.max()
+        text_ucr = f";Valeur de Ucr : {max_Ucr:.2f} MV/m"
+        return f"Pr max{text_ucr}"
 
 def classify_vacuum(pickup, void, zero_idx):
     """
@@ -735,7 +742,8 @@ def classify_signals(file_name, header, time, df_signals, df_defaults, filter=Tr
 
         case "Dép seuil de sécurité RF":
             Ucat = header.get("UCAT").get("Valeur")
-            label = classify_RF_protections(time, Ucav, Ucat)
+            Ucr = df_signals.get("A Ucr") 
+            label = classify_RF_protections(time, Ucav, Ucr, Ucat)
             final_label = f"{primary_fault};{label}"
 
         case "Rég signal RF hors tolérance":
