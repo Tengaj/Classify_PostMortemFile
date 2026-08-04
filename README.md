@@ -1,6 +1,6 @@
 # Classification automatique des défauts dans les cavités supraconductrices RF de SPIRAL 2
 
-Ce projet permet l'analyse post-mortem et la classification automatique des signaux LLRF (Low Level Radio Frequency). Il traite les données brutes pour identifier la nature physique des pannes. Il permet une analyse annuelle ou complète des fichiers post-mortem. 
+Ce projet permet l'analyse post-mortem et la classification automatique des signaux LLRF (Low Level Radio Frequency) du GANIL. Il traite les données brutes pour identifier la nature physique des pannes. Il permet une analyse annuelle ou complète des fichiers post-mortem. 
 
 ## Prérequis
 
