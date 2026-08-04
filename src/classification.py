@@ -725,10 +725,10 @@ def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
         # Cas A : Tension presque nulle en moyenne avant le défaut
         if Ucav_before_t0.empty:
             if Ucav.iloc[zero_idx] < ucav_min:
-                return f"Filtré;Ucav < {ucav_min}"
+                return f"Filtré;Ucav < {ucav_min} MV/m"
         else:
             if np.mean(Ucav_before_t0) < ucav_min:
-                return f"Filtré;Ucav moyenne < {ucav_min}"
+                return f"Filtré;Ucav moyenne < {ucav_min} MV/m"
 
         # Cas B : Tension qui tombe trop bas pendant un certain temps avant t0
         required_points = max(2, int(max_duration_us / dt_us))
@@ -736,7 +736,7 @@ def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
         
         if len(Ucav_before_t0) >= required_points:
             if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-                return f"Filtré;Ucav < {ucav_min} avant t0"
+                return f"Filtré;Ucav < {ucav_min} MV/m avant t0"
 
 def classify_signals(file_name, header, time, df_signals, df_defaults, filter=True):
     """
