@@ -55,6 +55,8 @@ def _run_analysis_engine(files_list):
             for future in as_completed(future_to_file):
                 file_path, label, msg = future.result()
                 # print(msg)  # Décommenter si besoin de logs en temps réel
+                if "Erreur :" in "msg":
+                    print(msg)
                 if label is not None:
                     results[file_path] = label
     else:
@@ -62,6 +64,8 @@ def _run_analysis_engine(files_list):
         for f in files_list:
             file_path, label, msg = _process_file_worker(f)
             # print(msg) # Décommenter si besoin de logs
+            if "Erreur :" in "msg":
+                print(msg)
             if label is not None:
                 results[file_path] = label
                 

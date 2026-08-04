@@ -170,6 +170,11 @@ def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
     Détecte t0, le moment ou le signal signal sort de son amplitude moyenne avec un Z-score.
     - z_threshold : Nombre d'écarts-types pour déclencher l'alarme (5 est standard).
     """
+    # Protection signal trop court
+    if len(signal) < 20:
+        zero_idx = np.argmin(np.abs(signal.index)) if not signal.empty else 0
+        return zero_idx, (signal.index[zero_idx] if not signal.empty else None)
+
     zero_idx = np.argmin(np.abs(signal.index))
 
     # Baseline et zone sûre
@@ -180,7 +185,8 @@ def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
 
     # Z-score d'amplitude
     all_stds_amp = safe_zone.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
-    signal_std = max(all_stds_amp.min(), 1e-6)
+    min_std_amp = all_stds_amp.min()
+    signal_std = max(min_std_amp if pd.notna(min_std_amp) else 1e-6, 1e-6)
     z_scores_amp = abs((signal - signal_mean) / signal_std)
 
     # Z-score différentiel (dérivée)
@@ -190,9 +196,14 @@ def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
     all_stds_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).std()
     all_means_diff = safe_zone_diff.rolling(window=search_window, min_periods=int(search_window*0.5)).mean()
     
-    best_idx_diff = all_stds_diff.idxmin()
-    diff_std = max(all_stds_diff[best_idx_diff], 1e-6)
-    diff_mean = all_means_diff[best_idx_diff]
+    if all_stds_diff.isna().all():
+        # S'il n'y a que des NaN (fichier très court), on met des valeurs neutres
+        diff_std = 1e-6
+        diff_mean = 0
+    else:
+        best_idx_diff = all_stds_diff.idxmin()
+        diff_std = max(all_stds_diff[best_idx_diff], 1e-6)
+        diff_mean = all_means_diff[best_idx_diff]
     
     z_scores_diff = abs((signal_diff - diff_mean) / diff_std)
 
@@ -205,9 +216,6 @@ def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
     
     is_anomaly_bin = (target_z_scores > z_threshold).astype(int)
 
-    future_window = is_anomaly_bin.iloc[::-1].rolling(window=min_consecutive).min().iloc[::-1]
-    valid_anomaly_starts = (future_window == 1)
-
     #On vérifie si les N prochains points sont anormaux en regardant vers l'avant avec un décalage négatif
     valid_anomaly_starts = is_anomaly_bin.rolling(window=min_consecutive).min().shift(-(min_consecutive - 1)) == 1
     
@@ -215,7 +223,8 @@ def detect_t0_zscore(signal, z_threshold=5.0, calm = True):
 
     # On extrait uniquement les Z-scores qui démarrent une vraie chute
     if anomalies.empty:
-        return zero_idx-10000, None
+        safe_return_idx = max(0, zero_idx - 10000)
+        return safe_return_idx, None
 
     # Le filtre calme
     if calm:

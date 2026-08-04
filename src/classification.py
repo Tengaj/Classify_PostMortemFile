@@ -458,7 +458,13 @@ def _check_wrong_alarm_anomalies(time, Uci, Ucr, modIQ):
         return None
 
     # Extraction des niveaux calmes juste avant la coupure
-    ucr_before = np.median(Ucr.iloc[idx_before_start:idx_before_end])
+    ucr_window = Ucr.iloc[idx_before_start:idx_before_end]
+    
+    if ucr_window.empty:
+        fallback_idx = max(0, zero_idx - 1)
+        ucr_before = Ucr.iloc[fallback_idx]
+    else:
+        ucr_before = np.median(ucr_window)
 
     # Extraction des extrêmes atteints juste après la coupure
     uci_after = Uci.iloc[idx_after_start:idx_after_end].min()
@@ -717,15 +723,20 @@ def _check_filters(file_name, header, time, Ucav, zero_idx, ampt):
         Ucav_before_t0 = Ucav.iloc[:zero_idx]
 
         # Cas A : Tension presque nulle en moyenne avant le défaut
-        if np.mean(Ucav_before_t0) < ucav_min:
-            return f"Filtré;Tension moyenne < {ucav_min}"
+        if Ucav_before_t0.empty:
+            if Ucav.iloc[zero_idx] < ucav_min:
+                return f"Filtré;Tension < {ucav_min}"
+        else:
+            if np.mean(Ucav_before_t0) < ucav_min:
+                return f"Filtré;Tension moyenne < {ucav_min}"
 
         # Cas B : Tension qui tombe trop bas pendant un certain temps avant t0
         required_points = max(2, int(max_duration_us / dt_us))
         drop_mask = Ucav_before_t0 < ucav_min
         
-        if drop_mask.rolling(window=required_points).sum().max() >= required_points:
-            return f"Filtré;Tension < {ucav_min} avant t0"
+        if len(Ucav_before_t0) >= required_points:
+            if drop_mask.rolling(window=required_points).sum().max() >= required_points:
+                return f"Filtré;Tension < {ucav_min} avant t0"
 
 def classify_signals(file_name, header, time, df_signals, df_defaults, filter=True):
     """
