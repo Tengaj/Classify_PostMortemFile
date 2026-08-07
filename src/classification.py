@@ -665,7 +665,7 @@ def classify_quench(Ucav, t0_ampt_idx):
     threshold_false_alarm = min_false_alarm_us
 
     # Classification
-    fall_time_str = f";Temps de chute : {delta_t:.2f} us"
+    fall_time_str = f";Temps de chute à {target_pct * 100:.0f}% : {delta_t:.2f} us"
 
     if delta_t <= threshold_breakdown:
         return f"Claquage{fall_time_str}"
@@ -777,7 +777,7 @@ def classify_signals(file_name, header, time, df_signals, df_defaults, filter=Tr
             final_label = f"{primary_fault};{label}"
         
         case "Claquage ou quench cavité":
-            label = classify_quench(Ucav, t0_ampt_idx)
+            label = classify_quench(Ucav, zero_idx)
             final_label = f"{primary_fault};{label}" 
 
         case "Dép seuil de sécurité RF":

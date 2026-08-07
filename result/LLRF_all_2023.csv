@@ -8,7 +8,7 @@ Fichier;Defaut;Label;Détails
 2023 11 09 CMA01_0005;Rég signal RF hors tolérance;Fausse alerte
 2023 11 16 CMA01_0006;Rég signal RF hors tolérance;Fausse alerte
 2023 11 16 CMA01_0007;Rég signal RF hors tolérance;Filtré;AMPT > 10.0%
-2023 07 28 CMA02_0003;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
+2023 07 28 CMA02_0003;Claquage ou quench cavité;Claquage;Temps de chute à 50% : 11.36 us
 2023 08 31 CMA02_0001;Seuil de vide;Filtré;Beam NON
 2023 08 31 CMA02_0002;Seuil de vide;Filtré;Beam NON
 2023 10 19 CMA02_0003;Seuil de vide;Filtré;Loop OFF
@@ -67,7 +67,7 @@ Fichier;Defaut;Label;Détails
 2023 11 09 CMA04_0004;Rég signal RF hors tolérance;Filtré;Beam NON
 2023 11 14 CMA04_0002;Seuil de vide;Filtré;Beam NON
 2023 11 14 CMA04_0003;Rég signal RF hors tolérance;Filtré;Beam NON
-2023 07 28 CMA05_0006;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1578.60 us
+2023 07 28 CMA05_0006;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50% : 1578.60 us
 2023 08 17 CMA05_0007;Rég signal RF hors tolérance;Filtré;Beam NON
 2023 09 01 CMA05_0002;Rég signal RF hors tolérance;Filtré;AMPT > 10.0%
 2023 10 19 CMA05_0005;Rég signal RF hors tolérance;Perte faisceau
@@ -116,7 +116,7 @@ Fichier;Defaut;Label;Détails
 2023 07 28 CMA10_0005;Claquage ou quench cavité;Filtré;Beam NON
 2023 10 19 CMA10_0004;Seuil de vide;Filtré;Beam NON
 2023 08 11 CMA11_0009;Rég signal RF hors tolérance;Fausse alerte
-2023 08 11 CMA11_0012;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
+2023 08 11 CMA11_0012;Claquage ou quench cavité;Claquage;Temps de chute à 50% : 11.36 us
 2023 11 09 CMA11_0002;Seuil de vide;;Courant pickup moyen avant t0 : -33.056 μA, Vide à t0 : 6.984e-06 mbar
 2023 07 28 CMA12_0005_D Signal RF hors tolérance;Rég signal RF hors tolérance;Oscillation Ucav;Fréquence : 4454 Hz, Excès de puissance (209%)
 2023 07 28 CMA12_0006_D Signal RF hors tolérance;Rég signal RF hors tolérance;Oscillation Ucav;Fréquence : 5364 Hz, Excès de puissance (37%)

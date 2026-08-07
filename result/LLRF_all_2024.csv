@@ -12,7 +12,7 @@ Fichier;Defaut;Label;Détails
 2024 11 08 CMA01_0001;Rég signal RF hors tolérance;Gain chaîne de puissance;Pic modIQ : +174%
 2024 11 08 CMA01_0002;Rég signal RF hors tolérance;Filtré;Loop OFF
 2024 11 18 CMA01_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
-2024 11 18 CMA01_0002;Rég signal RF hors tolérance;Filtré;Tension < 0.1 avant t0
+2024 11 18 CMA01_0002;Rég signal RF hors tolérance;Filtré;Ucav < 0.1 MV/m avant t0
 2024 11 25 CMA01_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2024 11 29 CMA01_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2024 09 19 CMA02_0001;Rég signal RF hors tolérance;Filtré;Loop OFF
@@ -163,7 +163,7 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMA10_0008;Rég signal RF hors tolérance;Filtré;Loop OFF
 2024 10 28 CMA10_0001;Claquage ou quench cavité;Filtré;Loop OFF
 2024 10 28 CMA10_0002;Claquage ou quench cavité;Filtré;Loop OFF
-2024 11 04 CMA10_0003 quench rapide;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
+2024 11 04 CMA10_0003 quench rapide;Claquage ou quench cavité;Claquage;Temps de chute à 50% : 11.36 us
 2024 11 04 CMA10_0004;Rég signal RF hors tolérance;Quench;Temps de chute : 6825.47 us
 2024 11 08 CMA10_0001;Rég signal RF hors tolérance;Gain chaîne de puissance;Pic modIQ : +326%
 2024 11 08 CMA10_0002;Rég signal RF hors tolérance;Gain chaîne de puissance;Pic modIQ : +307%
@@ -295,7 +295,7 @@ Fichier;Defaut;Label;Détails
 2024 10 24 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2024 10 24 CMB07-CAV1_0003;Rég signal RF hors tolérance;Filtré;Loop OFF
 2024 10 24 CMB07-CAV1_0005;Rég signal RF hors tolérance;Filtré;KPI < 10.0
-2024 11 08 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtré;Tension < 0.1 avant t0
+2024 11 08 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtré;Ucav < 0.1 MV/m avant t0
 2024 11 08 CMB07-CAV1_0004;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2024 11 27 CMB07-CAV1_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2024 11 27 CMB07-CAV1_0002;Rég signal RF hors tolérance;Filtré;KPI < 10.0

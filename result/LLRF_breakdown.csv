@@ -1,92 +1,92 @@
 Fichier;Annee;Defaut;Label;Détails
-2020 07 15 CMA02_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 07 24 CMA02_0003;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 07 28 CMA02_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 07 30 CMA02_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 09 23 CMA02_0013;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 07 27 CMA05_0002;2020;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1760.31 us
-2020 09 24 CMA07_0002;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 09 24 CMA09_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 09 24 CMA10_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 09 18 CMA11_0007;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 12 02 CMA11_0006;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 07 27 CMB05-CAV1_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2020 07 27 CMB05-CAV2_0003;2020;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 06 23 CMA02_0001 coupure à 99%;2021;Claquage ou quench cavité;Claquage;Temps de chute : 22.71 us
-2021 11 26 CMA02_0002;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2339.51 us
-2021 06 23 CMA04_0001 coupure sur quench à Ec=8.5;2021;Claquage ou quench cavité;Claquage;Temps de chute : 22.71 us
-2021 06 28 CMA05_0001;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1771.67 us
-2021 06 29 CMA05_0001 faux quench à 8MVpm;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1714.89 us
-2021 10 22 CMA05_0002 faux quench à 2MVm;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1419.61 us
-2021 06 28 CMA08_0002 arret sur defaut quench;2021;Claquage ou quench cavité;Claquage;Temps de chute : 17.04 us
-2021 06 28 CMA08_0003;2021;Claquage ou quench cavité;Claquage;Temps de chute : 17.04 us
-2021 06 28 CMA08_0004;2021;Claquage ou quench cavité;Claquage;Temps de chute : 17.04 us
-2021 06 17 CMA10_0008;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 06 17 CMA10_0009;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute : 6814.12 us
+2020 07 15 CMA02_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 07 24 CMA02_0003;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 07 28 CMA02_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 07 30 CMA02_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 09 23 CMA02_0013;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 07 27 CMA05_0002;2020;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1760.31 us
+2020 09 24 CMA07_0002;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 09 24 CMA09_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 09 24 CMA10_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 09 18 CMA11_0007;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 12 02 CMA11_0006;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 07 27 CMB05-CAV1_0001;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2020 07 27 CMB05-CAV2_0003;2020;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 06 23 CMA02_0001 coupure à 99%;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 22.71 us
+2021 11 26 CMA02_0002;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1237.90 us
+2021 06 23 CMA04_0001 coupure sur quench à Ec=8.5;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 22.71 us
+2021 06 28 CMA05_0001;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1771.67 us
+2021 06 29 CMA05_0001 faux quench à 8MVpm;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1714.89 us
+2021 10 22 CMA05_0002 faux quench à 2MVm;2021;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1419.61 us
+2021 06 28 CMA08_0002 arret sur defaut quench;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 17.04 us
+2021 06 28 CMA08_0003;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 17.04 us
+2021 06 28 CMA08_0004;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 17.04 us
+2021 06 17 CMA10_0008;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 06 17 CMA10_0009;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
 2021 09 03 CMB05-CAV2_0008;2021;Claquage ou quench cavité;Autre;Incomplet (Pas de chute à 50%)
-2021 11 19 CMB07-CAV2_0001;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 11 19 CMB07-CAV2_0002;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 11 19 CMB07-CAV2_0004;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 11 19 CMB07-CAV2_0005;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 11 19 CMB07-CAV2_0006;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2021 11 19 CMB07-CAV2_0007;2021;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 09 16 CMA09_0001;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 11 09 CMA10_0005;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 11 09 CMA10_0006;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 09 06 CMA11_0001;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 20 CMA11_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 04 CMB01-CAV2_0001;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1987.45 us
-2022 10 04 CMB01-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1987.45 us
-2022 10 04 CMB01-CAV2_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 04 CMB01-CAV2_0004;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1987.45 us
-2022 10 07 CMB01-CAV2_0026 defaut quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1976.09 us
-2022 10 07 CMB01-CAV2_0045;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1976.09 us
-2022 10 07 CMB01-CAV2_0059 defaut quench;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 07 CMB01-CAV2_0060;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 12 CMB01-CAV2_0008;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 3679.62 us
-2022 10 12 CMB01-CAV2_0017;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 4463.25 us
-2022 10 12 CMB01-CAV2_0018;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 4485.96 us
-2022 10 14 CMB01-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1976.09 us
-2022 08 23 CMB07-CAV2_0008;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 09 20 CMB07-CAV2_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 09 22 CMB07-CAV2_0003;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 09 25 CMB07-CAV2_0007 faux quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 09 30 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 10 04 CMB07-CAV2_0001;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 10 07 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 07 CMB07-CAV2_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 07 CMB07-CAV2_0005;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2180.52 us
-2022 10 07 CMB07-CAV2_0006;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 14 CMB07-CAV2_0005;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 14 CMB07-CAV2_0006;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 14 CMB07-CAV2_0007;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 10 17 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 10 19 CMB07-CAV2_0001;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 10 19 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 10 21 CMB07-CAV2_0001;2022;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2022 11 29 CMB07-CAV2_0006 defaut quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 12 05 CMB07-CAV2_0001 défaut quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2022 12 08 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2203.23 us
-2023 07 28 CMA02_0003;2023;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2023 07 28 CMA05_0006;2023;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1578.60 us
-2023 07 28 CMA10_0005;2023;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2023 08 11 CMA11_0012;2023;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 24 CMA08_0017_D Claquage ou quench cavité;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 24 CMA09_0004;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 24 CMA09_0005;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 24 CMA09_0006;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 28 CMA10_0001;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1340.11 us
-2024 10 28 CMA10_0002;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute : 474024.02 us
-2024 11 04 CMA10_0003 quench rapide;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 28 CMA11_0002;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 28 CMA11_0003;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 28 CMA11_0004;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute : 7404.67 us
-2024 10 24 CMB01-CAV1_0004 faux quench rapide cavité OFF;2024;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2024 10 24 CMB01-CAV1_0005;2024;Claquage ou quench cavité;Quench;Temps de chute : 999.40 us
-2025 10 23 CMB01-CAV1_0001;2025;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
-2025 10 17 CMB01-CAV2_0004;2025;Claquage ou quench cavité;Fausse alarme;Temps de chute : 1760.31 us
-2026 07 01 CMA09_0003;2026;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
+2021 11 19 CMB07-CAV2_0001;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 11 19 CMB07-CAV2_0002;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 11 19 CMB07-CAV2_0004;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 11 19 CMB07-CAV2_0005;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 11 19 CMB07-CAV2_0006;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2021 11 19 CMB07-CAV2_0007;2021;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 09 16 CMA09_0001;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 11 09 CMA10_0005;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 11 09 CMA10_0006;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 09 06 CMA11_0001;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 20 CMA11_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 04 CMB01-CAV2_0001;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1987.45 us
+2022 10 04 CMB01-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1987.45 us
+2022 10 04 CMB01-CAV2_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 04 CMB01-CAV2_0004;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1987.45 us
+2022 10 07 CMB01-CAV2_0026 defaut quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1976.09 us
+2022 10 07 CMB01-CAV2_0045;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1976.09 us
+2022 10 07 CMB01-CAV2_0059 defaut quench;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 07 CMB01-CAV2_0060;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 12 CMB01-CAV2_0008;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1260.61 us
+2022 10 12 CMB01-CAV2_0017;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1271.97 us
+2022 10 12 CMB01-CAV2_0018;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1215.18 us
+2022 10 14 CMB01-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1976.09 us
+2022 08 23 CMB07-CAV2_0008;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 09 20 CMB07-CAV2_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 09 22 CMB07-CAV2_0003;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 09 25 CMB07-CAV2_0007 faux quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 09 30 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 10 04 CMB07-CAV2_0001;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 10 07 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 07 CMB07-CAV2_0003;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 07 CMB07-CAV2_0005;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2180.52 us
+2022 10 07 CMB07-CAV2_0006;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 14 CMB07-CAV2_0005;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 14 CMB07-CAV2_0006;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 14 CMB07-CAV2_0007;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 10 17 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 10 19 CMB07-CAV2_0001;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 10 19 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 10 21 CMB07-CAV2_0001;2022;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2022 11 29 CMB07-CAV2_0006 defaut quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 12 05 CMB07-CAV2_0001 défaut quench;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2022 12 08 CMB07-CAV2_0002;2022;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2203.23 us
+2023 07 28 CMA02_0003;2023;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2023 07 28 CMA05_0006;2023;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1578.60 us
+2023 07 28 CMA10_0005;2023;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2023 08 11 CMA11_0012;2023;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 24 CMA08_0017_D Claquage ou quench cavité;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 24 CMA09_0004;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 24 CMA09_0005;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 24 CMA09_0006;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 28 CMA10_0001;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1340.11 us
+2024 10 28 CMA10_0002;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 474024.02 us
+2024 11 04 CMA10_0003 quench rapide;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 28 CMA11_0002;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 28 CMA11_0003;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 28 CMA11_0004;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 7404.67 us
+2024 10 24 CMB01-CAV1_0004 faux quench rapide cavité OFF;2024;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2024 10 24 CMB01-CAV1_0005;2024;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 13128.53 us
+2025 10 23 CMB01-CAV1_0001;2025;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
+2025 10 17 CMB01-CAV2_0004;2025;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 1760.31 us
+2026 07 01 CMA09_0003;2026;Claquage ou quench cavité;Claquage;Temps de chute à 50.0% : 11.36 us
 2026 06 16 CMB02-CAV2_0015;2026;Claquage ou quench cavité;Autre;Incomplet (Pas de chute à 50%)
 2026 06 16 CMB02-CAV2_0024;2026;Claquage ou quench cavité;Autre;Incomplet (Pas de chute à 50%)
 2026 06 16 CMB02-CAV2_0033;2026;Claquage ou quench cavité;Autre;Incomplet (Pas de chute à 50%)
-2026 06 26 CMB07-CAV2_0001;2026;Claquage ou quench cavité;Fausse alarme;Temps de chute : 2180.52 us
+2026 06 26 CMB07-CAV2_0001;2026;Claquage ou quench cavité;Fausse alarme;Temps de chute à 50.0% : 2180.52 us

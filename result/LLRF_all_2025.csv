@@ -25,7 +25,7 @@ Fichier;Defaut;Label;Détails
 2025 10 14 CMB01-CAV1_0005;Rég signal RF hors tolérance;Autre;Pic modIQ ou Uci
 2025 10 17 CMB01-CAV1_0003;Rég signal RF hors tolérance;Oscillation Ucav;Fréquence : 96 Hz, Excès de puissance (161%)
 2025 10 20 CMB01-CAV1_0001;Rég signal RF hors tolérance;Oscillation Ucav;Fréquence : 49 Hz, Excès de puissance (161%)
-2025 10 23 CMB01-CAV1_0001;Claquage ou quench cavité;Claquage;Temps de chute : 11.36 us
+2025 10 23 CMB01-CAV1_0001;Claquage ou quench cavité;Claquage;Temps de chute à 50% : 11.36 us
 2025 10 15 CMB01-CAV2_0002;Rég signal RF hors tolérance;Fausse alerte
 2025 10 17 CMB01-CAV2_0003;Rég signal RF hors tolérance;Fausse alerte
 2025 10 17 CMB01-CAV2_0004;Claquage ou quench cavité;Filtré;Beam NON
