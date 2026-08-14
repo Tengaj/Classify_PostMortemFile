@@ -130,7 +130,7 @@ Fichier;Defaut;Label;Détails
 2026 07 04 CMB01-CAV2_0001;Rég signal RF hors tolérance;Fausse alerte
 2026 07 09 CMB01-CAV2_0002;Rég signal RF hors tolérance;Fausse alerte
 2026 07 17 CMB01-CAV2_0002;Rég signal RF hors tolérance;Fausse alerte
-2026 07 17 CMB01-CAV2_0003;Rég signal RF hors tolérance;Anomalie liée au faisceau
+2026 07 17 CMB01-CAV2_0003;Rég signal RF hors tolérance;Anomalie de la présence faisceau
 2026 06 04 CMB02-CAV1_0001;Dép seuil de sécurité RF;Filtré;KPI < 10.0
 2026 06 16 CMB02-CAV1_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
 2026 06 18 CMB02-CAV1_0001;Rég signal RF hors tolérance;Filtré;KPI < 10.0
@@ -254,7 +254,7 @@ Fichier;Defaut;Label;Détails
 2026 07 05 CMB05-CAV1_0002;Rég signal RF hors tolérance;Filtré;Loop OFF
 2026 07 05 CMB05-CAV1_0003;Rég signal RF hors tolérance;Filtré;Loop OFF
 2026 07 08 CMB05-CAV1_0003;Rég signal RF hors tolérance;Fausse alerte
-2026 07 09 CMB05-CAV1_0002;Rég signal RF hors tolérance;Anomalie liée au faisceau
+2026 07 09 CMB05-CAV1_0002;Rég signal RF hors tolérance;Anomalie de la présence faisceau
 2026 07 09 CMB05-CAV1_0003;Rég signal RF hors tolérance;Filtré;Loop OFF
 2026 07 09 CMB05-CAV1_0004;Rég signal RF hors tolérance;Gain chaîne de puissance;Pic modIQ : +260%
 2026 07 09 CMB05-CAV1_0005;Rég signal RF hors tolérance;Fausse alerte
@@ -270,7 +270,7 @@ Fichier;Defaut;Label;Détails
 2026 07 05 CMB05-CAV2_0002;Rég signal RF hors tolérance;Filtré;Loop OFF
 2026 07 05 CMB05-CAV2_0003;Rég signal RF hors tolérance;Autre;Pic modIQ ou Uci
 2026 07 08 CMB05-CAV2_0003;Rég signal RF hors tolérance;Filtré;Loop OFF
-2026 07 09 CMB05-CAV2_0002;Rég signal RF hors tolérance;Anomalie liée au faisceau
+2026 07 09 CMB05-CAV2_0002;Rég signal RF hors tolérance;Anomalie de la présence faisceau
 2026 07 09 CMB05-CAV2_0003;Rég signal RF hors tolérance;Filtré;Loop OFF
 2026 07 09 CMB05-CAV2_0004;Rég signal RF hors tolérance;Fausse alerte
 2026 07 09 CMB05-CAV2_0005;Rég signal RF hors tolérance;Filtré;Beam NON

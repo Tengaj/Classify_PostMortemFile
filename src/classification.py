@@ -341,7 +341,7 @@ def _check_beam_anomalies(beam_presence, t0_zscore_idx):
         
         # Le faisceau est présent au moins 2 points mais il n'est pas parfaitement stable
         if points_on >= 2 and points_on < total_points:
-            return "Anomalie liée au faisceau"
+            return "Anomalie de la présence faisceau"
             
     return None
 
